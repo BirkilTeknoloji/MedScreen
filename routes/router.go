@@ -12,9 +12,7 @@ func SetupRoutes(r *gin.Engine) {
 
 		v1.POST("/users", controllers.CreateUser)
 		v1.GET("/users/:id", controllers.GetUserByID)
-		v1.DELETE("/users/:id", controllers.DeleteUserByID)
-		v1.GET("/users", controllers.GetAllUsers)
-		v1.GET("/users/card/:card_id", controllers.GetUserByCardID)
+
 	}
 
 }
