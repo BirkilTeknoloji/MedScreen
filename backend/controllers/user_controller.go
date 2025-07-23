@@ -1,48 +1,60 @@
 package controllers
 
 import (
-	"go-backend/models"
 	"go-backend/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Tüm kullanıcıları getir
-func GetUsers(c *gin.Context) {
-	users := services.GetAllUsers()
-	c.JSON(http.StatusOK, users)
-}
-
-// Yeni kullanıcı oluştur
 func CreateUser(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
+	var input struct {
+		Name   string `json:"Name" binding:"required"`
+		Role   string `json:"Role" binding:"required"`
+		CardID string `json:"CardID" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Tüm alanlar gereklidir"})
+		return
+	}
+
+	user, err := services.CreateUser(input.Name, input.Role, input.CardID)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	result := services.CreateUser(user)
-	c.JSON(http.StatusCreated, result)
+	c.JSON(http.StatusCreated, user)
 }
 
-// Belirli kullanıcıyı getir
 func GetUserByID(c *gin.Context) {
-	id := c.Param("id")
-	user, err := services.GetUserByID(id)
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz ID"})
+		return
+	}
+
+	user, err := services.GetUserByID(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Kullanıcı bulunamadı"})
 		return
 	}
+
 	c.JSON(http.StatusOK, user)
 }
 
-// Belirli kullanıcıyı sil
-func DeleteUser(c *gin.Context) {
-	id := c.Param("id")
-	if err := services.DeleteUser(id); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Kullanıcı silinemedi"})
+func GetUserByCardID(c *gin.Context) {
+	cardID := c.Param("card_id")
+
+	user, err := services.GetUserByCardID(cardID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Kart ile eşleşen kullanıcı bulunamadı"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Kullanıcı silindi"})
+
+	c.JSON(http.StatusOK, user)
 }
