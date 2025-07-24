@@ -3,18 +3,17 @@ package routes
 import (
 	"go-backend/controllers"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-func SetupRoutes(r *gin.Engine) {
-	v1 := r.Group("/api/v1")
-	{
+func SetupRoutes(app *fiber.App) {
+	// Rotaları gruplamak için (örneğin /api/v1)
+	api := app.Group("/api/v1")
 
-		v1.POST("/users", controllers.CreateUser)
-		v1.GET("/users/:id", controllers.GetUserByID)
-		v1.DELETE("/users/:id", controllers.DeleteUserByID)
-		v1.GET("/users", controllers.GetAllUsers)
-		v1.GET("/users/card/:card_id", controllers.GetUserByCardID)
-	}
-
+	users := api.Group("/users")
+	users.Post("/", controllers.CreateUser)
+	users.Get("/", controllers.GetAllUsers)
+	users.Get("/:id", controllers.GetUserByID)
+	users.Delete("/:id", controllers.DeleteUserByID)
+	users.Get("/card/:card_id", controllers.GetUserByCardID)
 }
