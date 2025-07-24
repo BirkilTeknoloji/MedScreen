@@ -4,8 +4,10 @@ import (
 	"go-backend/config"
 	"go-backend/models"
 	"go-backend/routes"
+	"log"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
@@ -15,12 +17,20 @@ func main() {
 	// Veritabanı tablolarını oluştur (otomatik migrate)
 	config.DB.AutoMigrate(&models.User{})
 
-	// Gin router başlat
-	r := gin.Default()
+	// Fiber app başlat
+	app := fiber.New()
+
+	// Gelen istekleri, durumu, gecikmeyi vb. loglamak için logger middleware'ini kullan.
+	// Daha detaylı bir format için
+	app.Use(logger.New(logger.Config{
+		Format: "[${ip}]:${port} ${status} - ${latency} -${method} ${path}\n",
+	}))
 
 	// Rotaları tanımla
-	routes.SetupRoutes(r)
+	routes.SetupRoutes(app)
 
 	// Uygulamayı çalıştır
-	r.Run(":8080")
+	if err := app.Listen(":8080"); err != nil {
+		log.Fatalf("Fiber app'i başlatırken hata oluştu: %v", err)
+	}
 }
