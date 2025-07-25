@@ -11,7 +11,7 @@ type User struct {
 	CardID string `gorm:"uniqueIndex;not null"`
 
 	// Eğer hasta ise hasta bilgisi olabilir
-	//PatientInfo PatientInfo
+	PatientInfo PatientInfo `gorm:"foreignKey:UserID"`
 }
 
 // type PatientInfo struct {

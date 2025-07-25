@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-backend/models"
 	"go-backend/services"
 	"strconv"
 
@@ -9,18 +10,29 @@ import (
 
 func CreateUser(c *fiber.Ctx) error {
 	var input struct {
-		Name   string `json:"Name" binding:"required"`
-		Role   string `json:"Role" binding:"required"`
-		CardID string `json:"CardID" binding:"required"`
+		Name        string              `json:"Name" validate:"required"`
+		Role        string              `json:"Role" validate:"required"`
+		CardID      string              `json:"CardID" validate:"required"`
+		PatientInfo *models.PatientInfo `json:"PatientInfo,omitempty"`
 	}
 
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Tüm alanlar gereklidir: " + err.Error()})
 	}
 
-	user, err := services.CreateUser(input.Name, input.Role, input.CardID)
+	// Eğer rol "patient" ise ve hasta bilgisi (özellikle TC no) gelmediyse hata ver
+	if input.Role == "patient" && (input.PatientInfo == nil || input.PatientInfo.TCNumber == "") {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Rol 'patient' olduğunda PatientInfo alanı ve TCNumber zorunludur."})
+	}
+
+	// Servis katmanına göndermek için User modelini oluştur
+	userToCreate := models.User{Name: input.Name, Role: input.Role, CardID: input.CardID}
+
+	// Servis fonksiyonunu doğru parametrelerle çağırıyoruz:
+	// Hatalı eski çağrı: services.CreateUser(input.Name, input.Role, input.CardID)
+	user, err := services.CreateUser(userToCreate, input.PatientInfo)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(user)

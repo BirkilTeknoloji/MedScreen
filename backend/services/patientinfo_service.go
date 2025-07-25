@@ -1,0 +1,36 @@
+package services
+
+import (
+	"errors"
+	"fmt"
+	"go-backend/config"
+	"go-backend/models"
+
+	"gorm.io/gorm"
+)
+
+// GetPatientInfoByUserID, verilen kullanıcı ID'sine ait hasta bilgilerini getirir.
+func GetPatientInfoByUserID(userID uint) (models.PatientInfo, error) {
+	var info models.PatientInfo
+	err := config.DB.Where("user_id = ?", userID).First(&info).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return models.PatientInfo{}, errors.New("bu kullanıcıya ait hasta bilgisi bulunamadı")
+	}
+	return info, err
+}
+
+// UpdatePatientInfoByUserID, verilen kullanıcı ID'sine ait hasta bilgilerini günceller.
+func UpdatePatientInfoByUserID(userID uint, input *models.PatientInfo) (models.PatientInfo, error) {
+	// Önce mevcut kaydı bulalım
+	existingInfo, err := GetPatientInfoByUserID(userID)
+	if err != nil {
+		return models.PatientInfo{}, err // Kayıt yoksa hata döner
+	}
+
+	// Gelen input'u mevcut kayıt üzerine işle (Model'deki ID, UserID gibi alanları korur)
+	if err := config.DB.Model(&existingInfo).Updates(input).Error; err != nil {
+		return models.PatientInfo{}, fmt.Errorf("hasta bilgisi güncellenemedi: %w", err)
+	}
+
+	return existingInfo, nil
+}

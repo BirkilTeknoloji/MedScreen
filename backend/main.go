@@ -15,7 +15,7 @@ func main() {
 	config.InitDB()
 
 	// Veritabanı tablolarını oluştur (otomatik migrate)
-	config.DB.AutoMigrate(&models.User{})
+	config.DB.AutoMigrate(&models.User{}, &models.PatientInfo{})
 
 	// Fiber app başlat
 	app := fiber.New()

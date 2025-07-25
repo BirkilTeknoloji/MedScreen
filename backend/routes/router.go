@@ -16,4 +16,8 @@ func SetupRoutes(app *fiber.App) {
 	users.Get("/:id", controllers.GetUserByID)
 	users.Delete("/:id", controllers.DeleteUserByID)
 	users.Get("/card/:card_id", controllers.GetUserByCardID)
+
+	// PatientInfo Rotaları (User'a bağlı)
+	users.Get("/:id/patientinfo", controllers.GetPatientInfoForUser)
+	users.Put("/:id/patientinfo", controllers.UpdatePatientInfoForUser)
 }
