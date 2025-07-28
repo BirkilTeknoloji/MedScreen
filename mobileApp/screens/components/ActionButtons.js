@@ -1,16 +1,16 @@
 // components/ActionButtons.js
 import React from 'react';
 import { View, Button, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-export default function ActionButtons({ navigation }) {
+export default function ActionButtons() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.buttonGroup}>
       <Button 
-        title="📷 QR Kodumu Göster" 
-        onPress={() => {
-          // QR kod gösterme işlevi buraya eklenecek
-          console.log('QR Kod göster');
-        }} 
+        title="📷 QR Kod Okut" 
+        onPress={() => navigation.navigate('QrScannerScreen')} 
       />
       <Button 
         title="↩️ Çıkış Yap" 

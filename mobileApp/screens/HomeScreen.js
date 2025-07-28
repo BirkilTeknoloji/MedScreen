@@ -1,64 +1,113 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, ToastAndroid, Platform, Alert } from 'react-native';
 import NfcManager, { NfcTech } from 'react-native-nfc-manager';
 import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-root-toast';
 
-const API_URL = "http://192.168.1.106:8080/api/v1/users/card/:card_id";
+// const API_URL = "http://192.168.1.110:8080/api/v1/users/card/:card_id";
+const API_URL = "http://192.168.1.104:8080/api/v1/users/card/:card_id";
 
 async function sendRfidToBackend(tagId) {
     try {
         const url = API_URL.replace(':card_id', tagId);
-        console.log('Backend url:', url);
         const response = await fetch(url, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
-        if (!response.ok) throw new Error('Backend bağlantı hatası: ' + response.status);
+        if (!response.ok) {
+            console.log('Backend bağlantı hatası:', response.status);
+            return null;
+        }
         const data = await response.json();
         console.log('Backend yanıtı:', data);
         return data;
     } catch (error) {
-        console.error('Backend gönderme hatası:', error);
-        Alert.alert('Hata', 'Veri gönderilirken hata oluştu.');
+        console.log('Backend gönderme hatası:', error);
         return null;
     }
 }
 
-
-// NFC başlatma fonksiyonu
 function startNfc() {
     NfcManager.start();
     console.log('NFC Başlatıldı');
 }
 
-// NFC okuma fonksiyonu
 async function readNfcTag(navigation) {
-    console.log("NFC dinleniyor... "); 
     try {
-        await NfcManager.requestTechnology(NfcTech.Ndef);
-        console.log("✅ NFC teknolojisi seçildi"); 
+        await NfcManager.requestTechnology([NfcTech.Ndef, NfcTech.NfcA, NfcTech.NfcB, NfcTech.NfcF, NfcTech.NfcV, NfcTech.NdefFormatable, NfcTech.MifareClassic]);
         const tag = await NfcManager.getTag();
         console.log('📦 NFC Tag Okundu:', JSON.stringify(tag));
-        console.log('🆔 NFC Tag ID:', tag.id);
 
         const backendResponse = await sendRfidToBackend(tag.id || JSON.stringify(tag.id));
-        if (backendResponse) {
-            Alert.alert('Başarılı', 'Giriş başarılı!');
-        }
 
-        if (backendResponse.Role === "patient") {
-            navigation.navigate('PatientScreen', { userData: backendResponse });
+        if (backendResponse && backendResponse.Role) {
+            const toast = Toast.show('✅ Giriş başarılı, yönlendiriliyorsunuz...', {
+                duration: Toast.durations.LONG,
+                position: 100,
+                shadow: true,
+                animation: true,
+                hideOnPress: true,
+                delay: 0,
+                backgroundColor: '#333',
+                textColor: '#fff',
+                containerStyle: {
+                    paddingHorizontal: 24,
+                    paddingVertical: 18,
+                    borderRadius: 15,
+                },
+                textStyle: {
+                    fontSize: 24,
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                },
+            });
+
+            setTimeout(() => {
+                Toast.hide(toast);
+                if (backendResponse.Role === 'patient') {
+                    navigation.navigate('PatientScreen', { userData: backendResponse });
+                } else {
+                    navigation.navigate('PersonnelScreen', { userData: backendResponse });
+                }
+            }, 2000);
         } else {
-            navigation.navigate('PersonnelScreen', { userData: backendResponse });
+            Toast.show('❌ Giriş başarısız: Kart tanımlı değil.', {
+                duration: Toast.durations.LONG,
+                position: 100,
+                backgroundColor: '#b00020',
+                textColor: '#fff',
+                containerStyle: {
+                    paddingHorizontal: 24,
+                    paddingVertical: 16,
+                    borderRadius: 12,
+                },
+                textStyle: {
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                },
+            });
+
+            // Kart tanımsızsa NFC tekrar aktifleştir
+            await NfcManager.cancelTechnologyRequest();
+            setTimeout(() => readNfcTag(navigation), 3000);
         }
 
     } catch (ex) {
-        console.error('❌ NFC Hatası:', ex);
-        Alert.alert('Hata', ex.toString());
-    } finally {
-        NfcManager.cancelTechnologyRequest();
+        console.log('❌ NFC Hatası:', ex?.message || ex?.toString());
+
+        // Hata durumunda NFC teknolojisini bırak
+        try {
+            await NfcManager.cancelTechnologyRequest();
+        } catch (cancelError) {
+            console.warn('NFC cancel error:', cancelError);
+        }
+
+        // Belirli süre sonra tekrar dene (isteğe bağlı)
+        setTimeout(() => readNfcTag(navigation), 3000);
     }
 }
+
 
 
 export default function HomeScreen() {
@@ -66,10 +115,7 @@ export default function HomeScreen() {
 
     useEffect(() => {
         startNfc();
-
-        // Async fonksiyonu useEffect içinde tanımla ve çağır
         async function initNfcRead() {
-            console.log('NFC Okuma Başlatılıyor...');
             await readNfcTag(navigation);
         }
         initNfcRead();

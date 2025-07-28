@@ -1,4 +1,8 @@
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
-  plugins: ['react-native-reanimated/plugin'],
+  presets: [
+    '@react-native/babel-preset', // Yeni RN için önerilen preset
+  ],
+  plugins: [
+    'react-native-reanimated/plugin', // Vision Camera için gerekli
+  ],
 };
