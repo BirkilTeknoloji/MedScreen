@@ -15,9 +15,15 @@ func SetupRoutes(app *fiber.App) {
 	users.Get("/", controllers.GetAllUsers)
 	users.Get("/:id", controllers.GetUserByID)
 	users.Delete("/:id", controllers.DeleteUserByID)
+	users.Get("/:id/qrcode", controllers.GetUserQRCode) // Yeni QR kod rotası
 	users.Get("/card/:card_id", controllers.GetUserByCardID)
 
 	// PatientInfo Rotaları (User'a bağlı)
 	users.Get("/:id/patientinfo", controllers.GetPatientInfoForUser)
 	users.Put("/:id/patientinfo", controllers.UpdatePatientInfoForUser)
+
+	// Cihaz Rotaları
+	device := api.Group("/device")
+	device.Post("/view", controllers.GetPatientDataForDevice)
+	device.Post("/medication-by-qr", controllers.GetMedicationByQRCode)
 }

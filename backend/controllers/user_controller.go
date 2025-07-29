@@ -68,6 +68,29 @@ func DeleteUserByID(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Kullanıcı başarıyla silindi"})
 }
+
+// GetUserQRCode, belirli bir kullanıcının CardID'sinden oluşturulan QR kodunu PNG resmi olarak döndürür.
+func GetUserQRCode(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz kullanıcı ID"})
+	}
+
+	// Servis katmanından QR kodun PNG verisini al
+	pngData, err := services.GenerateQRCodeForUser(uint(id))
+	if err != nil {
+		// Hata kullanıcı bulunamadıysa 404, başka bir sebepse 500 dönebiliriz.
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Cevabın bir PNG resmi olduğunu belirt
+	c.Set("Content-Type", "image/png")
+
+	// PNG verisini cevap olarak gönder
+	return c.Send(pngData)
+}
+
 func GetUserByCardID(c *fiber.Ctx) error {
 	cardID := c.Params("card_id")
 

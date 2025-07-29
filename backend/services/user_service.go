@@ -6,7 +6,90 @@ import (
 	"go-backend/config"
 	"go-backend/models"
 	"strings"
+
+	"github.com/skip2/go-qrcode"
 )
+
+// Custom errors for device view logic
+var (
+	ErrScannerNotFound         = errors.New("kartı okutan kullanıcı bulunamadı")
+	ErrPatientNotFound         = errors.New("bilgisi istenen hasta bulunamadı")
+	ErrRequestedUserNotPatient = errors.New("bilgisi istenen kullanıcı bir hasta değil")
+	ErrPermissionDenied        = errors.New("bu hasta bilgilerini görme yetkiniz yok")
+	// ErrPatientSelfViewOnly, bir hastanın başka bir hastanın verisini görmeye çalışması durumunda kullanılır.
+	ErrPatientSelfViewOnly   = errors.New("hastalar sadece kendi bilgilerini görebilir")
+	ErrScannerNotAuthorized  = errors.New("bu işlemi yapma yetkiniz yok (sadece doktorlar)")
+	ErrPatientFromQRNotFound = errors.New("QR kod ile eşleşen hasta bulunamadı")
+	ErrUserHasNoCardID       = errors.New("bu kullanıcının bir kart ID'si bulunmuyor")
+)
+
+// MedicationResponse, QR kod okutulduğunda dönecek olan ilaç bilgilerini içerir.
+type MedicationResponse struct {
+	PatientName   string   `json:"patient_name"`
+	Prescriptions []string `json:"prescriptions"`
+}
+
+// GetPatientDataForView, yatak başı cihazı için yetkilendirme ve veri getirme mantığını içerir.
+func GetPatientDataForView(scannerCardID string, patientUserID uint) (models.User, error) {
+	var scanner models.User
+	if err := config.DB.Where("card_id = ?", scannerCardID).First(&scanner).Error; err != nil {
+		return models.User{}, ErrScannerNotFound
+	}
+
+	var patient models.User
+	if err := config.DB.Preload("PatientInfo").First(&patient, patientUserID).Error; err != nil {
+		return models.User{}, ErrPatientNotFound
+	}
+
+	if patient.Role != "patient" {
+		return models.User{}, ErrRequestedUserNotPatient
+	}
+
+	switch scanner.Role {
+	case "doctor":
+		return patient, nil
+	case "patient":
+		if scanner.ID == patient.ID {
+			return patient, nil
+		}
+		return models.User{}, ErrPatientSelfViewOnly
+	default:
+		return models.User{}, ErrPermissionDenied
+	}
+}
+
+// GetMedicationByQRCode, QR kod verisini ve okutan kişinin kartını kullanarak hastanın ilaç bilgilerini doğrular ve getirir.
+func GetMedicationByQRCode(scannerCardID, qrData string) (MedicationResponse, error) {
+	var scanner models.User
+	// 1. Kartı okutan personeli bul
+	if err := config.DB.Where("card_id = ?", scannerCardID).First(&scanner).Error; err != nil {
+		return MedicationResponse{}, ErrScannerNotFound
+	}
+
+	// 2. Personelin yetkisini kontrol et (sadece doktorlar)
+	if scanner.Role != "doctor" {
+		return MedicationResponse{}, ErrScannerNotAuthorized
+	}
+
+	// 3. QR kod verisi (hastanın CardID'si) ile hastayı bul
+	var patient models.User
+	if err := config.DB.Preload("PatientInfo").Where("card_id = ?", qrData).First(&patient).Error; err != nil {
+		return MedicationResponse{}, ErrPatientFromQRNotFound
+	}
+
+	// 4. Bulunan kullanıcının rolünün "patient" olduğunu doğrula
+	if patient.Role != "patient" {
+		return MedicationResponse{}, ErrPatientFromQRNotFound // QR kod bir doktora aitse de hata verelim
+	}
+
+	// 5. İlaç bilgilerini hazırla ve döndür
+	response := MedicationResponse{
+		PatientName:   patient.Name,
+		Prescriptions: patient.PatientInfo.Prescriptions,
+	}
+
+	return response, nil
+}
 
 func CreateUser(user models.User, patientInfo *models.PatientInfo) (models.User, error) {
 	role := strings.ToLower(user.Role)
@@ -52,6 +135,26 @@ func CreateUser(user models.User, patientInfo *models.PatientInfo) (models.User,
 
 	// Her şey yolundaysa transaction'ı onayla
 	return newUser, tx.Commit().Error
+}
+
+// GenerateQRCodeForUser, bir kullanıcı ID'sine göre o kullanıcının CardID'sinden bir QR kod (PNG) oluşturur.
+func GenerateQRCodeForUser(userID uint) ([]byte, error) {
+	// 1. Kullanıcıyı veritabanından bul
+	user, err := GetUserByID(userID)
+	if err != nil {
+		// GetUserByID zaten "not found" hatası dönecektir.
+		return nil, err
+	}
+
+	// 2. Kullanıcının bir CardID'si olduğundan emin ol
+	if user.CardID == "" {
+		return nil, ErrUserHasNoCardID
+	}
+
+	// 3. CardID'yi kullanarak 256x256 boyutunda bir QR kod PNG'si oluştur
+	// qrcode.Encode(data string, level RecoveryLevel, size int) ([]byte, error)
+	png, err := qrcode.Encode(user.CardID, qrcode.Medium, 256)
+	return png, err
 }
 
 func GetUserByID(id uint) (models.User, error) {
