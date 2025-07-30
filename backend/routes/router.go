@@ -26,4 +26,12 @@ func SetupRoutes(app *fiber.App) {
 	device := api.Group("/device")
 	device.Post("/view", controllers.GetPatientDataForDevice)
 	device.Post("/medication-by-qr", controllers.GetMedicationByQRCode)
+
+	// /api/devices altındaki route grubu
+	deviceRoutes := api.Group("/devices")
+
+	// Router tanımları
+	deviceRoutes.Post("/register", controllers.Register)
+	deviceRoutes.Get("/user/:userID", controllers.ListByUser)
+	deviceRoutes.Get("/user/:userID/count", controllers.CountByUser)
 }

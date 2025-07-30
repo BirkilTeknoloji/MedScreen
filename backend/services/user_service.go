@@ -82,10 +82,19 @@ func GetMedicationByQRCode(scannerCardID, qrData string) (MedicationResponse, er
 		return MedicationResponse{}, ErrPatientFromQRNotFound // QR kod bir doktora aitse de hata verelim
 	}
 
-	// 5. İlaç bilgilerini hazırla ve döndür
+	// 5. İlaç bilgilerini (models.Prescriptions) string dilimine ([]string) çevir ve döndür.
+	// `models.Prescriptions` muhtemelen bir struct dilimidir (örn: []Prescription).
+	// Bu nedenle her bir eleman üzerinden geçip istediğimiz string temsilini oluşturmalıyız.
+	var prescriptionList []string
+	for _, prescription := range patient.PatientInfo.Prescriptions {
+		// Burada `prescription`'ın nasıl bir string'e dönüştürüleceğini belirtmelisiniz.
+		// Örneğin, eğer bir struct ise ve 'Name' alanı varsa: prescription.Name
+		// Model tanımını bilmediğimiz için `fmt.Sprintf` ile genel bir çevrim yapıyoruz.
+		prescriptionList = append(prescriptionList, fmt.Sprintf("%v", prescription))
+	}
 	response := MedicationResponse{
 		PatientName:   patient.Name,
-		Prescriptions: patient.PatientInfo.Prescriptions,
+		Prescriptions: prescriptionList,
 	}
 
 	return response, nil
