@@ -7,17 +7,9 @@ import (
 type User struct {
 	gorm.Model
 	Name   string `gorm:"not null"`
-	Role   string `gorm:"not null"` // "patient" veya "doctor"
+	Role   string `gorm:"not null"` // "patient" or "personnel"
 	CardID string `gorm:"uniqueIndex;not null"`
 
-	// Eğer hasta ise hasta bilgisi olabilir
+	// If the user is a patient, there may be patient information
 	PatientInfo PatientInfo `gorm:"foreignKey:UserID"`
 }
-
-// type PatientInfo struct {
-// 	gorm.Model
-// 	UserID     uint `gorm:"uniqueIndex"` // Her hastaya bir bilgi
-// 	Diagnosis  string
-// 	Allergies  string
-// 	Treatments string
-// }

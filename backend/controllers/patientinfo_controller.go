@@ -3,56 +3,47 @@ package controllers
 import (
 	"go-backend/models"
 	"go-backend/services"
-	"strconv"
+	"go-backend/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-// GetPatientInfoForUser, belirli bir kullanıcının hasta bilgilerini getirir.
+// GetPatientInfoForUser, retrieves patient information for a specific user.
 func GetPatientInfoForUser(c *fiber.Ctx) error {
-	idParam := c.Params("id")
-	userID, err := strconv.Atoi(idParam)
+	userID, err := utils.ParseUserID(c, "id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz kullanıcı ID"})
+		return nil
 	}
-
-	patientInfo, err := services.GetPatientInfoByUserID(uint(userID))
+	patientInfo, err := services.GetPatientInfoByUserID(userID)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
 	}
-
 	return c.Status(fiber.StatusOK).JSON(patientInfo)
 }
 
-// UpdatePatientInfoForUser, belirli bir kullanıcının hasta bilgilerini günceller.
+// UpdatePatientInfoForUser, updates patient information for a specific user.
 func UpdatePatientInfoForUser(c *fiber.Ctx) error {
-	idParam := c.Params("id") // Bu User'ın ID'si olmalı
-	userID, err := strconv.Atoi(idParam)
+	userID, err := utils.ParseUserID(c, "id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz kullanıcı ID"})
+		return nil
 	}
-
 	var input models.PatientInfo
 	if err := c.BodyParser(&input); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz veri formatı: " + err.Error()})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid data format: " + err.Error()})
 	}
-
-	// Servis katmanını çağırarak güncelleme yap
-	updatedInfo, err := services.UpdatePatientInfoByUserID(uint(userID), &input)
+	updatedInfo, err := services.UpdatePatientInfoByUserID(userID, &input)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
 	}
-
 	return c.Status(fiber.StatusOK).JSON(updatedInfo)
 }
 
-// GetPatientInfoByDeviceId, cihaz ID'sine göre hasta bilgisini getirir.
+// GetPatientInfoByDeviceId, retrieves patient information by device ID.
 func GetPatientInfoByDeviceId(c *fiber.Ctx) error {
 	deviceId := c.Params("deviceId")
 	if deviceId == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cihaz ID gerekli"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Device ID is required"})
 	}
-
 	patientInfo, err := services.GetPatientInfoByDeviceId(deviceId)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})

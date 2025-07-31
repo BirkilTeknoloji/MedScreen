@@ -3,7 +3,7 @@ package controllers
 import (
 	"go-backend/models"
 	"go-backend/services"
-	"strconv"
+	"go-backend/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,19 +17,19 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	if err := c.BodyParser(&input); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Tüm alanlar gereklidir: " + err.Error()})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "All fields are required: " + err.Error()})
 	}
 
-	// Eğer rol "patient" ise ve hasta bilgisi (özellikle TC no) gelmediyse hata ver
+	// If the role is "patient" and the patient information (especially the TR ID number) is not received, give an error.
 	if input.Role == "patient" && (input.PatientInfo == nil || input.PatientInfo.TCNumber == "") {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Rol 'patient' olduğunda PatientInfo alanı ve TCNumber zorunludur."})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "When the role is 'patient', PatientInfo field and TCNumber are required."})
 	}
 
-	// Servis katmanına göndermek için User modelini oluştur
+	// Create the User model to send to the service layer
 	userToCreate := models.User{Name: input.Name, Role: input.Role, CardID: input.CardID}
 
-	// Servis fonksiyonunu doğru parametrelerle çağırıyoruz:
-	// Hatalı eski çağrı: services.CreateUser(input.Name, input.Role, input.CardID)
+	// Calling the service function with the correct parameters:
+	// Incorrect old call: services.CreateUser(input.Name, input.Role, input.CardID)
 	user, err := services.CreateUser(userToCreate, input.PatientInfo)
 	if err != nil {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": err.Error()})
@@ -39,74 +39,56 @@ func CreateUser(c *fiber.Ctx) error {
 }
 
 func GetUserByID(c *fiber.Ctx) error {
-	idParam := c.Params("id")
-
-	id, err := strconv.Atoi(idParam)
+	userID, err := utils.ParseUserID(c, "id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz ID"})
+		return nil
 	}
-
-	user, err := services.GetUserByID(uint(id))
+	user, err := services.GetUserByID(userID)
 	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Kullanıcı bulunamadı"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
 	}
-
 	return c.Status(fiber.StatusOK).JSON(user)
 }
 
 func DeleteUserByID(c *fiber.Ctx) error {
-	idParam := c.Params("id")
-	id, err := strconv.Atoi(idParam)
+	userID, err := utils.ParseUserID(c, "id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz kullanıcı ID"})
+		return nil
 	}
-
-	err = services.DeleteUserByID(uint(id))
+	err = services.DeleteUserByID(userID)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
 	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Kullanıcı başarıyla silindi"})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "User successfully deleted"})
 }
 
-// GetUserQRCode, belirli bir kullanıcının CardID'sinden oluşturulan QR kodunu PNG resmi olarak döndürür.
+// GetUserQRCode, returns the QR code generated from a specific user's CardID as a PNG image.
 func GetUserQRCode(c *fiber.Ctx) error {
-	idParam := c.Params("id")
-	id, err := strconv.Atoi(idParam)
+	userID, err := utils.ParseUserID(c, "id")
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Geçersiz kullanıcı ID"})
+		return nil
 	}
-
-	// Servis katmanından QR kodun PNG verisini al
-	pngData, err := services.GenerateQRCodeForUser(uint(id))
+	pngData, err := services.GenerateQRCodeForUser(userID)
 	if err != nil {
-		// Hata kullanıcı bulunamadıysa 404, başka bir sebepse 500 dönebiliriz.
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
 	}
-
-	// Cevabın bir PNG resmi olduğunu belirt
 	c.Set("Content-Type", "image/png")
-
-	// PNG verisini cevap olarak gönder
 	return c.Send(pngData)
 }
 
 func GetUserByCardID(c *fiber.Ctx) error {
 	cardID := c.Params("card_id")
-
 	user, err := services.GetUserByCardID(cardID)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
 	}
-
 	return c.Status(fiber.StatusOK).JSON(user)
 }
 
 func GetAllUsers(c *fiber.Ctx) error {
 	users, err := services.GetAllUsers()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Kullanıcılar alınamadı"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Users could not be retrieved"})
 	}
-
 	return c.Status(fiber.StatusOK).JSON(users)
 }

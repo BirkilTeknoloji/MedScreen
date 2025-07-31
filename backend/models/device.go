@@ -8,8 +8,8 @@ import (
 
 type Device struct {
 	gorm.Model
-	DeviceID   string `gorm:"uniqueIndex;not null"` // cihaz benzersiz kimliği
-	UserID     uint   // 1. Foreign Key alanı: Veritabanında saklanır.
-	User       User   `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // 2. İlişki alanı: GORM tarafından veri yüklemek için kullanılır.
+	DeviceID   string `gorm:"uniqueIndex;not null"` // device unique ID
+	UserID     uint   // 1. Foreign Key field: Stored in the database.
+	User       User   `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // 2. Relationship field: Used by GORM to load data.
 	LastSeenAt *time.Time
 }

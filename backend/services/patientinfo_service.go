@@ -9,20 +9,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetPatientInfoByUserID, verilen kullanıcı ID'sine ait hasta bilgilerini getirir.
+// GetPatientInfoByUserID returns patient info for a given user ID.
 func GetPatientInfoByUserID(userID uint) (models.PatientInfo, error) {
 	var info models.PatientInfo
 	err := config.DB.Where("user_id = ?", userID).First(&info).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return models.PatientInfo{}, errors.New("bu kullanıcıya ait hasta bilgisi bulunamadı")
+		return models.PatientInfo{}, errors.New("No patient information found for this user")
 	}
 	return info, err
 }
 
-// GetPatientInfoByDeviceId, verilen cihaz ID'sine ait hasta bilgilerini getirir.
-func GetPatientInfoByDeviceId(DeviceID string) (*models.PatientInfo, error) {
+// GetPatientInfoByDeviceId returns patient info for a given device ID.
+func GetPatientInfoByDeviceId(deviceID string) (*models.PatientInfo, error) {
 	var device models.Device
-	if err := config.DB.Where("device_id = ?", DeviceID).First(&device).Error; err != nil {
+	if err := config.DB.Where("device_id = ?", deviceID).First(&device).Error; err != nil {
 		return nil, err
 	}
 
@@ -34,17 +34,15 @@ func GetPatientInfoByDeviceId(DeviceID string) (*models.PatientInfo, error) {
 	return &patientInfo, nil
 }
 
-// UpdatePatientInfoByUserID, verilen kullanıcı ID'sine ait hasta bilgilerini günceller.
+// UpdatePatientInfoByUserID updates patient info for a given user ID.
 func UpdatePatientInfoByUserID(userID uint, input *models.PatientInfo) (models.PatientInfo, error) {
-	// Önce mevcut kaydı bulalım
 	existingInfo, err := GetPatientInfoByUserID(userID)
 	if err != nil {
-		return models.PatientInfo{}, err // Kayıt yoksa hata döner
+		return models.PatientInfo{}, err
 	}
 
-	// Gelen input'u mevcut kayıt üzerine işle (Model'deki ID, UserID gibi alanları korur)
 	if err := config.DB.Model(&existingInfo).Updates(input).Error; err != nil {
-		return models.PatientInfo{}, fmt.Errorf("hasta bilgisi güncellenemedi: %w", err)
+		return models.PatientInfo{}, fmt.Errorf("Patient information could not be updated: %w", err)
 	}
 
 	return existingInfo, nil

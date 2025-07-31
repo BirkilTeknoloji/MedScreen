@@ -42,4 +42,20 @@ export default StyleSheet.create({
         textAlign: 'center',
         color: '#666',
     },
+    button: {
+        backgroundColor: '#4caf50',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    buttonDisabled: {
+        backgroundColor: '#9e9e9e',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });

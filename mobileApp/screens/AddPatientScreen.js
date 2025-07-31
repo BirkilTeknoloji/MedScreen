@@ -6,6 +6,7 @@ import Toast from 'react-native-root-toast';
 import { startNfcReading, stopNfcReading, sendRfidToBackend } from '../services/nfc/nfcHandler';
 import { addPatient } from '../services/api';
 import styles from './styles/AddPatientScreenStyle';
+import { TouchableOpacity } from 'react-native';
 
 const showToast = (message, backgroundColor) => {
     Toast.show(message, {
@@ -78,11 +79,16 @@ export default function AddPatientScreen() {
                 <Text style={styles.value}>{deviceId}</Text>
             </View>
 
-            <Button
-                title="➕ Hastayı Kaydet"
+            <TouchableOpacity
+                style={[
+                    styles.button,
+                    !userData && styles.buttonDisabled
+                ]}
                 onPress={handleAddPatient}
                 disabled={!userData}
-            />
+            >
+                <Text style={styles.buttonText}>➕  Hastayı Kaydet</Text>
+            </TouchableOpacity>
 
             <Text style={styles.statusText}>
                 {isReading ? '📱 NFC okuma aktif...' : '❌ NFC okuma durdu'}
