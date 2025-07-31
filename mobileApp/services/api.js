@@ -23,7 +23,7 @@ export const addPatient = async (deviceId, userId) => {
 
 export const getPatientData = async (id) => {
   try {
-    const url = `${BASE_URL}/users/${id}/patientinfo`;
+    const url = `${BASE_API_URL}/users/${id}/patientinfo`;
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -43,7 +43,7 @@ export const getPatientData = async (id) => {
 
 export const getPatientByDeviceId = async (deviceId) => {
   try {
-    const url = `${BASE_URL}/users/device/${deviceId}/patientinfo`;
+    const url = `${BASE_API_URL}/users/device/${deviceId}/patientinfo`;
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
