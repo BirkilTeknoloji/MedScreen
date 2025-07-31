@@ -1,9 +1,8 @@
-// components/DataList.js
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
+import styles from './styles/DataListStyle';
 
 export default function DataList({ data, emptyMessage = "Kayıt yok" }) {
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return <Text style={styles.emptyText}>{emptyMessage}</Text>;
   }
 
@@ -19,24 +18,3 @@ export default function DataList({ data, emptyMessage = "Kayıt yok" }) {
   );
 }
 
-const styles = StyleSheet.create({
-  listItem: {
-    paddingVertical: 5,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
-  },
-  listTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  listDate: {
-    fontSize: 14,
-    color: '#666',
-  },
-  emptyText: { 
-    fontStyle: 'italic', 
-    color: '#999', 
-    paddingLeft: 10, 
-    paddingVertical: 5 
-  },
-});

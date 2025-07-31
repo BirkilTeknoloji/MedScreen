@@ -1,8 +1,8 @@
-import NfcManager, { NfcTech, NfcEvents } from 'react-native-nfc-manager';
+import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
+import { BASE_API_URL } from '@env';
 
 export async function sendRfidToBackend(tagId) {
-    const API_URL = "http://192.168.1.113:8080/api/v1/users/card/:card_id";
-    const url = API_URL.replace(':card_id', tagId);
+    const url = `${BASE_API_URL}/users/card/${tagId}`;
     console.log('🌐 İstek gönderiliyor:', url);
 
     try {
@@ -24,7 +24,6 @@ export async function sendRfidToBackend(tagId) {
         const data = await response.json();
         console.log('✅ Backend yanıtı:', data);
         return data;
-
     } catch (error) {
         console.log('❌ Fetch hatası:', error);
         return null;
@@ -45,7 +44,7 @@ export async function startNfcReading(handleTagDiscovered, setIsReading) {
         setIsReading(false);
         console.log('NFC başlatma hatası:', error);
     }
-};
+}
 
 export async function stopNfcReading(setIsReading, isProcessingRef) {
     try {

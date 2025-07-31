@@ -1,0 +1,83 @@
+import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f0f4f7',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+    },
+    nfcImage: {
+        width: 180,
+        height: 180,
+        marginBottom: 60,
+        resizeMode: 'contain',
+    },
+    infoText: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        color: '#3370b0ff',
+        textAlign: 'center',
+        backgroundColor: 'rgba(15, 88, 165, 0.07)',
+        paddingHorizontal: 25,
+        paddingVertical: 15,
+        borderRadius: 15,
+        textShadowColor: 'rgba(0,0,0,0.25)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 3,
+    },
+    arrow: {
+        fontSize: 45,
+        marginLeft: 5,
+    },
+    statusText: {
+        fontSize: 16,
+        color: '#666',
+        marginTop: 20,
+        textAlign: 'center',
+    },
+    optionTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#333',
+        textAlign: 'center',
+    },
+    welcomeText: {
+        fontSize: 60,
+        color: '#666',
+        marginBottom: 100,
+        textAlign: 'center',
+    },
+    cardContainer: {
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    card: {
+        backgroundColor: '#e0ecf8',
+        paddingVertical: 20,
+        paddingHorizontal: 30,
+        borderRadius: 12,
+        marginVertical: 10,
+        width: '90%',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    cardText: {
+        fontSize: 20,
+        color: '#1c4a7e',
+        fontWeight: '600',
+        marginBottom: 5,
+    },
+    cardSubText: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+    },
+});

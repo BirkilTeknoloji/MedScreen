@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, LogBox } from 'react-native';
 import Orientation from 'react-native-orientation-locker';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -21,6 +21,10 @@ export default function App() {
       Orientation.unlockAllOrientations();
     };
   }, []);
+
+  LogBox.ignoreLogs([
+    'Text strings must be rendered within a <Text> component'
+  ]);
 
   return (
     <RootSiblingParent> {/* Toast mesajları için gerekli */}

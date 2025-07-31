@@ -1,29 +1,22 @@
-// components/ActionButtons.js
-import React from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import { View, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import styles from './styles/ActionButtonsStyle';
 
 export default function ActionButtons() {
   const navigation = useNavigation();
+
+  const handleNavigate = (screen) => navigation.navigate(screen);
 
   return (
     <View style={styles.buttonGroup}>
       <Button 
         title="📷 QR Kod Okut" 
-        onPress={() => navigation.navigate('QrScannerScreen')} 
+        onPress={() => handleNavigate('QrScannerScreen')} 
       />
       <Button 
         title="↩️ Çıkış Yap" 
-        onPress={() => navigation.navigate('HomeScreen')} 
+        onPress={() => handleNavigate('Home')} 
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  buttonGroup: { 
-    marginTop: 20, 
-    flexDirection: 'row', 
-    justifyContent: 'space-between' 
-  },
-});

@@ -1,4 +1,3 @@
-// components/MedicalHistoryTab.js
 import React from 'react';
 import { ScrollView } from 'react-native';
 import DropdownSection from './DropdownSection';
@@ -8,15 +7,15 @@ export default function MedicalHistoryTab({ data }) {
   return (
     <ScrollView style={{ flex: 1 }}>
       <DropdownSection title="Tıbbi Geçmiş">
-        <DataList data={data.medicalhistory} />
+        <DataList data={data.Medicalhistory} />
       </DropdownSection>
 
       <DropdownSection title="Ameliyat Geçmişi">
-        <DataList data={data.surgeryhistory} />
+        <DataList data={data.Surgeryhistory} />
       </DropdownSection>
 
       <DropdownSection title="Alerjiler">
-        <DataList data={data.allergies} />
+        <DataList data={data.Allergies} />
       </DropdownSection>
     </ScrollView>
   );

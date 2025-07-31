@@ -1,16 +1,26 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Image, Button } from 'react-native';
+import { useState, useRef, useCallback } from 'react';
+import { View, Text, Image, Button } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { startNfcReading, stopNfcReading, sendRfidToBackend } from '../services/nfc/nfcHandler';
-import Toast from 'react-native-root-toast';
-import { addPatient } from '../services/api';
 import DeviceInfo from 'react-native-device-info';
+import Toast from 'react-native-root-toast';
+import { startNfcReading, stopNfcReading, sendRfidToBackend } from '../services/nfc/nfcHandler';
+import { addPatient } from '../services/api';
+import styles from './styles/AddPatientScreenStyle';
 
-export default function AddPatientScreen({ route }) {
+const showToast = (message, backgroundColor) => {
+    Toast.show(message, {
+        duration: 3000,
+        position: 100,
+        backgroundColor,
+        textColor: '#fff',
+    });
+};
+
+export default function AddPatientScreen() {
     const navigation = useNavigation();
     const [isReading, setIsReading] = useState(false);
     const isProcessingRef = useRef(false);
-    const [deviceId] = useState(DeviceInfo.getUniqueIdSync());
+    const deviceId = DeviceInfo.getUniqueIdSync();
     const [userData, setUserData] = useState(null);
 
     const handleTagDiscovered = async (tag) => {
@@ -19,9 +29,8 @@ export default function AddPatientScreen({ route }) {
 
         try {
             const user = await sendRfidToBackend(tag.id);
-            if (!user || !user.ID || !user.PatientInfo) throw new Error('Kullanıcı bulunamadı');
-
-            setUserData(user); // name, role, userId gibi bilgileri al
+            if (!user?.ID || !user?.PatientInfo) throw new Error('Kullanıcı bulunamadı');
+            setUserData(user);
         } catch (error) {
             console.log('❌ Hata:', error);
         } finally {
@@ -32,37 +41,22 @@ export default function AddPatientScreen({ route }) {
     };
 
     const handleAddPatient = async () => {
-        if (!userData || !userData.ID || !userData.PatientInfo) {
-            Toast.show('Lütfen geçerli bir kart okutun.', {
-                duration: 3000,
-                position: 100,
-                backgroundColor: '#f57c00',
-                textColor: '#fff',
-            });
+        if (!userData?.ID || !userData?.PatientInfo) {
+            showToast('Lütfen geçerli bir kart okutun.', '#f57c00');
             return;
         }
 
         try {
             const result = await addPatient(deviceId, userData.ID);
-            Toast.show('✅ Hasta başarıyla kaydedildi.', {
-                duration: 3000,
-                position: 100,
-                backgroundColor: '#4caf50',
-                textColor: '#fff',
-            });
+            showToast('✅ Hasta başarıyla kaydedildi.', '#4caf50');
             navigation.navigate('PatientScreen', { userData: result });
-        } catch (err) {
-            Toast.show('❌ Hasta kaydı başarısız oldu.', {
-                duration: 3000,
-                position: 100,
-                backgroundColor: '#b00020',
-                textColor: '#fff',
-            });
+        } catch {
+            showToast('❌ Hasta kaydı başarısız oldu.', '#b00020');
         }
     };
 
     useFocusEffect(
-        React.useCallback(() => {
+        useCallback(() => {
             startNfcReading(handleTagDiscovered, setIsReading);
             return () => stopNfcReading(setIsReading, isProcessingRef);
         }, [])
@@ -96,47 +90,3 @@ export default function AddPatientScreen({ route }) {
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f0f4f7',
-        padding: 20,
-        justifyContent: 'center',
-    },
-    nfcImage: {
-        width: 140,
-        height: 140,
-        alignSelf: 'center',
-        marginBottom: 30,
-    },
-    infoText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
-    },
-    infoBox: {
-        backgroundColor: '#fff',
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: '#ccc',
-    },
-    label: {
-        fontWeight: 'bold',
-        fontSize: 16,
-        marginTop: 10,
-    },
-    value: {
-        fontSize: 16,
-        color: '#333',
-    },
-    statusText: {
-        fontSize: 14,
-        marginTop: 15,
-        textAlign: 'center',
-        color: '#666',
-    },
-});
