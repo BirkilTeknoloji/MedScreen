@@ -1,7 +1,6 @@
 package services
 
 import (
-	"errors"
 	"go-backend/models"
 	"time"
 
@@ -17,25 +16,24 @@ func NewDeviceService(db *gorm.DB) *DeviceService {
 }
 
 func (s *DeviceService) RegisterDevice(deviceID string, userID uint) (*models.Device, error) {
-	var existing models.Device
-	err := s.DB.Where("device_id = ?", deviceID).First(&existing).Error
-	if err == nil {
-		existing.LastSeenAt = ptrTime(time.Now())
-		s.DB.Save(&existing)
-		return &existing, nil
-	}
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
+	var device models.Device
+
+	// Cihazı bul veya oluştur, userID güncelle
+	err := s.DB.Where(models.Device{DeviceID: deviceID}).
+		Assign(models.Device{UserID: userID}).
+		FirstOrCreate(&device).Error
+	if err != nil {
 		return nil, err
 	}
-	d := models.Device{
-		DeviceID:   deviceID,
-		UserID:     userID, // Bu satırın `UserID` olduğundan emin olun, `User` değil.
-		LastSeenAt: ptrTime(time.Now()),
-	}
-	if err := s.DB.Create(&d).Error; err != nil {
+
+	// 🔁 İlişkili User ve onun PatientInfo'sunu da yükle
+	err = s.DB.Preload("User.PatientInfo").
+		First(&device, device.ID).Error
+	if err != nil {
 		return nil, err
 	}
-	return &d, nil
+
+	return &device, nil
 }
 
 func (s *DeviceService) ListUserDevices(userID uint) ([]models.Device, error) {

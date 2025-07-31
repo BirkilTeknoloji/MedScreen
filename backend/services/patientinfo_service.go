@@ -19,6 +19,21 @@ func GetPatientInfoByUserID(userID uint) (models.PatientInfo, error) {
 	return info, err
 }
 
+// GetPatientInfoByDeviceId, verilen cihaz ID'sine ait hasta bilgilerini getirir.
+func GetPatientInfoByDeviceId(DeviceID string) (*models.PatientInfo, error) {
+	var device models.Device
+	if err := config.DB.Where("device_id = ?", DeviceID).First(&device).Error; err != nil {
+		return nil, err
+	}
+
+	var patientInfo models.PatientInfo
+	if err := config.DB.Where("user_id = ?", device.UserID).First(&patientInfo).Error; err != nil {
+		return nil, err
+	}
+
+	return &patientInfo, nil
+}
+
 // UpdatePatientInfoByUserID, verilen kullanıcı ID'sine ait hasta bilgilerini günceller.
 func UpdatePatientInfoByUserID(userID uint, input *models.PatientInfo) (models.PatientInfo, error) {
 	// Önce mevcut kaydı bulalım

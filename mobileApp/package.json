@@ -16,6 +16,7 @@
     "react": "19.1.0",
     "react-is": "^19.1.0",
     "react-native": "0.80.1",
+    "react-native-device-info": "^14.0.4",
     "react-native-gesture-handler": "^2.27.2",
     "react-native-nfc-manager": "^3.16.2",
     "react-native-orientation-locker": "^1.7.0",

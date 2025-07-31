@@ -1,6 +1,5 @@
-// QrScannerScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
 
 export default function QrScannerScreen({ navigation }) {
@@ -188,27 +187,27 @@ export default function QrScannerScreen({ navigation }) {
               <Text style={styles.buttonLabel}>Bu veriyi nasıl işlemek istiyorsunuz?</Text>
               
               <View style={styles.buttonRow}>
-                <Text 
+                <TouchableOpacity
                   style={[styles.button, styles.jsonButton]}
                   onPress={tryParseAsJSON}
                 >
-                  JSON Olarak Dene
-                </Text>
+                  <Text style={styles.buttonText}>JSON Olarak Dene</Text>
+                </TouchableOpacity>
                 
-                <Text 
+                <TouchableOpacity
                   style={[styles.button, styles.directButton]}
                   onPress={handleDirectValue}
                 >
-                  Doğrudan Kullan
-                </Text>
+                  <Text style={styles.buttonText}>Doğrudan Kullan</Text>
+                </TouchableOpacity>
               </View>
               
-              <Text 
+              <TouchableOpacity
                 style={[styles.button, styles.rescanButton]}
                 onPress={handleRescan}
               >
-                Yeniden Tara
-              </Text>
+                <Text style={styles.buttonText}>Yeniden Tara</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -368,8 +367,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
     fontSize: 14,
     fontWeight: 'bold',
+    color: 'white',
   },
   jsonButton: {
     backgroundColor: '#4CAF50',
@@ -378,12 +382,10 @@ const styles = StyleSheet.create({
   },
   directButton: {
     backgroundColor: '#2196F3',
-    color: 'white',
     flex: 0.48,
   },
   rescanButton: {
     backgroundColor: '#FF9800',
-    color: 'white',
     width: '100%',
     marginTop: 10,
   },

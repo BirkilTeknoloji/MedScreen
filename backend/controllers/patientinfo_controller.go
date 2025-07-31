@@ -45,3 +45,18 @@ func UpdatePatientInfoForUser(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(updatedInfo)
 }
+
+// GetPatientInfoByDeviceId, cihaz ID'sine göre hasta bilgisini getirir.
+func GetPatientInfoByDeviceId(c *fiber.Ctx) error {
+	deviceId := c.Params("deviceId")
+	if deviceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cihaz ID gerekli"})
+	}
+
+	patientInfo, err := services.GetPatientInfoByDeviceId(deviceId)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(patientInfo)
+}

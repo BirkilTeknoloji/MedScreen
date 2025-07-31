@@ -11,7 +11,6 @@ import (
 type PatientInfo struct {
 	gorm.Model
 	UserID         uint `gorm:"uniqueIndex;not null"`
-	DeviceID       string
 	Name           string
 	TCNumber       string `gorm:"uniqueIndex;not null"`
 	BirthDate      string

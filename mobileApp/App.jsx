@@ -9,6 +9,7 @@ import { RootSiblingParent } from 'react-native-root-siblings';
 import HomeScreen from './screens/HomeScreen';
 import PatientScreen from './screens/PatientScreen';
 import QrScannerScreen from './screens/QrScannerScreen';
+import AddPatientScreen from './screens/AddPatientScreen';
 // import PersonnelScreen from './screens/PersonnelScreen';
 
 const Stack = createNativeStackNavigator();
@@ -28,6 +29,7 @@ export default function App() {
           <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="PatientScreen" component={PatientScreen} />
+            <Stack.Screen name="AddPatientScreen" component={AddPatientScreen} />
             {/* <Stack.Screen name="PersonnelScreen" component={PersonnelScreen} /> */}
             <Stack.Screen name="QrScannerScreen" component={QrScannerScreen} />
           </Stack.Navigator>

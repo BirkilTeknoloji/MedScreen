@@ -1,30 +1,30 @@
-// components/AppointmentsTestsTab.js
 import React from 'react';
 import { ScrollView } from 'react-native';
 import DropdownSection from './DropdownSection';
 import DataList from './DataList';
 
 export default function AppointmentsTestsTab({ data }) {
+  console.log("data", data)
   return (
     <ScrollView style={{ flex: 1 }}>
       <DropdownSection title="Randevular">
-        <DataList data={data.appointments} />
+        <DataList data={data.Appointments} />
       </DropdownSection>
 
       <DropdownSection title="Tanılar">
-        <DataList data={data.diagnosis} />
+        <DataList data={data.Diagnosis} />
       </DropdownSection>
 
       <DropdownSection title="Reçeteler">
-        <DataList data={data.prescriptions} />
+        <DataList data={data.Prescriptions} />
       </DropdownSection>
 
       <DropdownSection title="Notlar">
-        <DataList data={data.notes} />
+        <DataList data={data.Notes} />
       </DropdownSection>
 
       <DropdownSection title="Tetkikler">
-        <DataList data={data.tests} />
+        <DataList data={data.Tests} />
       </DropdownSection>
     </ScrollView>
   );

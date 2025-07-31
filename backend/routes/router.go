@@ -21,6 +21,7 @@ func SetupRoutes(app *fiber.App) {
 	// PatientInfo Rotaları (User'a bağlı)
 	users.Get("/:id/patientinfo", controllers.GetPatientInfoForUser)
 	users.Put("/:id/patientinfo", controllers.UpdatePatientInfoForUser)
+	users.Get("/device/:deviceId/patientinfo", controllers.GetPatientInfoByDeviceId) // Cihaz bilgisi için rota eklendi
 
 	// Cihaz Rotaları
 	device := api.Group("/device")
