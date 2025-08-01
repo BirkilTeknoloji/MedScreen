@@ -4,6 +4,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { sendRfidToBackend, startNfcReading, stopNfcReading } from '../services/nfc/nfcHandler';
 import Toast from 'react-native-root-toast';
 import styles from './styles/HomeScreenStyle';
+import { addPatient } from '../services/api';
 
 const showSuccessToast = (message) => {
     return Toast.show(message, {
@@ -51,7 +52,6 @@ export default function HomeScreen() {
     const navigation = useNavigation();
     const [isReading, setIsReading] = useState(false);
     const isProcessingRef = useRef(false);
-    const [showOptions, setShowOptions] = useState(false);
     const [userData, setUserData] = useState(null);
 
     const handleTagDiscovered = async (tag) => {
@@ -66,13 +66,24 @@ export default function HomeScreen() {
 
             if (backendResponse?.Role) {
                 const toast = showSuccessToast('✅ Giriş başarılı, yönlendiriliyorsunuz...');
+
                 setTimeout(() => {
                     Toast.hide(toast);
+
                     if (backendResponse.Role === 'patient') {
-                        navigation.navigate('PatientScreen', { userData: backendResponse, isPatientLogin: true });
+                        addPatient(backendResponse.ID)
+                            .then(() => {
+                                navigation.navigate('PatientScreen', { isPatientLogin: false });
+                            })
+                            .catch(() => {
+                                showErrorToast('❌ Hasta otomatik kaydı başarısız.');
+                            })
+                            .finally(() => {
+                                isProcessingRef.current = false;
+                            });
                     } else {
-                        setUserData(backendResponse);
-                        setShowOptions(true);
+                        navigation.navigate('PatientScreen', { isPatientLogin: false });
+                        isProcessingRef.current = false;
                     }
                 }, 2000);
             } else {
@@ -83,6 +94,7 @@ export default function HomeScreen() {
             }
         } catch (error) {
             console.log('Tag işleme hatası:', error);
+            showErrorToast('❌ NFC işleminde hata oluştu.');
             setTimeout(() => {
                 isProcessingRef.current = false;
             }, 3000);
@@ -93,7 +105,6 @@ export default function HomeScreen() {
         React.useCallback(() => {
             console.log('HomeScreen focused - NFC başlatılıyor');
             startNfcReading(handleTagDiscovered, setIsReading);
-            setShowOptions(false);
             setUserData(null);
             return () => {
                 console.log('HomeScreen unfocused - NFC durduruluyor');
@@ -104,38 +115,13 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
-            {showOptions ? (
-                <>
-                    <Text style={styles.welcomeText}>Hoş geldiniz, {userData?.PatientInfo?.Name || userData?.Name}</Text>
-                    <Text style={styles.optionTitle}>Lütfen bir seçenek seçin:</Text>
-                    <View style={styles.cardContainer}>
-                        <TouchableOpacity 
-                            style={styles.card} 
-                            onPress={() => navigation.navigate('PatientScreen')}
-                        >
-                            <Text style={styles.cardText}>📋 Hasta Bilgileri</Text>
-                            <Text style={styles.cardSubText}>(Bu cihaza kayıtlı hasta)</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={styles.card} 
-                            onPress={() => navigation.navigate('AddPatientScreen', { userData })}
-                        >
-                            <Text style={styles.cardText}>➕ Hasta Ekle</Text>
-                            <Text style={styles.cardSubText}>(Bu cihaza hasta kaydet)</Text>
-                        </TouchableOpacity>
-                    </View>
-                </>
-            ) : (
-                <>
-                    <Image source={require('../assets/nfc.png')} style={styles.nfcImage} />
-                    <Text style={styles.infoText}>
-                        Giriş için lütfen kartınızı okutunuz <Text style={styles.arrow}>⤴</Text>
-                    </Text>
-                    <Text style={styles.statusText}>
-                        {isReading ? '📱 NFC okuma aktif...' : '❌ NFC okuma durdu'}
-                    </Text>
-                </>
-            )}
+            <Image source={require('../assets/nfc.png')} style={styles.nfcImage} />
+            <Text style={styles.infoText}>
+                Giriş için lütfen kartınızı okutunuz <Text style={styles.arrow}>⤴</Text>
+            </Text>
+            <Text style={styles.statusText}>
+                {isReading ? '📱 NFC okuma aktif...' : '❌ NFC okuma durdu'}
+            </Text>
         </View>
     );
 }

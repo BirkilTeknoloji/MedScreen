@@ -1,7 +1,9 @@
 import { BASE_API_URL } from '@env';
+import DeviceInfo from 'react-native-device-info';
 
-export const addPatient = async (deviceId, userId) => {
+export const addPatient = async (userId) => {
   try {
+    const deviceId = DeviceInfo.getUniqueIdSync();
     const response = await fetch(`${BASE_API_URL}/devices/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,12 +46,12 @@ export const getPatientData = async (id) => {
 export const getPatientByDeviceId = async (deviceId) => {
   try {
     const url = `${BASE_API_URL}/users/device/${deviceId}/patientinfo`;
+    console.log('Cihaz ID ile hasta verisi alınıyor:', url);
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
     const data = await response.json();
-    console.log("device response:", data);
     if (response.ok) {
       return data;
     } else {

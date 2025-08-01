@@ -13,7 +13,6 @@ export async function sendRfidToBackend(tagId) {
                 'Accept': 'application/json',
             },
         });
-        console.log('Response:', response);
 
         if (!response.ok) {
             const errorText = await response.text();

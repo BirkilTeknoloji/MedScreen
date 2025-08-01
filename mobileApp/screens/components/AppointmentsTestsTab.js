@@ -4,7 +4,6 @@ import DropdownSection from './DropdownSection';
 import DataList from './DataList';
 
 export default function AppointmentsTestsTab({ data }) {
-  console.log("data", data)
   return (
     <ScrollView style={{ flex: 1 }}>
       <DropdownSection title="Randevular">

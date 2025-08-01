@@ -19,16 +19,7 @@ export default function PatientScreen({ route, navigation }) {
     const deviceId = DeviceInfo.getUniqueIdSync();
     console.log('Cihaz ID:', deviceId);
 
-    const isPatientLogin = route.params?.isPatientLogin;
-    const patientData = route.params?.userData;
-
-    if (isPatientLogin && patientData) {
-      console.log('Patient girişi - kendi bilgileri gösteriliyor:', patientData);
-      setUserData(patientData);
-      setIsLoading(false);
-      return;
-    }
-
+    // cihaz ID'ye bağlı hasta verisi çekiliyor
     fetchPatientData(deviceId);
   }, [route.params]);
 
