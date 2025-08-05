@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Alert, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, Alert, ActivityIndicator, TouchableOpacity, Modal, Pressable, Image } from 'react-native';
 import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
 import styles from './styles/QrScannerScreenStyle';
 import { BASE_API_URL } from '@env';
@@ -11,6 +11,8 @@ export default function QrScannerScreen({ navigation }) {
   const [scannedData, setScannedData] = useState(null);
   const [patientInfo, setPatientInfo] = useState(null);
   const [fetchingInfo, setFetchingInfo] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState(null);
   const device = useCameraDevice('front');
 
   useEffect(() => {
@@ -28,22 +30,18 @@ export default function QrScannerScreen({ navigation }) {
     })();
   }, []);
 
-  // API çağrısı
   const fetchPatientInfo = async ({ id, field, itemId }) => {
     try {
       setFetchingInfo(true);
       const response = await fetch(`${BASE_API_URL}/users/${id}/patientinfo/${field}/${itemId}`);
-      console.log('Hasta bilgisi alınıyor:', response.url);
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
+
       const data = await response.json();
       setPatientInfo(data);
     } catch (error) {
-      console.error('Hasta bilgisi alınamadı:', error);
-      Alert.alert('Hata', 'Hasta bilgisi alınamadı. Lütfen tekrar deneyin.');
+      console.error('Failed to retrieve patient information:', error);
+      Alert.alert('Error', 'Failed to retrieve patient information. Please try again.');
       setPatientInfo(null);
-      // İstersen yeniden taramaya izin ver:
       setIsScanning(true);
       setScannedData(null);
     } finally {
@@ -51,16 +49,11 @@ export default function QrScannerScreen({ navigation }) {
     }
   };
 
-  // QR kod okunduğunda otomatik çalışan fonksiyon
   const handleScan = async (codes) => {
     if (codes.length > 0 && isScanning) {
       const value = codes[0].value;
       setIsScanning(false);
-      setScannedData({
-        content: value,
-        type: typeof value,
-        length: value.length,
-      });
+      setScannedData({ content: value, type: typeof value, length: value.length });
       setPatientInfo(null);
 
       try {
@@ -68,18 +61,12 @@ export default function QrScannerScreen({ navigation }) {
         if (parsed.id && parsed.field && parsed.itemId) {
           await fetchPatientInfo(parsed);
         } else {
-          Alert.alert(
-            'Eksik Veri',
-            'QR kod içeriği gerekli alanları içermiyor: id, field, itemId'
-          );
+          Alert.alert('Missing Data', 'QR code content does not contain required fields: id, field, itemId');
           setIsScanning(true);
           setScannedData(null);
         }
-      } catch (err) {
-        Alert.alert(
-          'JSON Parse Hatası',
-          'QR içeriği JSON formatında değil veya hatalı.'
-        );
+      } catch {
+        Alert.alert('JSON Parse Error', 'QR code content is not in valid JSON format or is corrupted.');
         setIsScanning(true);
         setScannedData(null);
       }
@@ -97,6 +84,8 @@ export default function QrScannerScreen({ navigation }) {
     setIsScanning(true);
   };
 
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
   if (isLoading) {
     return (
       <View style={styles.center}>
@@ -110,9 +99,7 @@ export default function QrScannerScreen({ navigation }) {
     return (
       <View style={styles.center}>
         <Text style={styles.errorText}>Kamera izni gerekli</Text>
-        <Text style={styles.infoText}>
-          Lütfen uygulama ayarlarından kamera iznini etkinleştirin
-        </Text>
+        <Text style={styles.infoText}>Lütfen uygulama ayarlarından kamera iznini etkinleştirin</Text>
       </View>
     );
   }
@@ -143,18 +130,14 @@ export default function QrScannerScreen({ navigation }) {
         </View>
         {isScanning && (
           <View style={styles.infoContainer}>
-            <Text style={styles.instructionText}>
-              QR kodu kamera görüş alanına yerleştirin
-            </Text>
-            <Text style={styles.cameraInfoText}>
-              📱 Kamera: {device.position === 'front' ? 'Ön' : 'Arka'}
-            </Text>
+            <Text style={styles.instructionText}>QR kodu kamera görüş alanına yerleştirin</Text>
+            <Text style={styles.cameraInfoText}>📱 Kamera: {device.position === 'front' ? 'Ön' : 'Arka'}</Text>
           </View>
         )}
       </View>
 
       {fetchingInfo && (
-        <View style={{ padding: 10 }}>
+        <View style={{ padding: 10, alignItems: 'center' }}>
           <ActivityIndicator size="large" />
           <Text>Hasta bilgisi yükleniyor...</Text>
         </View>
@@ -165,18 +148,89 @@ export default function QrScannerScreen({ navigation }) {
           <View style={styles.resultContainer}>
             <Text style={styles.resultTitle}>{patientInfo.title}</Text>
 
-            <View style={{ marginTop: 16 }}>                
-              <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333' }}>
+            <View style={{ marginTop: 16 }}>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 8 }}>
                 Sonuç:
               </Text>
-              <Text style={{
-                fontSize: 18,
-                marginBottom: 12,
-                color: patientInfo.result === 'normal' ? 'green' : 'red',
-                fontWeight: '600'
-              }}>
-                {patientInfo.result}
-              </Text>
+
+              {Array.isArray(patientInfo.result) ? (
+                patientInfo.result.map((item, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      marginBottom: 12,
+                      padding: 12,
+                      backgroundColor: '#f9f9f9',
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      borderColor: '#ddd',
+                    }}
+                  >
+                    {Object.entries(item).map(([key, value]) => {
+                      if (key.toLowerCase() === 'imageurl' && typeof value === 'string') {
+                        return (
+                          <Pressable
+                            key={key}
+                            onPress={() => {
+                              setModalImageUrl(value);
+                              setModalVisible(true);
+                            }}
+                          >
+                            <Image
+                              source={{ uri: value }}
+                              style={{ width: 150, height: 150, marginBottom: 8, borderRadius: 8 }}
+                              resizeMode="contain"
+                            />
+                          </Pressable>
+                        );
+                      }
+                      return (
+                        <Text key={key} style={{ fontSize: 14, marginBottom: 4, color: '#444' }}>
+                          <Text style={{ fontWeight: 'bold' }}>{capitalize(key)}: </Text>
+                          {String(value)}
+                        </Text>
+                      );
+                    })}
+                  </View>
+                ))
+              ) : (
+                <View
+                  style={{
+                    marginBottom: 12,
+                    padding: 12,
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: '#ddd',
+                  }}
+                >
+                  {Object.entries(patientInfo.result).map(([key, value]) => {
+                    if (key.toLowerCase() === 'imageurl' && typeof value === 'string') {
+                      return (
+                        <Pressable
+                          key={key}
+                          onPress={() => {
+                            setModalImageUrl(value);
+                            setModalVisible(true);
+                          }}
+                        >
+                          <Image
+                            source={{ uri: value }}
+                            style={{ width: 150, height: 150, marginBottom: 8, borderRadius: 8 }}
+                            resizeMode="contain"
+                          />
+                        </Pressable>
+                      );
+                    }
+                    return (
+                      <Text key={key} style={{ fontSize: 14, marginBottom: 4, color: '#444' }}>
+                        <Text style={{ fontWeight: 'bold' }}>{capitalize(key)}: </Text>
+                        {String(value)}
+                      </Text>
+                    );
+                  })}
+                </View>
+              )}
             </View>
 
             <TouchableOpacity
@@ -186,6 +240,7 @@ export default function QrScannerScreen({ navigation }) {
             >
               <Text style={styles.buttonText}>Yeniden Tara</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={[styles.button, styles.homeButton]}
               onPress={() => navigation.navigate('PatientScreen')}
@@ -197,7 +252,29 @@ export default function QrScannerScreen({ navigation }) {
         </View>
       )}
 
-      {/* Eğer istersen, hata veya eksik veri durumunda yeniden tarama otomatik aktif olacak */}
+      {/* Modal for showing large image */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <Pressable
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => setModalVisible(false)}
+        >
+          <Image
+            source={{ uri: modalImageUrl }}
+            style={{ width: '90%', height: '90%', borderRadius: 12 }}
+            resizeMode="contain"
+          />
+        </Pressable>
+      </Modal>
     </View>
   );
 }
