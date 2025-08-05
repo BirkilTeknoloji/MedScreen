@@ -23,6 +23,9 @@ func SetupRoutes(app *fiber.App) {
 		users.Get("/:id/patientinfo", controllers.GetPatientInfoForUser)
 		users.Put("/:id/patientinfo", controllers.UpdatePatientInfoForUser)
 		users.Get("/device/:deviceId/patientinfo", controllers.GetPatientInfoByDeviceId)
+
+		// QR kod okuma ile hastanın belirli bir test/reçete gibi bilgisini getiren route
+		users.Get("/:id/patientinfo/:field/:itemId", controllers.GetPatientInfoDetailByQR)
 	}
 
 	// Device routes
