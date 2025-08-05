@@ -5,6 +5,7 @@ import (
 	"go-backend/models"
 	"go-backend/services"
 	"go-backend/utils"
+	"reflect"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -58,7 +59,7 @@ func GetPatientInfoByDeviceId(c *fiber.Ctx) error {
 // Bu fonksiyon, hastanın belirli bir verisine bağlanan QR kodlarıyla kullanılmak üzere tasarlanmıştır.
 func GetPatientInfoDetailByQR(c *fiber.Ctx) error {
 	userID := c.Params("id")
-	field := c.Params("field")
+	field := strings.Title(strings.ToLower(c.Params("field"))) // örn: "appointments" → "Appointments"
 	itemID := c.Params("itemId")
 
 	var patientInfo models.PatientInfo
@@ -68,50 +69,38 @@ func GetPatientInfoDetailByQR(c *fiber.Ctx) error {
 		})
 	}
 
-	switch strings.ToLower(field) {
-	case "appointments":
-		for _, item := range patientInfo.Appointments {
-			if item.ID == itemID {
-				return c.JSON(item)
-			}
-		}
-	case "diagnosis":
-		for _, item := range patientInfo.Diagnosis {
-			if item.ID == itemID {
-				return c.JSON(item)
-			}
-		}
-	case "prescriptions":
-		for _, item := range patientInfo.Prescriptions {
-			if item.ID == itemID {
-				return c.JSON(item)
-			}
-		}
-	case "notes":
-		for _, item := range patientInfo.Notes {
-			if item.ID == itemID {
-				return c.JSON(item)
-			}
-		}
-	case "tests":
-		for _, item := range patientInfo.Tests {
-			if item.ID == itemID {
-				return c.JSON(item)
-			}
-		}
-	case "allergies":
-		for _, item := range patientInfo.Allergies {
-			if item.ID == itemID {
-				return c.JSON(item)
-			}
-		}
-	default:
+	// patientInfo'yu reflection ile ele al
+	v := reflect.ValueOf(patientInfo)
+	fieldValue := v.FieldByName(field)
+
+	// Geçerli bir alan mı kontrolü
+	if !fieldValue.IsValid() {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Geçersiz alan belirtildi. Geçerli alanlar: appointments, diagnosis, prescriptions, notes, tests, allergies.",
+			"error": "Geçersiz alan belirtildi. Geçerli alanlar: Appointments, Diagnosis, Prescriptions, Notes, Tests, Allergies.",
 		})
 	}
 
-	// Eğer buraya gelinirse, belirtilen alandaki listede öğe bulunamamıştır.
+	// Alan bir slice mı?
+	if fieldValue.Kind() != reflect.Slice {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Belirtilen alan bir liste değil",
+		})
+	}
+
+	// Listeyi gez ve ID eşleşmesini kontrol et
+	for i := 0; i < fieldValue.Len(); i++ {
+		item := fieldValue.Index(i)
+		idField := item.FieldByName("ID")
+
+		if !idField.IsValid() {
+			continue
+		}
+
+		if idField.String() == itemID {
+			return c.JSON(item.Interface())
+		}
+	}
+
 	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 		"error": "Belirtilen alanda verilen ID ile öğe bulunamadı",
 	})
