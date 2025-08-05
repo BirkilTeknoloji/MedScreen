@@ -33,7 +33,7 @@ export default function AddPatientScreen() {
             if (!user?.ID || !user?.PatientInfo) throw new Error('Kullanıcı bulunamadı');
             setUserData(user);
         } catch (error) {
-            console.log('❌ Hata:', error);
+            console.error('❌ Hata:', error);
         } finally {
             setTimeout(() => {
                 isProcessingRef.current = false;

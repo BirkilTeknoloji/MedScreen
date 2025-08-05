@@ -17,7 +17,6 @@ export default function PatientScreen({ route, navigation }) {
 
   useEffect(() => {
     const deviceId = DeviceInfo.getUniqueIdSync();
-    console.log('Cihaz ID:', deviceId);
 
     // cihaz ID'ye bağlı hasta verisi çekiliyor
     fetchPatientData(deviceId);
@@ -28,10 +27,9 @@ export default function PatientScreen({ route, navigation }) {
       const data = await getPatientByDeviceId(deviceId);
       if (data) {
         setUserData(data);
-        console.log('Cihaza kayıtlı hasta bulundu:', data);
       } else {
         setError("Bu cihaza kayıtlı hasta bulunamadı.");
-        console.log('Cihaza kayıtlı hasta yok');
+        console.warn('Cihaza kayıtlı hasta yok');
       }
     } catch (err) {
       console.error('Hasta verilerini alma hatası:', err);

@@ -56,12 +56,11 @@ export default function HomeScreen() {
 
     const handleTagDiscovered = async (tag) => {
         if (isProcessingRef.current) {
-            console.log('Tag işlemi zaten devam ediyor, yeni işlem engellendi');
+            console.warn('Tag işlemi zaten devam ediyor, yeni işlem engellendi');
             return;
         }
         isProcessingRef.current = true;
         try {
-            console.log('📦 NFC Tag Okundu:', JSON.stringify(tag));
             const backendResponse = await sendRfidToBackend(tag.id || JSON.stringify(tag.id));
 
             if (backendResponse?.Role) {
@@ -93,7 +92,7 @@ export default function HomeScreen() {
                 }, 3000);
             }
         } catch (error) {
-            console.log('Tag işleme hatası:', error);
+            console.error('Tag işleme hatası:', error);
             showErrorToast('❌ NFC işleminde hata oluştu.');
             setTimeout(() => {
                 isProcessingRef.current = false;
@@ -103,11 +102,9 @@ export default function HomeScreen() {
 
     useFocusEffect(
         React.useCallback(() => {
-            console.log('HomeScreen focused - NFC başlatılıyor');
             startNfcReading(handleTagDiscovered, setIsReading);
             setUserData(null);
             return () => {
-                console.log('HomeScreen unfocused - NFC durduruluyor');
                 stopNfcReading(setIsReading, isProcessingRef);
             };
         }, [])

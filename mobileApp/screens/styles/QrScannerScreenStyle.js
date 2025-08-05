@@ -170,4 +170,9 @@ export default StyleSheet.create({
     width: '100%',
     marginTop: 10,
   },
+    homeButton: {
+    backgroundColor: '#50a87cff',
+    width: '100%',
+    marginTop: 10,
+  },
 });
