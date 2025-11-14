@@ -1,0 +1,48 @@
+# Environment variables
+.env
+
+.kiro
+database_query.sql
+database.txt
+
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+medscreen
+medscreen.exe
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Dependency directories
+vendor/
+
+# Build directories
+bin/
+dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
