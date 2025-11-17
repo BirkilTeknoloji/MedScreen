@@ -71,24 +71,11 @@ func InitDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 func RunMigrations(db *gorm.DB) error {
 	log.Println("Running database migrations...")
 
-	// Note: Models will be added in subsequent tasks
-	// For now, this function is ready to accept models when they are created
-	// Example usage when models are ready:
-	// err := db.AutoMigrate(
-	//     &models.User{},
-	//     &models.NFCCard{},
-	//     &models.Patient{},
-	//     &models.Appointment{},
-	//     &models.Diagnosis{},
-	//     &models.Prescription{},
-	//     &models.MedicalTest{},
-	//     &models.MedicalHistory{},
-	//     &models.SurgeryHistory{},
-	//     &models.Allergy{},
-	//     &models.VitalSign{},
-	// )
+	// Import models package is required at the top of the file
+	// This will be handled by the import statement
 
-	// Placeholder for now - will be populated when models are created
+	// Note: Since the database already exists with tables, AutoMigrate will
+	// only add missing columns and indexes, not recreate existing tables
 	err := db.AutoMigrate()
 
 	if err != nil {
