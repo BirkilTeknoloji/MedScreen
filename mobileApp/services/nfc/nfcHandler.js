@@ -3,6 +3,7 @@ import { BASE_API_URL } from '@env';
 
 export async function sendRfidToBackend(tagId) {
     const url = `${BASE_API_URL}/users/card/${tagId}`;
+    console.log(url)
     try {
         const response = await fetch(url, {
             method: 'GET',

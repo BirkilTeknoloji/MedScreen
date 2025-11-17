@@ -1,9 +1,10 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 20 
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#e5edf5ff',
   },
   loadingText: {
     textAlign: 'center',
@@ -11,7 +12,7 @@ export default StyleSheet.create({
     marginTop: 50,
   },
   errorText: {
-    color: 'red', 
+    color: 'red',
     textAlign: 'center',
     fontSize: 16,
     marginTop: 50,
@@ -21,4 +22,12 @@ export default StyleSheet.create({
     fontSize: 16,
     marginTop: 50,
   },
+  
+  contentRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 20,
+  },
+  
+  
 });

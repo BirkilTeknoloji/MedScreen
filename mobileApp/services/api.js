@@ -9,6 +9,7 @@ export const addPatient = async (userId) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ device_id: deviceId, user_id: userId }),
     });
+    console.log(response)
     if (!response.ok) {
       const errorData = await response.text();
       console.error('API response error:', errorData);
@@ -44,6 +45,7 @@ export const getPatientData = async (id) => {
 export const getPatientByDeviceId = async (deviceId) => {
   try {
     const url = `${BASE_API_URL}/users/device/${deviceId}/patientinfo`;
+    console.log("patientURL: ",url)
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
