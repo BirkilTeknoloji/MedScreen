@@ -7,6 +7,7 @@ import (
 // ErrorResponse represents a standardized error response
 type ErrorResponse struct {
 	Success bool        `json:"success"`
+	Code    string      `json:"code"`
 	Message string      `json:"message"`
 	Error   string      `json:"error,omitempty"`
 	Details interface{} `json:"details,omitempty"`
@@ -15,6 +16,7 @@ type ErrorResponse struct {
 // SuccessResponse represents a standardized success response
 type SuccessResponse struct {
 	Success bool        `json:"success"`
+	Code    string      `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 	Meta    *Meta       `json:"meta,omitempty"`
@@ -29,9 +31,14 @@ type Meta struct {
 }
 
 // SendErrorResponse sends a standardized error response
-func SendErrorResponse(c *gin.Context, statusCode int, message string, err error) {
+func SendErrorResponse(c *gin.Context, statusCode int, code string, message string, err error) {
+	if code == "" {
+		code = "UNKNOWN_ERROR"
+	}
+
 	response := ErrorResponse{
 		Success: false,
+		Code:    code,
 		Message: message,
 	}
 
@@ -43,9 +50,14 @@ func SendErrorResponse(c *gin.Context, statusCode int, message string, err error
 }
 
 // SendSuccessResponse sends a standardized success response
-func SendSuccessResponse(c *gin.Context, statusCode int, message string, data interface{}) {
+func SendSuccessResponse(c *gin.Context, statusCode int, code string, message string, data interface{}) {
+	if code == "" {
+		code = "OPERATION_COMPLETED"
+	}
+
 	response := SuccessResponse{
 		Success: true,
+		Code:    code,
 		Message: message,
 		Data:    data,
 	}
@@ -54,9 +66,14 @@ func SendSuccessResponse(c *gin.Context, statusCode int, message string, data in
 }
 
 // SendSuccessResponseWithMeta sends a standardized success response with pagination metadata
-func SendSuccessResponseWithMeta(c *gin.Context, statusCode int, message string, data interface{}, meta *Meta) {
+func SendSuccessResponseWithMeta(c *gin.Context, statusCode int, code string, message string, data interface{}, meta *Meta) {
+	if code == "" {
+		code = "OPERATION_COMPLETED"
+	}
+
 	response := SuccessResponse{
 		Success: true,
+		Code:    code,
 		Message: message,
 		Data:    data,
 		Meta:    meta,
