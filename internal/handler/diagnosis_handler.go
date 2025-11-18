@@ -25,33 +25,33 @@ func NewDiagnosisHandler(service service.DiagnosisService) *DiagnosisHandler {
 func (h *DiagnosisHandler) CreateDiagnosis(c *gin.Context) {
 	var diagnosis models.Diagnosis
 	if err := c.ShouldBindJSON(&diagnosis); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.CreateDiagnosis(&diagnosis); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to create diagnosis", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_DIAGNOSIS_CREATE_FAILED, "Failed to create diagnosis", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusCreated, "Diagnosis created successfully", diagnosis)
+	utils.SendSuccessResponse(c, http.StatusCreated, utils.SUCCESS_DIAGNOSIS_CREATED, "Diagnosis created successfully", diagnosis)
 }
 
 // GetDiagnosis handles GET /api/v1/diagnoses/:id
 func (h *DiagnosisHandler) GetDiagnosis(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid diagnosis ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_DIAGNOSIS_ID, "Invalid diagnosis ID", err)
 		return
 	}
 
 	diagnosis, err := h.service.GetDiagnosis(uint(id))
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusNotFound, "Diagnosis not found", err)
+		utils.SendErrorResponse(c, http.StatusNotFound, utils.ERROR_DIAGNOSIS_NOT_FOUND, "Diagnosis not found", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Diagnosis retrieved successfully", diagnosis)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_DIAGNOSIS_RETRIEVED, "Diagnosis retrieved successfully", diagnosis)
 }
 
 // GetDiagnoses handles GET /api/v1/diagnoses
@@ -107,60 +107,60 @@ func (h *DiagnosisHandler) GetDiagnoses(c *gin.Context) {
 	if patientID != nil || doctorID != nil || appointmentID != nil || startDate != nil || endDate != nil {
 		diagnoses, total, err := h.service.GetDiagnosesByFilters(patientID, doctorID, appointmentID, startDate, endDate, page, limit)
 		if err != nil {
-			utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve diagnoses", err)
+			utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve diagnoses", err)
 			return
 		}
 
 		meta := utils.CalculateMeta(page, limit, total)
-		utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Diagnoses retrieved successfully", diagnoses, meta)
+		utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_DIAGNOSES_RETRIEVED, "Diagnoses retrieved successfully", diagnoses, meta)
 		return
 	}
 
 	// Default: get all diagnoses
 	diagnoses, total, err := h.service.GetDiagnoses(page, limit)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve diagnoses", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve diagnoses", err)
 		return
 	}
 
 	meta := utils.CalculateMeta(page, limit, total)
-	utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Diagnoses retrieved successfully", diagnoses, meta)
+	utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_DIAGNOSES_RETRIEVED, "Diagnoses retrieved successfully", diagnoses, meta)
 }
 
 // UpdateDiagnosis handles PUT /api/v1/diagnoses/:id
 func (h *DiagnosisHandler) UpdateDiagnosis(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid diagnosis ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_DIAGNOSIS_ID, "Invalid diagnosis ID", err)
 		return
 	}
 
 	var diagnosis models.Diagnosis
 	if err := c.ShouldBindJSON(&diagnosis); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.UpdateDiagnosis(uint(id), &diagnosis); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to update diagnosis", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_DIAGNOSIS_UPDATE_FAILED, "Failed to update diagnosis", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Diagnosis updated successfully", diagnosis)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_DIAGNOSIS_UPDATED, "Diagnosis updated successfully", diagnosis)
 }
 
 // DeleteDiagnosis handles DELETE /api/v1/diagnoses/:id
 func (h *DiagnosisHandler) DeleteDiagnosis(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid diagnosis ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_DIAGNOSIS_ID, "Invalid diagnosis ID", err)
 		return
 	}
 
 	if err := h.service.DeleteDiagnosis(uint(id)); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to delete diagnosis", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_DIAGNOSIS_DELETE_FAILED, "Failed to delete diagnosis", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Diagnosis deleted successfully", nil)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_DIAGNOSIS_DELETED, "Diagnosis deleted successfully", nil)
 }

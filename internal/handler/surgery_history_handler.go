@@ -25,33 +25,33 @@ func NewSurgeryHistoryHandler(service service.SurgeryHistoryService) *SurgeryHis
 func (h *SurgeryHistoryHandler) CreateSurgeryHistory(c *gin.Context) {
 	var surgery models.SurgeryHistory
 	if err := c.ShouldBindJSON(&surgery); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.CreateSurgeryHistory(&surgery); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to create surgery history", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_SURGERY_HISTORY_CREATE_FAILED, "Failed to create surgery history", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusCreated, "Surgery history created successfully", surgery)
+	utils.SendSuccessResponse(c, http.StatusCreated, utils.SUCCESS_SURGERY_HISTORY_CREATED, "Surgery history created successfully", surgery)
 }
 
 // GetSurgeryHistory handles GET /api/v1/surgery-histories/:id
 func (h *SurgeryHistoryHandler) GetSurgeryHistory(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid surgery history ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_SURGERY_HISTORY_ID, "Invalid surgery history ID", err)
 		return
 	}
 
 	surgery, err := h.service.GetSurgeryHistory(uint(id))
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusNotFound, "Surgery history not found", err)
+		utils.SendErrorResponse(c, http.StatusNotFound, utils.ERROR_SURGERY_HISTORY_NOT_FOUND, "Surgery history not found", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Surgery history retrieved successfully", surgery)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_SURGERY_HISTORY_RETRIEVED, "Surgery history retrieved successfully", surgery)
 }
 
 // GetSurgeryHistories handles GET /api/v1/surgery-histories
@@ -93,60 +93,60 @@ func (h *SurgeryHistoryHandler) GetSurgeryHistories(c *gin.Context) {
 	if patientID != nil || startDate != nil || endDate != nil {
 		surgeries, total, err := h.service.GetSurgeryHistoriesByFilters(patientID, startDate, endDate, page, limit)
 		if err != nil {
-			utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve surgery histories", err)
+			utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve surgery histories", err)
 			return
 		}
 
 		meta := utils.CalculateMeta(page, limit, total)
-		utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Surgery histories retrieved successfully", surgeries, meta)
+		utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_SURGERY_HISTORIES_RETRIEVED, "Surgery histories retrieved successfully", surgeries, meta)
 		return
 	}
 
 	// Default: get all surgery histories
 	surgeries, total, err := h.service.GetSurgeryHistories(page, limit)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve surgery histories", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve surgery histories", err)
 		return
 	}
 
 	meta := utils.CalculateMeta(page, limit, total)
-	utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Surgery histories retrieved successfully", surgeries, meta)
+	utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_SURGERY_HISTORIES_RETRIEVED, "Surgery histories retrieved successfully", surgeries, meta)
 }
 
 // UpdateSurgeryHistory handles PUT /api/v1/surgery-histories/:id
 func (h *SurgeryHistoryHandler) UpdateSurgeryHistory(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid surgery history ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_SURGERY_HISTORY_ID, "Invalid surgery history ID", err)
 		return
 	}
 
 	var surgery models.SurgeryHistory
 	if err := c.ShouldBindJSON(&surgery); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.UpdateSurgeryHistory(uint(id), &surgery); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to update surgery history", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_SURGERY_HISTORY_UPDATE_FAILED, "Failed to update surgery history", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Surgery history updated successfully", surgery)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_SURGERY_HISTORY_UPDATED, "Surgery history updated successfully", surgery)
 }
 
 // DeleteSurgeryHistory handles DELETE /api/v1/surgery-histories/:id
 func (h *SurgeryHistoryHandler) DeleteSurgeryHistory(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid surgery history ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_SURGERY_HISTORY_ID, "Invalid surgery history ID", err)
 		return
 	}
 
 	if err := h.service.DeleteSurgeryHistory(uint(id)); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to delete surgery history", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_SURGERY_HISTORY_DELETE_FAILED, "Failed to delete surgery history", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Surgery history deleted successfully", nil)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_SURGERY_HISTORY_DELETED, "Surgery history deleted successfully", nil)
 }

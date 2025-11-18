@@ -24,33 +24,33 @@ func NewAllergyHandler(service service.AllergyService) *AllergyHandler {
 func (h *AllergyHandler) CreateAllergy(c *gin.Context) {
 	var allergy models.Allergy
 	if err := c.ShouldBindJSON(&allergy); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.CreateAllergy(&allergy); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to create allergy", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_ALLERGY_CREATE_FAILED, "Failed to create allergy", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusCreated, "Allergy created successfully", allergy)
+	utils.SendSuccessResponse(c, http.StatusCreated, utils.SUCCESS_ALLERGY_CREATED, "Allergy created successfully", allergy)
 }
 
 // GetAllergy handles GET /api/v1/allergies/:id
 func (h *AllergyHandler) GetAllergy(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid allergy ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_ALLERGY_ID, "Invalid allergy ID", err)
 		return
 	}
 
 	allergy, err := h.service.GetAllergy(uint(id))
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusNotFound, "Allergy not found", err)
+		utils.SendErrorResponse(c, http.StatusNotFound, utils.ERROR_ALLERGY_NOT_FOUND, "Allergy not found", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Allergy retrieved successfully", allergy)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_ALLERGY_RETRIEVED, "Allergy retrieved successfully", allergy)
 }
 
 // GetAllergies handles GET /api/v1/allergies
@@ -85,60 +85,60 @@ func (h *AllergyHandler) GetAllergies(c *gin.Context) {
 	if patientID != nil || severity != nil {
 		allergies, total, err := h.service.GetAllergiesByFilters(patientID, severity, page, limit)
 		if err != nil {
-			utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve allergies", err)
+			utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve allergies", err)
 			return
 		}
 
 		meta := utils.CalculateMeta(page, limit, total)
-		utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Allergies retrieved successfully", allergies, meta)
+		utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_ALLERGIES_RETRIEVED, "Allergies retrieved successfully", allergies, meta)
 		return
 	}
 
 	// Default: get all allergies
 	allergies, total, err := h.service.GetAllergies(page, limit)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve allergies", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve allergies", err)
 		return
 	}
 
 	meta := utils.CalculateMeta(page, limit, total)
-	utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Allergies retrieved successfully", allergies, meta)
+	utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_ALLERGIES_RETRIEVED, "Allergies retrieved successfully", allergies, meta)
 }
 
 // UpdateAllergy handles PUT /api/v1/allergies/:id
 func (h *AllergyHandler) UpdateAllergy(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid allergy ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_ALLERGY_ID, "Invalid allergy ID", err)
 		return
 	}
 
 	var allergy models.Allergy
 	if err := c.ShouldBindJSON(&allergy); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.UpdateAllergy(uint(id), &allergy); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to update allergy", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_ALLERGY_UPDATE_FAILED, "Failed to update allergy", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Allergy updated successfully", allergy)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_ALLERGY_UPDATED, "Allergy updated successfully", allergy)
 }
 
 // DeleteAllergy handles DELETE /api/v1/allergies/:id
 func (h *AllergyHandler) DeleteAllergy(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid allergy ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_ALLERGY_ID, "Invalid allergy ID", err)
 		return
 	}
 
 	if err := h.service.DeleteAllergy(uint(id)); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to delete allergy", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_ALLERGY_DELETE_FAILED, "Failed to delete allergy", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Allergy deleted successfully", nil)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_ALLERGY_DELETED, "Allergy deleted successfully", nil)
 }

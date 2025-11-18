@@ -25,33 +25,33 @@ func NewMedicalTestHandler(service service.MedicalTestService) *MedicalTestHandl
 func (h *MedicalTestHandler) CreateMedicalTest(c *gin.Context) {
 	var test models.MedicalTest
 	if err := c.ShouldBindJSON(&test); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.CreateMedicalTest(&test); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to create medical test", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_MEDICAL_TEST_CREATE_FAILED, "Failed to create medical test", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusCreated, "Medical test created successfully", test)
+	utils.SendSuccessResponse(c, http.StatusCreated, utils.SUCCESS_MEDICAL_TEST_CREATED, "Medical test created successfully", test)
 }
 
 // GetMedicalTest handles GET /api/v1/medical-tests/:id
 func (h *MedicalTestHandler) GetMedicalTest(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid medical test ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_MEDICAL_TEST_ID, "Invalid medical test ID", err)
 		return
 	}
 
 	test, err := h.service.GetMedicalTest(uint(id))
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusNotFound, "Medical test not found", err)
+		utils.SendErrorResponse(c, http.StatusNotFound, utils.ERROR_MEDICAL_TEST_NOT_FOUND, "Medical test not found", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Medical test retrieved successfully", test)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_MEDICAL_TEST_RETRIEVED, "Medical test retrieved successfully", test)
 }
 
 // GetMedicalTests handles GET /api/v1/medical-tests
@@ -112,60 +112,60 @@ func (h *MedicalTestHandler) GetMedicalTests(c *gin.Context) {
 	if patientID != nil || doctorID != nil || testType != nil || status != nil || startDate != nil || endDate != nil {
 		tests, total, err := h.service.GetMedicalTestsByFilters(patientID, doctorID, testType, status, startDate, endDate, page, limit)
 		if err != nil {
-			utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve medical tests", err)
+			utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve medical tests", err)
 			return
 		}
 
 		meta := utils.CalculateMeta(page, limit, total)
-		utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Medical tests retrieved successfully", tests, meta)
+		utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_MEDICAL_TESTS_RETRIEVED, "Medical tests retrieved successfully", tests, meta)
 		return
 	}
 
 	// Default: get all medical tests
 	tests, total, err := h.service.GetMedicalTests(page, limit)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve medical tests", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve medical tests", err)
 		return
 	}
 
 	meta := utils.CalculateMeta(page, limit, total)
-	utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Medical tests retrieved successfully", tests, meta)
+	utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_MEDICAL_TESTS_RETRIEVED, "Medical tests retrieved successfully", tests, meta)
 }
 
 // UpdateMedicalTest handles PUT /api/v1/medical-tests/:id
 func (h *MedicalTestHandler) UpdateMedicalTest(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid medical test ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_MEDICAL_TEST_ID, "Invalid medical test ID", err)
 		return
 	}
 
 	var test models.MedicalTest
 	if err := c.ShouldBindJSON(&test); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.UpdateMedicalTest(uint(id), &test); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to update medical test", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_MEDICAL_TEST_UPDATE_FAILED, "Failed to update medical test", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Medical test updated successfully", test)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_MEDICAL_TEST_UPDATED, "Medical test updated successfully", test)
 }
 
 // DeleteMedicalTest handles DELETE /api/v1/medical-tests/:id
 func (h *MedicalTestHandler) DeleteMedicalTest(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid medical test ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_MEDICAL_TEST_ID, "Invalid medical test ID", err)
 		return
 	}
 
 	if err := h.service.DeleteMedicalTest(uint(id)); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to delete medical test", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_MEDICAL_TEST_DELETE_FAILED, "Failed to delete medical test", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Medical test deleted successfully", nil)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_MEDICAL_TEST_DELETED, "Medical test deleted successfully", nil)
 }

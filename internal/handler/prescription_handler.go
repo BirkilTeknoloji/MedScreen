@@ -25,33 +25,33 @@ func NewPrescriptionHandler(service service.PrescriptionService) *PrescriptionHa
 func (h *PrescriptionHandler) CreatePrescription(c *gin.Context) {
 	var prescription models.Prescription
 	if err := c.ShouldBindJSON(&prescription); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.CreatePrescription(&prescription); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to create prescription", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_PRESCRIPTION_CREATE_FAILED, "Failed to create prescription", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusCreated, "Prescription created successfully", prescription)
+	utils.SendSuccessResponse(c, http.StatusCreated, utils.SUCCESS_PRESCRIPTION_CREATED, "Prescription created successfully", prescription)
 }
 
 // GetPrescription handles GET /api/v1/prescriptions/:id
 func (h *PrescriptionHandler) GetPrescription(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid prescription ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_PRESCRIPTION_ID, "Invalid prescription ID", err)
 		return
 	}
 
 	prescription, err := h.service.GetPrescription(uint(id))
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusNotFound, "Prescription not found", err)
+		utils.SendErrorResponse(c, http.StatusNotFound, utils.ERROR_PRESCRIPTION_NOT_FOUND, "Prescription not found", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Prescription retrieved successfully", prescription)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_PRESCRIPTION_RETRIEVED, "Prescription retrieved successfully", prescription)
 }
 
 // GetPrescriptions handles GET /api/v1/prescriptions
@@ -106,60 +106,60 @@ func (h *PrescriptionHandler) GetPrescriptions(c *gin.Context) {
 	if patientID != nil || doctorID != nil || status != nil || startDate != nil || endDate != nil {
 		prescriptions, total, err := h.service.GetPrescriptionsByFilters(patientID, doctorID, status, startDate, endDate, page, limit)
 		if err != nil {
-			utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve prescriptions", err)
+			utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve prescriptions", err)
 			return
 		}
 
 		meta := utils.CalculateMeta(page, limit, total)
-		utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Prescriptions retrieved successfully", prescriptions, meta)
+		utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_PRESCRIPTIONS_RETRIEVED, "Prescriptions retrieved successfully", prescriptions, meta)
 		return
 	}
 
 	// Default: get all prescriptions
 	prescriptions, total, err := h.service.GetPrescriptions(page, limit)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to retrieve prescriptions", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve prescriptions", err)
 		return
 	}
 
 	meta := utils.CalculateMeta(page, limit, total)
-	utils.SendSuccessResponseWithMeta(c, http.StatusOK, "Prescriptions retrieved successfully", prescriptions, meta)
+	utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_PRESCRIPTIONS_RETRIEVED, "Prescriptions retrieved successfully", prescriptions, meta)
 }
 
 // UpdatePrescription handles PUT /api/v1/prescriptions/:id
 func (h *PrescriptionHandler) UpdatePrescription(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid prescription ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_PRESCRIPTION_ID, "Invalid prescription ID", err)
 		return
 	}
 
 	var prescription models.Prescription
 	if err := c.ShouldBindJSON(&prescription); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.UpdatePrescription(uint(id), &prescription); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to update prescription", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_PRESCRIPTION_UPDATE_FAILED, "Failed to update prescription", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Prescription updated successfully", prescription)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_PRESCRIPTION_UPDATED, "Prescription updated successfully", prescription)
 }
 
 // DeletePrescription handles DELETE /api/v1/prescriptions/:id
 func (h *PrescriptionHandler) DeletePrescription(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, "Invalid prescription ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_PRESCRIPTION_ID, "Invalid prescription ID", err)
 		return
 	}
 
 	if err := h.service.DeletePrescription(uint(id)); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, "Failed to delete prescription", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_PRESCRIPTION_DELETE_FAILED, "Failed to delete prescription", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, "Prescription deleted successfully", nil)
+	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_PRESCRIPTION_DELETED, "Prescription deleted successfully", nil)
 }
