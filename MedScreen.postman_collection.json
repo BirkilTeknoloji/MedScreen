@@ -1,0 +1,1450 @@
+{
+	"info": {
+		"_postman_id": "medscreen-api-collection",
+		"name": "MedScreen API",
+		"description": "Complete API collection for MedScreen medical system backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"role\": \"doctor\",\n  \"specialization\": \"Cardiology\",\n  \"license_number\": \"MD12345\",\n  \"phone\": \"+1234567890\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"role\": \"doctor\",\n  \"specialization\": \"Neurology\",\n  \"license_number\": \"MD12345\",\n  \"phone\": \"+1234567890\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"{{user_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Patients",
+			"item": [
+				{
+					"name": "Create Patient",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"tc_number\": \"12345678901\",\n  \"birth_date\": \"1990-05-15T00:00:00Z\",\n  \"gender\": \"female\",\n  \"phone\": \"+9876543210\",\n  \"email\": \"jane.smith@example.com\",\n  \"address\": \"123 Main Street, City\",\n  \"emergency_contact_name\": \"John Smith\",\n  \"emergency_contact_phone\": \"+9876543211\",\n  \"blood_type\": \"A+\",\n  \"height\": 165.5,\n  \"weight\": 60.0,\n  \"primary_doctor_id\": {{doctor_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Patients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Patient by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"{{patient_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Patient Medical History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}/medical-history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"{{patient_id}}",
+								"medical-history"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Patient",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"tc_number\": \"12345678901\",\n  \"birth_date\": \"1990-05-15T00:00:00Z\",\n  \"gender\": \"female\",\n  \"phone\": \"+9876543210\",\n  \"email\": \"jane.smith@example.com\",\n  \"address\": \"456 New Street, City\",\n  \"emergency_contact_name\": \"John Smith\",\n  \"emergency_contact_phone\": \"+9876543211\",\n  \"blood_type\": \"A+\",\n  \"height\": 165.5,\n  \"weight\": 62.0,\n  \"primary_doctor_id\": {{doctor_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"{{patient_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Patient",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"{{patient_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Create Appointment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"doctor_id\": {{doctor_id}},\n  \"appointment_date\": \"2025-11-20T10:00:00Z\",\n  \"duration_minutes\": 30,\n  \"appointment_type\": \"consultation\",\n  \"status\": \"scheduled\",\n  \"reason\": \"Regular checkup\",\n  \"notes\": \"Patient requested morning appointment\",\n  \"created_by_user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Appointments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Appointment by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments",
+								"{{appointment_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Appointment",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"doctor_id\": {{doctor_id}},\n  \"appointment_date\": \"2025-11-20T14:00:00Z\",\n  \"duration_minutes\": 45,\n  \"appointment_type\": \"follow-up\",\n  \"status\": \"confirmed\",\n  \"reason\": \"Follow-up consultation\",\n  \"notes\": \"Rescheduled to afternoon\",\n  \"created_by_user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments",
+								"{{appointment_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Appointment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/appointments/{{appointment_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"appointments",
+								"{{appointment_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Diagnoses",
+			"item": [
+				{
+					"name": "Create Diagnosis",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"doctor_id\": {{doctor_id}},\n  \"diagnosis_date\": \"2025-11-17T00:00:00Z\",\n  \"icd_code\": \"J00\",\n  \"diagnosis_name\": \"Acute nasopharyngitis\",\n  \"description\": \"Common cold with mild symptoms\",\n  \"severity\": \"mild\",\n  \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/diagnoses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"diagnoses"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Diagnoses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/diagnoses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"diagnoses"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Diagnosis by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/diagnoses/{{diagnosis_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"diagnoses",
+								"{{diagnosis_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Diagnosis",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"doctor_id\": {{doctor_id}},\n  \"diagnosis_date\": \"2025-11-17T00:00:00Z\",\n  \"icd_code\": \"J00\",\n  \"diagnosis_name\": \"Acute nasopharyngitis\",\n  \"description\": \"Common cold - improving\",\n  \"severity\": \"mild\",\n  \"status\": \"resolved\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/diagnoses/{{diagnosis_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"diagnoses",
+								"{{diagnosis_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Diagnosis",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/diagnoses/{{diagnosis_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"diagnoses",
+								"{{diagnosis_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Prescriptions",
+			"item": [
+				{
+					"name": "Create Prescription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"doctor_id\": {{doctor_id}},\n  \"prescribed_date\": \"2025-11-17T00:00:00Z\",\n  \"medication_name\": \"Paracetamol\",\n  \"dosage\": \"500mg\",\n  \"frequency\": \"3 times daily\",\n  \"duration\": \"7 days\",\n  \"quantity\": 21,\n  \"refills_allowed\": 0,\n  \"instructions\": \"Take after meals\",\n  \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/prescriptions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prescriptions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Prescriptions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/prescriptions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prescriptions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Prescription by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/prescriptions/{{prescription_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prescriptions",
+								"{{prescription_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Prescription",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"doctor_id\": {{doctor_id}},\n  \"prescribed_date\": \"2025-11-17T00:00:00Z\",\n  \"medication_name\": \"Paracetamol\",\n  \"dosage\": \"1000mg\",\n  \"frequency\": \"2 times daily\",\n  \"duration\": \"5 days\",\n  \"quantity\": 10,\n  \"refills_allowed\": 1,\n  \"instructions\": \"Take after meals with water\",\n  \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/prescriptions/{{prescription_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prescriptions",
+								"{{prescription_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Prescription",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/prescriptions/{{prescription_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"prescriptions",
+								"{{prescription_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Medical Tests",
+			"item": [
+				{
+					"name": "Create Medical Test",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"ordered_by_doctor_id\": {{doctor_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"test_type\": \"blood_test\",\n  \"test_name\": \"Complete Blood Count\",\n  \"ordered_date\": \"2025-11-17\",\n  \"scheduled_date\": \"2025-11-18\",\n  \"status\": \"ordered\",\n  \"lab_name\": \"Central Lab\",\n  \"notes\": \"Fasting required\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-tests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-tests"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Medical Tests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-tests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-tests"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Medical Test by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-tests/{{medical_test_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-tests",
+								"{{medical_test_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Medical Test",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"ordered_by_doctor_id\": {{doctor_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"test_type\": \"blood_test\",\n  \"test_name\": \"Complete Blood Count\",\n  \"ordered_date\": \"2025-11-17\",\n  \"scheduled_date\": \"2025-11-18\",\n  \"completed_date\": \"2025-11-19\",\n  \"status\": \"completed\",\n  \"results\": \"All values within normal range. WBC: 7.5, RBC: 5.2, Hemoglobin: 14.5\",\n  \"result_file_path\": \"/results/cbc_20251119.pdf\",\n  \"lab_name\": \"Central Lab\",\n  \"notes\": \"Test completed successfully\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-tests/{{medical_test_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-tests",
+								"{{medical_test_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Medical Test",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-tests/{{medical_test_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-tests",
+								"{{medical_test_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Medical History",
+			"item": [
+				{
+					"name": "Create Medical History",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"condition_name\": \"Hypertension\",\n  \"diagnosed_date\": \"2020-03-15\",\n  \"status\": \"chronic\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"notes\": \"High blood pressure managed with medication. Monitor blood pressure regularly.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-history"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Medical Histories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-history"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Medical History by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-history/{{medical_history_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-history",
+								"{{medical_history_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Medical History",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"condition_name\": \"Hypertension\",\n  \"diagnosed_date\": \"2020-03-15\",\n  \"resolved_date\": \"2025-11-17\",\n  \"status\": \"resolved\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"notes\": \"Blood pressure levels stable. Condition well controlled with lifestyle changes.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-history/{{medical_history_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-history",
+								"{{medical_history_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Medical History",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/medical-history/{{medical_history_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"medical-history",
+								"{{medical_history_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Surgery History",
+			"item": [
+				{
+					"name": "Create Surgery History",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"procedure_name\": \"Appendectomy\",\n  \"surgery_date\": \"2021-06-10\",\n  \"surgeon_name\": \"Dr. Smith\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"complications\": \"None\",\n  \"notes\": \"Emergency appendix removal at City General Hospital. Recovery was smooth.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/surgery-history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"surgery-history"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Surgery Histories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/surgery-history",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"surgery-history"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Surgery History by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/surgery-history/{{surgery_history_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"surgery-history",
+								"{{surgery_history_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Surgery History",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"procedure_name\": \"Appendectomy\",\n  \"surgery_date\": \"2021-06-10\",\n  \"surgeon_name\": \"Dr. Smith\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"complications\": \"None\",\n  \"notes\": \"Emergency appendix removal at City General Hospital. Complete recovery confirmed.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/surgery-history/{{surgery_history_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"surgery-history",
+								"{{surgery_history_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Surgery History",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/surgery-history/{{surgery_history_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"surgery-history",
+								"{{surgery_history_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Allergies",
+			"item": [
+				{
+					"name": "Create Allergy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"allergen\": \"Penicillin\",\n  \"allergy_type\": \"medication\",\n  \"severity\": \"life-threatening\",\n  \"reaction\": \"Anaphylaxis\",\n  \"diagnosed_date\": \"2015-08-20T00:00:00Z\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"notes\": \"Patient must carry EpiPen. Avoid all penicillin-based antibiotics\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/allergies",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"allergies"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Allergies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/allergies",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"allergies"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Allergy by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/allergies/{{allergy_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"allergies",
+								"{{allergy_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Allergy",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"allergen\": \"Penicillin\",\n  \"allergy_type\": \"medication\",\n  \"severity\": \"severe\",\n  \"reaction\": \"Anaphylaxis with respiratory distress\",\n  \"diagnosed_date\": \"2015-08-20T00:00:00Z\",\n  \"notes\": \"Patient must carry EpiPen at all times. Avoid all beta-lactam antibiotics\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/allergies/{{allergy_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"allergies",
+								"{{allergy_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Allergy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/allergies/{{allergy_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"allergies",
+								"{{allergy_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Vital Signs",
+			"item": [
+				{
+					"name": "Create Vital Sign",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"recorded_by_user_id\": {{user_id}},\n  \"recorded_at\": \"2025-11-17T10:00:00Z\",\n  \"temperature\": 36.8,\n  \"blood_pressure_systolic\": 120,\n  \"blood_pressure_diastolic\": 80,\n  \"heart_rate\": 72,\n  \"respiratory_rate\": 16,\n  \"oxygen_saturation\": 98,\n  \"weight\": 70.5,\n  \"height\": 175.0,\n  \"notes\": \"Normal vital signs\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/vital-signs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"vital-signs"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Vital Signs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/vital-signs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"vital-signs"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Vital Sign by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/vital-signs/{{vital_sign_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"vital-signs",
+								"{{vital_sign_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Vital Sign",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"recorded_by_user_id\": {{user_id}},\n  \"recorded_at\": \"2025-11-17T10:00:00Z\",\n  \"temperature\": 37.0,\n  \"blood_pressure_systolic\": 122,\n  \"blood_pressure_diastolic\": 82,\n  \"heart_rate\": 75,\n  \"respiratory_rate\": 16,\n  \"oxygen_saturation\": 98,\n  \"weight\": 70.5,\n  \"height\": 175.0,\n  \"notes\": \"Corrected vital signs after verification\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/vital-signs/{{vital_sign_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"vital-signs",
+								"{{vital_sign_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Vital Sign",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/vital-signs/{{vital_sign_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"vital-signs",
+								"{{vital_sign_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "NFC Cards",
+			"item": [
+				{
+					"name": "Create NFC Card",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"card_uid\": \"04:A1:B2:C3:D4:E5:F6\",\n  \"is_active\": true,\n  \"issued_at\": \"2025-11-17T10:00:00Z\",\n  \"created_by_user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/nfc-cards",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"nfc-cards"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All NFC Cards",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nfc-cards",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"nfc-cards"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get NFC Card by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nfc-cards/{{nfc_card_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"nfc-cards",
+								"{{nfc_card_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update NFC Card",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"card_uid\": \"04:A1:B2:C3:D4:E5:F6\",\n  \"assigned_user_id\": {{user_id}},\n  \"is_active\": true,\n  \"issued_at\": \"2025-11-17T10:00:00Z\",\n  \"created_by_user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/nfc-cards/{{nfc_card_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"nfc-cards",
+								"{{nfc_card_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Assign NFC Card",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": {{user_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/nfc-cards/{{nfc_card_id}}/assign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"nfc-cards",
+								"{{nfc_card_id}}",
+								"assign"
+							]
+						}
+					}
+				},
+				{
+					"name": "Deactivate NFC Card",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nfc-cards/{{nfc_card_id}}/deactivate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"nfc-cards",
+								"{{nfc_card_id}}",
+								"deactivate"
+							]
+						}
+					}
+				},
+				{
+					"name": "Authenticate by NFC",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"card_uid\": \"04:A1:B2:C3:D4:E5:F6\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/nfc-cards/authenticate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"nfc-cards",
+								"authenticate"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete NFC Card",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/nfc-cards/{{nfc_card_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"nfc-cards",
+								"{{nfc_card_id}}"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "doctor_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "patient_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "appointment_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "diagnosis_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "prescription_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "medical_test_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "medical_history_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "surgery_history_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "allergy_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "vital_sign_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "nfc_card_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
