@@ -21,6 +21,11 @@ type SurgeryHistory struct {
 	AddedByDoctor   *User     `gorm:"foreignKey:AddedByDoctorID" json:"added_by_doctor,omitempty"`
 }
 
+// TableName overrides the default table name
+func (SurgeryHistory) TableName() string {
+	return "surgery_history"
+}
+
 // BeforeCreate validates the surgery history data before creating
 func (s *SurgeryHistory) BeforeCreate(tx *gorm.DB) error {
 	return s.validate()
