@@ -27,6 +27,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 				utils.SendErrorResponse(
 					c,
 					http.StatusInternalServerError,
+					utils.ERROR_INTERNAL_SERVER,
 					"Internal server error",
 					fmt.Errorf("%v", err),
 				)
