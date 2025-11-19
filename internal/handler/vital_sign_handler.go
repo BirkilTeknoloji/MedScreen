@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"medscreen/internal/constants"
 	"medscreen/internal/models"
 	"medscreen/internal/service"
 	"medscreen/internal/utils"
@@ -25,33 +26,33 @@ func NewVitalSignHandler(service service.VitalSignService) *VitalSignHandler {
 func (h *VitalSignHandler) CreateVitalSign(c *gin.Context) {
 	var vitalSign models.VitalSign
 	if err := c.ShouldBindJSON(&vitalSign); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.CreateVitalSign(&vitalSign); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_VITAL_SIGN_CREATE_FAILED, "Failed to create vital sign", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_VITAL_SIGN_CREATE_FAILED, "Failed to create vital sign", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusCreated, utils.SUCCESS_VITAL_SIGN_CREATED, "Vital sign created successfully", vitalSign)
+	utils.SendSuccessResponse(c, http.StatusCreated, constants.SUCCESS_VITAL_SIGN_CREATED, "Vital sign created successfully", vitalSign)
 }
 
 // GetVitalSign handles GET /api/v1/vital-signs/:id
 func (h *VitalSignHandler) GetVitalSign(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_VITAL_SIGN_ID, "Invalid vital sign ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_VITAL_SIGN_ID, "Invalid vital sign ID", err)
 		return
 	}
 
 	vitalSign, err := h.service.GetVitalSign(uint(id))
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusNotFound, utils.ERROR_VITAL_SIGN_NOT_FOUND, "Vital sign not found", err)
+		utils.SendErrorResponse(c, http.StatusNotFound, constants.ERROR_VITAL_SIGN_NOT_FOUND, "Vital sign not found", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_VITAL_SIGN_RETRIEVED, "Vital sign retrieved successfully", vitalSign)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_VITAL_SIGN_RETRIEVED, "Vital sign retrieved successfully", vitalSign)
 }
 
 // GetVitalSigns handles GET /api/v1/vital-signs
@@ -100,60 +101,60 @@ func (h *VitalSignHandler) GetVitalSigns(c *gin.Context) {
 	if patientID != nil || appointmentID != nil || startDate != nil || endDate != nil {
 		vitalSigns, total, err := h.service.GetVitalSignsByFilters(patientID, appointmentID, startDate, endDate, page, limit)
 		if err != nil {
-			utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve vital signs", err)
+			utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to retrieve vital signs", err)
 			return
 		}
 
 		meta := utils.CalculateMeta(page, limit, total)
-		utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_VITAL_SIGNS_RETRIEVED, "Vital signs retrieved successfully", vitalSigns, meta)
+		utils.SendSuccessResponseWithMeta(c, http.StatusOK, constants.SUCCESS_VITAL_SIGNS_RETRIEVED, "Vital signs retrieved successfully", vitalSigns, meta)
 		return
 	}
 
 	// Default: get all vital signs
 	vitalSigns, total, err := h.service.GetVitalSigns(page, limit)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve vital signs", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to retrieve vital signs", err)
 		return
 	}
 
 	meta := utils.CalculateMeta(page, limit, total)
-	utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_VITAL_SIGNS_RETRIEVED, "Vital signs retrieved successfully", vitalSigns, meta)
+	utils.SendSuccessResponseWithMeta(c, http.StatusOK, constants.SUCCESS_VITAL_SIGNS_RETRIEVED, "Vital signs retrieved successfully", vitalSigns, meta)
 }
 
 // UpdateVitalSign handles PUT /api/v1/vital-signs/:id
 func (h *VitalSignHandler) UpdateVitalSign(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_VITAL_SIGN_ID, "Invalid vital sign ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_VITAL_SIGN_ID, "Invalid vital sign ID", err)
 		return
 	}
 
 	var vitalSign models.VitalSign
 	if err := c.ShouldBindJSON(&vitalSign); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.UpdateVitalSign(uint(id), &vitalSign); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_VITAL_SIGN_UPDATE_FAILED, "Failed to update vital sign", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_VITAL_SIGN_UPDATE_FAILED, "Failed to update vital sign", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_VITAL_SIGN_UPDATED, "Vital sign updated successfully", vitalSign)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_VITAL_SIGN_UPDATED, "Vital sign updated successfully", vitalSign)
 }
 
 // DeleteVitalSign handles DELETE /api/v1/vital-signs/:id
 func (h *VitalSignHandler) DeleteVitalSign(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_VITAL_SIGN_ID, "Invalid vital sign ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_VITAL_SIGN_ID, "Invalid vital sign ID", err)
 		return
 	}
 
 	if err := h.service.DeleteVitalSign(uint(id)); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_VITAL_SIGN_DELETE_FAILED, "Failed to delete vital sign", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_VITAL_SIGN_DELETE_FAILED, "Failed to delete vital sign", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_VITAL_SIGN_DELETED, "Vital sign deleted successfully", nil)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_VITAL_SIGN_DELETED, "Vital sign deleted successfully", nil)
 }

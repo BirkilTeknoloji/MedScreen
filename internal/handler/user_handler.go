@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"medscreen/internal/constants"
 	"medscreen/internal/models"
 	"medscreen/internal/service"
 	"medscreen/internal/utils"
@@ -24,33 +25,33 @@ func NewUserHandler(service service.UserService) *UserHandler {
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.CreateUser(&user); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_USER_CREATE_FAILED, "Failed to create user", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_USER_CREATE_FAILED, "Failed to create user", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusCreated, utils.SUCCESS_USER_CREATED, "User created successfully", user)
+	utils.SendSuccessResponse(c, http.StatusCreated, constants.SUCCESS_USER_CREATED, "User created successfully", user)
 }
 
 // GetUser handles GET /api/v1/users/:id
 func (h *UserHandler) GetUser(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_USER_ID, "Invalid user ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_USER_ID, "Invalid user ID", err)
 		return
 	}
 
 	user, err := h.service.GetUser(uint(id))
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusNotFound, utils.ERROR_USER_NOT_FOUND, "User not found", err)
+		utils.SendErrorResponse(c, http.StatusNotFound, constants.ERROR_USER_NOT_FOUND, "User not found", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_USER_RETRIEVED, "User retrieved successfully", user)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_USER_RETRIEVED, "User retrieved successfully", user)
 }
 
 // GetUsers handles GET /api/v1/users
@@ -73,48 +74,48 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 
 	users, total, err := h.service.GetUsers(page, limit, role)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve users", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to retrieve users", err)
 		return
 	}
 
 	meta := utils.CalculateMeta(page, limit, total)
-	utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_USERS_RETRIEVED, "Users retrieved successfully", users, meta)
+	utils.SendSuccessResponseWithMeta(c, http.StatusOK, constants.SUCCESS_USERS_RETRIEVED, "Users retrieved successfully", users, meta)
 }
 
 // UpdateUser handles PUT /api/v1/users/:id
 func (h *UserHandler) UpdateUser(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_USER_ID, "Invalid user ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_USER_ID, "Invalid user ID", err)
 		return
 	}
 
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.UpdateUser(uint(id), &user); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_USER_UPDATE_FAILED, "Failed to update user", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_USER_UPDATE_FAILED, "Failed to update user", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_USER_UPDATED, "User updated successfully", user)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_USER_UPDATED, "User updated successfully", user)
 }
 
 // DeleteUser handles DELETE /api/v1/users/:id
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_USER_ID, "Invalid user ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_USER_ID, "Invalid user ID", err)
 		return
 	}
 
 	if err := h.service.DeleteUser(uint(id)); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_USER_DELETE_FAILED, "Failed to delete user", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_USER_DELETE_FAILED, "Failed to delete user", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_USER_DELETED, "User deleted successfully", nil)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_USER_DELETED, "User deleted successfully", nil)
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"medscreen/internal/constants"
 	"medscreen/internal/models"
 	"medscreen/internal/service"
 	"medscreen/internal/utils"
@@ -25,33 +26,33 @@ func NewAppointmentHandler(service service.AppointmentService) *AppointmentHandl
 func (h *AppointmentHandler) CreateAppointment(c *gin.Context) {
 	var appointment models.Appointment
 	if err := c.ShouldBindJSON(&appointment); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.CreateAppointment(&appointment); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_APPOINTMENT_CREATE_FAILED, "Failed to create appointment", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_APPOINTMENT_CREATE_FAILED, "Failed to create appointment", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusCreated, utils.SUCCESS_APPOINTMENT_CREATED, "Appointment created successfully", appointment)
+	utils.SendSuccessResponse(c, http.StatusCreated, constants.SUCCESS_APPOINTMENT_CREATED, "Appointment created successfully", appointment)
 }
 
 // GetAppointment handles GET /api/v1/appointments/:id
 func (h *AppointmentHandler) GetAppointment(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_APPOINTMENT_ID, "Invalid appointment ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_APPOINTMENT_ID, "Invalid appointment ID", err)
 		return
 	}
 
 	appointment, err := h.service.GetAppointment(uint(id))
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusNotFound, utils.ERROR_APPOINTMENT_NOT_FOUND, "Appointment not found", err)
+		utils.SendErrorResponse(c, http.StatusNotFound, constants.ERROR_APPOINTMENT_NOT_FOUND, "Appointment not found", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_APPOINTMENT_RETRIEVED, "Appointment retrieved successfully", appointment)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_APPOINTMENT_RETRIEVED, "Appointment retrieved successfully", appointment)
 }
 
 // GetAppointments handles GET /api/v1/appointments
@@ -106,60 +107,60 @@ func (h *AppointmentHandler) GetAppointments(c *gin.Context) {
 	if doctorID != nil || patientID != nil || status != nil || startDate != nil || endDate != nil {
 		appointments, total, err := h.service.GetAppointmentsByFilters(doctorID, patientID, status, startDate, endDate, page, limit)
 		if err != nil {
-			utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve appointments", err)
+			utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to retrieve appointments", err)
 			return
 		}
 
 		meta := utils.CalculateMeta(page, limit, total)
-		utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_APPOINTMENTS_RETRIEVED, "Appointments retrieved successfully", appointments, meta)
+		utils.SendSuccessResponseWithMeta(c, http.StatusOK, constants.SUCCESS_APPOINTMENTS_RETRIEVED, "Appointments retrieved successfully", appointments, meta)
 		return
 	}
 
 	// Default: get all appointments
 	appointments, total, err := h.service.GetAppointments(page, limit)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_INTERNAL_SERVER, "Failed to retrieve appointments", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to retrieve appointments", err)
 		return
 	}
 
 	meta := utils.CalculateMeta(page, limit, total)
-	utils.SendSuccessResponseWithMeta(c, http.StatusOK, utils.SUCCESS_APPOINTMENTS_RETRIEVED, "Appointments retrieved successfully", appointments, meta)
+	utils.SendSuccessResponseWithMeta(c, http.StatusOK, constants.SUCCESS_APPOINTMENTS_RETRIEVED, "Appointments retrieved successfully", appointments, meta)
 }
 
 // UpdateAppointment handles PUT /api/v1/appointments/:id
 func (h *AppointmentHandler) UpdateAppointment(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_APPOINTMENT_ID, "Invalid appointment ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_APPOINTMENT_ID, "Invalid appointment ID", err)
 		return
 	}
 
 	var appointment models.Appointment
 	if err := c.ShouldBindJSON(&appointment); err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_REQUEST, "Invalid request body", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Invalid request body", err)
 		return
 	}
 
 	if err := h.service.UpdateAppointment(uint(id), &appointment); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_APPOINTMENT_UPDATE_FAILED, "Failed to update appointment", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_APPOINTMENT_UPDATE_FAILED, "Failed to update appointment", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_APPOINTMENT_UPDATED, "Appointment updated successfully", appointment)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_APPOINTMENT_UPDATED, "Appointment updated successfully", appointment)
 }
 
 // DeleteAppointment handles DELETE /api/v1/appointments/:id
 func (h *AppointmentHandler) DeleteAppointment(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		utils.SendErrorResponse(c, http.StatusBadRequest, utils.ERROR_INVALID_APPOINTMENT_ID, "Invalid appointment ID", err)
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_APPOINTMENT_ID, "Invalid appointment ID", err)
 		return
 	}
 
 	if err := h.service.DeleteAppointment(uint(id)); err != nil {
-		utils.SendErrorResponse(c, http.StatusInternalServerError, utils.ERROR_APPOINTMENT_DELETE_FAILED, "Failed to delete appointment", err)
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_APPOINTMENT_DELETE_FAILED, "Failed to delete appointment", err)
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, utils.SUCCESS_APPOINTMENT_DELETED, "Appointment deleted successfully", nil)
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_APPOINTMENT_DELETED, "Appointment deleted successfully", nil)
 }

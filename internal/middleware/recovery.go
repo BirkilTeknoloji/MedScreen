@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
+	"medscreen/internal/constants"
 	"medscreen/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 				utils.SendErrorResponse(
 					c,
 					http.StatusInternalServerError,
-					utils.ERROR_INTERNAL_SERVER,
+					constants.ERROR_INTERNAL_SERVER,
 					"Internal server error",
 					fmt.Errorf("%v", err),
 				)
