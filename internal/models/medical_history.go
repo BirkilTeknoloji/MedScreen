@@ -19,3 +19,8 @@ type MedicalHistory struct {
 	AddedByDoctorID uint                 `gorm:"not null" json:"added_by_doctor_id"`
 	AddedByDoctor   *User                `gorm:"foreignKey:AddedByDoctorID" json:"added_by_doctor,omitempty"`
 }
+
+// TableName overrides the default table name
+func (MedicalHistory) TableName() string {
+	return "medical_history"
+}
