@@ -84,10 +84,23 @@ func (r *userRepository) FindByRole(role models.UserRole, page, limit int) ([]mo
 	return users, total, nil
 }
 
-// FindByNFCCardID retrieves a user by NFC card ID
-func (r *userRepository) FindByNFCCardID(nfcCardID string) (*models.User, error) {
+// FindByNFCCardID retrieves a user by NFC card ID (foreign key)
+func (r *userRepository) FindByNFCCardID(nfcCardID uint) (*models.User, error) {
 	var user models.User
 	err := r.db.Where("nfc_card_id = ?", nfcCardID).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// FindByNFCCardUID retrieves a user by NFC card UID from the nfc_cards table
+func (r *userRepository) FindByNFCCardUID(cardUID string) (*models.User, error) {
+	var user models.User
+	err := r.db.Table("users").
+		Joins("JOIN nfc_cards ON nfc_cards.assigned_user_id = users.id").
+		Where("nfc_cards.card_uid = ? AND nfc_cards.is_active = ?", cardUID, true).
+		First(&user).Error
 	if err != nil {
 		return nil, err
 	}

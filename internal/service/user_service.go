@@ -126,18 +126,19 @@ func (s *userService) DeleteUser(id uint) error {
 	return s.repo.Delete(id)
 }
 
-// AuthenticateByNFC authenticates a user by NFC card ID
-func (s *userService) AuthenticateByNFC(nfcCardID string) (*models.User, error) {
-	if nfcCardID == "" {
-		return nil, errors.New("nfc_card_id is required")
+// AuthenticateByNFC authenticates a user by NFC card UID
+func (s *userService) AuthenticateByNFC(cardUID string) (*models.User, error) {
+	if cardUID == "" {
+		return nil, errors.New("card_uid is required")
 	}
 
-	user, err := s.repo.FindByNFCCardID(nfcCardID)
+	// Look up user via nfc_cards table using the physical card UID
+	user, err := s.repo.FindByNFCCardUID(cardUID)
 	if err != nil {
 		return nil, err
 	}
 	if user == nil {
-		return nil, errors.New("user not found with provided nfc_card_id")
+		return nil, errors.New("user not found with provided card_uid")
 	}
 
 	// Check if user is active

@@ -12,5 +12,5 @@ type User struct {
 	LicenseNumber  *string  `gorm:"size:50" json:"license_number,omitempty"`
 	Phone          string   `gorm:"size:20" json:"phone"`
 	IsActive       bool     `gorm:"default:true" json:"is_active"`
-	NFCCardID      *string  `gorm:"size:100;uniqueIndex" json:"nfc_card_id,omitempty"`
+	NFCCardID      *uint    `gorm:"index" json:"nfc_card_id,omitempty"` // Foreign key to nfc_cards.id
 }

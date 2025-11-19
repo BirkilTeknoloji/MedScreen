@@ -13,7 +13,8 @@ type UserRepository interface {
 	Update(user *models.User) error
 	Delete(id uint) error
 	FindByRole(role models.UserRole, page, limit int) ([]models.User, int64, error)
-	FindByNFCCardID(nfcCardID string) (*models.User, error)
+	FindByNFCCardID(nfcCardID uint) (*models.User, error)
+	FindByNFCCardUID(cardUID string) (*models.User, error)
 }
 
 // NFCCardRepository defines the interface for NFC card data access operations
