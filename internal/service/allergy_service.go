@@ -115,6 +115,10 @@ func (s *allergyService) UpdateAllergy(id uint, allergy *models.Allergy) error {
 	// Set the ID to ensure we're updating the correct record
 	allergy.ID = id
 
+	// Preserve immutable fields - don't allow changing who added it or the patient
+	allergy.AddedByDoctorID = existing.AddedByDoctorID
+	allergy.PatientID = existing.PatientID
+
 	return s.repo.Update(allergy)
 }
 
