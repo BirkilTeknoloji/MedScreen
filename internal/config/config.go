@@ -57,7 +57,7 @@ func LoadConfig() (*Config, error) {
 			Port:     getEnv("DB_PORT", "5432"),
 			User:     getEnv("DB_USER", "postgres"),
 			Password: getEnv("DB_PASSWORD", "1234"),
-			DBName:   getEnv("DB_NAME", "postgres"),
+			DBName:   getEnv("DB_NAME", "medscreen_test"), // test için kullanılan db, asıl db adı "postgres"
 			SSLMode:  getEnv("DB_SSLMODE", "disable"),
 		},
 		Server: ServerConfig{

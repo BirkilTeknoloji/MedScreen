@@ -2,8 +2,6 @@
 .env
 
 .kiro
-database_query.sql
-database.txt
 
 # Binaries
 *.exe

@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "medscreen-api-collection",
+		"_postman_id": "119f4936-cafa-441d-900a-b0dd663d9a2b",
 		"name": "MedScreen API",
 		"description": "Complete API collection for MedScreen medical system backend",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41185553"
 	},
 	"item": [
 		{
@@ -21,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"role\": \"doctor\",\n  \"specialization\": \"Cardiology\",\n  \"license_number\": \"MD12345\",\n  \"phone\": \"+1234567890\",\n  \"is_active\": true\n}"
+							"raw": "{\n  \"first_name\": \"Postman\",\n  \"last_name\": \"Test\",\n  \"role\": \"doctor\",\n  \"specialization\": \"Cardiology\",\n  \"license_number\": \"MD12345\",\n  \"phone\": \"+1234567890\",\n  \"is_active\": true\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/users",
@@ -34,7 +35,8 @@
 								"users"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Users",
@@ -52,7 +54,8 @@
 								"users"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get User by ID",
@@ -71,7 +74,8 @@
 								"{{user_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update User",
@@ -99,7 +103,8 @@
 								"{{user_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete User",
@@ -118,7 +123,8 @@
 								"{{user_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -137,7 +143,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"tc_number\": \"12345678901\",\n  \"birth_date\": \"1990-05-15T00:00:00Z\",\n  \"gender\": \"female\",\n  \"phone\": \"+9876543210\",\n  \"email\": \"jane.smith@example.com\",\n  \"address\": \"123 Main Street, City\",\n  \"emergency_contact_name\": \"John Smith\",\n  \"emergency_contact_phone\": \"+9876543211\",\n  \"blood_type\": \"A+\",\n  \"height\": 165.5,\n  \"weight\": 60.0,\n  \"primary_doctor_id\": {{doctor_id}}\n}"
+							"raw": "{\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"tc_number\": \"12345671251\",\n  \"birth_date\": \"1990-05-15T00:00:00Z\",\n  \"gender\": \"female\",\n  \"phone\": \"+9876543210\",\n  \"email\": \"jane.smith@example.com\",\n  \"address\": \"123 Main Street, City\",\n  \"emergency_contact_name\": \"John Smith\",\n  \"emergency_contact_phone\": \"+9876543211\",\n  \"blood_type\": \"A+\",\n  \"height\": 165.5,\n  \"weight\": 60.0,\n  \"primary_doctor_id\": {{doctor_id}}\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/patients",
@@ -150,7 +156,8 @@
 								"patients"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Patients",
@@ -168,7 +175,8 @@
 								"patients"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Patient by ID",
@@ -187,7 +195,8 @@
 								"{{patient_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Patient Medical History",
@@ -207,7 +216,8 @@
 								"medical-history"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Patient",
@@ -235,7 +245,8 @@
 								"{{patient_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Patient",
@@ -254,7 +265,8 @@
 								"{{patient_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -286,7 +298,8 @@
 								"appointments"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Appointments",
@@ -304,7 +317,8 @@
 								"appointments"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Appointment by ID",
@@ -323,7 +337,8 @@
 								"{{appointment_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Appointment",
@@ -351,7 +366,8 @@
 								"{{appointment_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Appointment",
@@ -370,7 +386,8 @@
 								"{{appointment_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -402,7 +419,8 @@
 								"diagnoses"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Diagnoses",
@@ -420,7 +438,8 @@
 								"diagnoses"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Diagnosis by ID",
@@ -439,7 +458,8 @@
 								"{{diagnosis_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Diagnosis",
@@ -467,7 +487,8 @@
 								"{{diagnosis_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Diagnosis",
@@ -486,7 +507,8 @@
 								"{{diagnosis_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -518,7 +540,8 @@
 								"prescriptions"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Prescriptions",
@@ -536,7 +559,8 @@
 								"prescriptions"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Prescription by ID",
@@ -555,7 +579,8 @@
 								"{{prescription_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Prescription",
@@ -583,7 +608,8 @@
 								"{{prescription_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Prescription",
@@ -602,7 +628,8 @@
 								"{{prescription_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -621,7 +648,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"ordered_by_doctor_id\": {{doctor_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"test_type\": \"blood_test\",\n  \"test_name\": \"Complete Blood Count\",\n  \"ordered_date\": \"2025-11-17\",\n  \"scheduled_date\": \"2025-11-18\",\n  \"status\": \"ordered\",\n  \"lab_name\": \"Central Lab\",\n  \"notes\": \"Fasting required\"\n}"
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"ordered_by_doctor_id\": {{doctor_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"test_type\": \"blood_test\",\n  \"test_name\": \"Complete Blood Count\",\n  \"ordered_date\": \"2025-11-17T00:00:00Z\",\n  \"scheduled_date\": \"2025-11-18T00:00:00Z\",\n  \"status\": \"ordered\",\n  \"lab_name\": \"Central Lab\",\n  \"notes\": \"Fasting required\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/medical-tests",
@@ -634,7 +661,8 @@
 								"medical-tests"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Medical Tests",
@@ -652,7 +680,8 @@
 								"medical-tests"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Medical Test by ID",
@@ -671,7 +700,8 @@
 								"{{medical_test_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Medical Test",
@@ -685,7 +715,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"ordered_by_doctor_id\": {{doctor_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"test_type\": \"blood_test\",\n  \"test_name\": \"Complete Blood Count\",\n  \"ordered_date\": \"2025-11-17\",\n  \"scheduled_date\": \"2025-11-18\",\n  \"completed_date\": \"2025-11-19\",\n  \"status\": \"completed\",\n  \"results\": \"All values within normal range. WBC: 7.5, RBC: 5.2, Hemoglobin: 14.5\",\n  \"result_file_path\": \"/results/cbc_20251119.pdf\",\n  \"lab_name\": \"Central Lab\",\n  \"notes\": \"Test completed successfully\"\n}"
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"ordered_by_doctor_id\": {{doctor_id}},\n  \"appointment_id\": {{appointment_id}},\n  \"test_type\": \"blood_test\",\n  \"test_name\": \"Complete Blood Count\",\n  \"ordered_date\": \"2025-11-17T00:00:00Z\",\n  \"scheduled_date\": \"2025-11-18T00:00:00Z\",\n  \"completed_date\": \"2025-11-19T00:00:00Z\",\n  \"status\": \"completed\",\n  \"results\": \"All values within normal range. WBC: 7.5, RBC: 5.2, Hemoglobin: 14.5\",\n  \"result_file_path\": \"/results/cbc_20251119.pdf\",\n  \"lab_name\": \"Central Lab\",\n  \"notes\": \"Test completed successfully\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/medical-tests/{{medical_test_id}}",
@@ -699,7 +729,8 @@
 								"{{medical_test_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Medical Test",
@@ -718,7 +749,8 @@
 								"{{medical_test_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -737,7 +769,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"condition_name\": \"Hypertension\",\n  \"diagnosed_date\": \"2020-03-15\",\n  \"status\": \"chronic\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"notes\": \"High blood pressure managed with medication. Monitor blood pressure regularly.\"\n}"
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"condition_name\": \"Hypertension\",\n  \"diagnosed_date\": \"2020-03-15T00:00:00Z\",\n  \"status\": \"chronic\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"notes\": \"High blood pressure managed with medication. Monitor blood pressure regularly.\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/medical-history",
@@ -750,7 +782,8 @@
 								"medical-history"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Medical Histories",
@@ -768,7 +801,8 @@
 								"medical-history"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Medical History by ID",
@@ -787,7 +821,8 @@
 								"{{medical_history_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Medical History",
@@ -801,7 +836,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"condition_name\": \"Hypertension\",\n  \"diagnosed_date\": \"2020-03-15\",\n  \"resolved_date\": \"2025-11-17\",\n  \"status\": \"resolved\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"notes\": \"Blood pressure levels stable. Condition well controlled with lifestyle changes.\"\n}"
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"condition_name\": \"Hypertension\",\n  \"diagnosed_date\": \"2020-03-15T00:00:00Z\",\n  \"resolved_date\": \"2025-11-17T00:00:00Z\",\n  \"status\": \"resolved\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"notes\": \"Blood pressure levels stable. Condition well controlled with lifestyle changes.\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/medical-history/{{medical_history_id}}",
@@ -815,7 +850,8 @@
 								"{{medical_history_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Medical History",
@@ -834,7 +870,8 @@
 								"{{medical_history_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -866,7 +903,8 @@
 								"surgery-history"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Surgery Histories",
@@ -884,7 +922,8 @@
 								"surgery-history"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Surgery History by ID",
@@ -903,7 +942,8 @@
 								"{{surgery_history_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Surgery History",
@@ -917,7 +957,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"procedure_name\": \"Appendectomy\",\n  \"surgery_date\": \"2021-06-10\",\n  \"surgeon_name\": \"Dr. Smith\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"complications\": \"None\",\n  \"notes\": \"Emergency appendix removal at City General Hospital. Complete recovery confirmed.\"\n}"
+							"raw": "{\n  \"patient_id\": {{patient_id}},\n  \"procedure_name\": \"Appendectomy\",\n  \"surgery_date\": \"2021-06-10T00:00:00Z\",\n  \"surgeon_name\": \"Dr. Smith\",\n  \"added_by_doctor_id\": {{doctor_id}},\n  \"complications\": \"None\",\n  \"notes\": \"Emergency appendix removal at City General Hospital. Complete recovery confirmed.\"\n}\n"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/surgery-history/{{surgery_history_id}}",
@@ -931,7 +971,8 @@
 								"{{surgery_history_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Surgery History",
@@ -950,7 +991,8 @@
 								"{{surgery_history_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -982,7 +1024,8 @@
 								"allergies"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Allergies",
@@ -1000,7 +1043,8 @@
 								"allergies"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Allergy by ID",
@@ -1019,7 +1063,8 @@
 								"{{allergy_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Allergy",
@@ -1047,7 +1092,8 @@
 								"{{allergy_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Allergy",
@@ -1066,7 +1112,8 @@
 								"{{allergy_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1098,7 +1145,8 @@
 								"vital-signs"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All Vital Signs",
@@ -1116,7 +1164,8 @@
 								"vital-signs"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get Vital Sign by ID",
@@ -1135,7 +1184,8 @@
 								"{{vital_sign_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update Vital Sign",
@@ -1163,7 +1213,8 @@
 								"{{vital_sign_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete Vital Sign",
@@ -1182,7 +1233,8 @@
 								"{{vital_sign_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1201,7 +1253,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"card_uid\": \"04:A1:B2:C3:D4:E5:F6\",\n  \"is_active\": true,\n  \"issued_at\": \"2025-11-17T10:00:00Z\",\n  \"created_by_user_id\": {{user_id}}\n}"
+							"raw": "{\n  \"card_uid\": \"19:A1:B2:C3:D4:E5:F6\",\n  \"is_active\": true,\n  \"issued_at\": \"2025-11-17T10:00:00Z\",\n  \"created_by_user_id\": {{user_id}}\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/nfc-cards",
@@ -1214,7 +1266,8 @@
 								"nfc-cards"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get All NFC Cards",
@@ -1232,7 +1285,8 @@
 								"nfc-cards"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Get NFC Card by ID",
@@ -1240,7 +1294,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/nfc-cards/{{nfc_card_id}}",
+							"raw": "{{base_url}}/api/v1/nfc-cards/2",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1248,10 +1302,11 @@
 								"api",
 								"v1",
 								"nfc-cards",
-								"{{nfc_card_id}}"
+								"2"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Update NFC Card",
@@ -1279,7 +1334,8 @@
 								"{{nfc_card_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Assign NFC Card",
@@ -1308,7 +1364,8 @@
 								"assign"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Deactivate NFC Card",
@@ -1328,7 +1385,8 @@
 								"deactivate"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Authenticate by NFC",
@@ -1342,7 +1400,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"card_uid\": \"04:A1:B2:C3:D4:E5:F6\"\n}"
+							"raw": "{\n  \"card_uid\": \"NFC-CARD-002-UID\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/nfc-cards/authenticate",
@@ -1356,7 +1414,8 @@
 								"authenticate"
 							]
 						}
-					}
+					},
+					"response": []
 				},
 				{
 					"name": "Delete NFC Card",
@@ -1375,76 +1434,88 @@
 								"{{nfc_card_id}}"
 							]
 						}
-					}
+					},
+					"response": []
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	],
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8080",
-			"type": "string"
+			"value": "http://localhost:8080"
 		},
 		{
 			"key": "user_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "doctor_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "patient_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "appointment_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "diagnosis_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "prescription_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "medical_test_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "medical_history_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "surgery_history_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "allergy_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "vital_sign_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		},
 		{
 			"key": "nfc_card_id",
-			"value": "1",
-			"type": "string"
+			"value": "1"
 		}
 	]
 }
