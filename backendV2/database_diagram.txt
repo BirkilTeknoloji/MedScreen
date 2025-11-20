@@ -1,0 +1,284 @@
+Table users {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+  role varchar(50) [not null, note: 'doctor, nurse, admin, receptionist']
+  specialization varchar(100) [null, note: 'For doctors']
+  license_number varchar(50) [null, note: 'Medical license']
+  phone varchar(20)
+  is_active boolean [default: true]
+  nfc_card_id integer [null, note: 'Foreign key to nfc_cards.id']
+  
+  indexes {
+    role
+    nfc_card_id
+  }
+}
+
+Table nfc_cards {
+  id integer [primary key, increment]
+  card_uid varchar(100) [unique, not null, note: 'Physical NFC card unique identifier']
+  assigned_user_id integer [null, note: 'Currently assigned user']
+  is_active boolean [default: true, note: 'Can be deactivated without deleting']
+  issued_at timestamp [default: `now()`]
+  last_used_at timestamp [null]
+  created_by_user_id integer [not null]
+
+  indexes {
+    card_uid
+    assigned_user_id
+    is_active
+  }
+}
+
+Table patients {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  user_id integer [null, note: 'If patient has portal access']
+  first_name varchar(100) [not null]
+  last_name varchar(100) [not null]
+  tc_number varchar(11) [unique, not null, note: 'Turkish ID number']
+  birth_date date [not null]
+  gender varchar(20) [not null, note: 'male, female, other']
+  phone varchar(20) [not null]
+  email varchar(255) [null]
+  address text
+  emergency_contact_name varchar(100)
+  emergency_contact_phone varchar(20)
+  blood_type varchar(5) [null, note: 'A+, A-, B+, B-, AB+, AB-, O+, O-']
+  height decimal(5,2) [null, note: 'in cm']
+  weight decimal(5,2) [null, note: 'in kg']
+  primary_doctor_id integer [not null, note: 'Assigned primary physician']
+  
+  indexes {
+    tc_number
+    last_name
+    primary_doctor_id
+  }
+}
+
+Table appointments {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  patient_id integer [not null]
+  doctor_id integer [not null]
+  appointment_date timestamp [not null]
+  duration_minutes integer [default: 30]
+  appointment_type varchar(50) [not null, note: 'consultation, follow-up, emergency, checkup']
+  status varchar(30) [not null, note: 'scheduled, confirmed, completed, cancelled, no-show']
+  reason text [note: 'Chief complaint']
+  notes text [note: 'Visit notes']
+  created_by_user_id integer [not null, note: 'Who scheduled it']
+  
+  indexes {
+    patient_id
+    doctor_id
+    appointment_date
+    status
+  }
+}
+
+Table diagnoses {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  patient_id integer [not null]
+  appointment_id integer [null, note: 'Related appointment']
+  doctor_id integer [not null]
+  diagnosis_date date [not null]
+  icd_code varchar(10) [null, note: 'ICD-10 code']
+  diagnosis_name varchar(255) [not null]
+  description text
+  severity varchar(20) [null, note: 'mild, moderate, severe, critical']
+  status varchar(30) [default: 'active', note: 'active, resolved, chronic, under_observation']
+  
+  indexes {
+    patient_id
+    appointment_id
+    doctor_id
+    diagnosis_date
+    icd_code
+  }
+}
+
+Table prescriptions {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  patient_id integer [not null]
+  appointment_id integer [null]
+  doctor_id integer [not null]
+  prescribed_date date [not null]
+  medication_name varchar(255) [not null]
+  dosage varchar(100) [not null, note: 'e.g., 500mg']
+  frequency varchar(100) [not null, note: 'e.g., twice daily']
+  duration varchar(100) [not null, note: 'e.g., 7 days, 2 weeks']
+  quantity integer [not null, note: 'Number of pills/doses']
+  refills_allowed integer [default: 0]
+  instructions text [note: 'Take with food, etc.']
+  status varchar(30) [default: 'active', note: 'active, completed, discontinued']
+  
+  indexes {
+    patient_id
+    appointment_id
+    doctor_id
+    prescribed_date
+  }
+}
+
+Table medical_tests {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  patient_id integer [not null]
+  appointment_id integer [null]
+  ordered_by_doctor_id integer [not null]
+  test_type varchar(100) [not null, note: 'blood_test, x-ray, mri, ct_scan, etc.']
+  test_name varchar(255) [not null]
+  ordered_date date [not null]
+  scheduled_date date [null]
+  completed_date date [null]
+  results text [null]
+  result_file_path varchar(500) [null, note: 'Path to PDF/image']
+  status varchar(30) [default: 'ordered', note: 'ordered, scheduled, completed, cancelled']
+  lab_name varchar(255) [null]
+  notes text
+  
+  indexes {
+    patient_id
+    appointment_id
+    ordered_by_doctor_id
+    test_type
+    status
+  }
+}
+
+Table medical_history {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  patient_id integer [not null]
+  condition_name varchar(255) [not null]
+  diagnosed_date date [null]
+  resolved_date date [null]
+  status varchar(30) [default: 'active', note: 'active, resolved, chronic']
+  notes text
+  added_by_doctor_id integer [not null]
+  
+  indexes {
+    patient_id
+    status
+  }
+}
+
+Table surgery_history {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  patient_id integer [not null]
+  procedure_name varchar(255) [not null]
+  surgery_date date [not null]
+  surgeon_name varchar(255) [null]
+  complications text [null]
+  notes text
+  added_by_doctor_id integer [not null]
+  
+  indexes {
+    patient_id
+    surgery_date
+  }
+}
+
+Table allergies {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  patient_id integer [not null]
+  allergen varchar(255) [not null, note: 'Medication, food, environmental']
+  allergy_type varchar(50) [not null, note: 'medication, food, environmental, other']
+  reaction text [not null, note: 'Description of reaction']
+  severity varchar(20) [not null, note: 'mild, moderate, severe, life-threatening']
+  diagnosed_date date [null]
+  notes text
+  added_by_doctor_id integer [not null]
+  
+  indexes {
+    patient_id
+    severity
+  }
+}
+
+Table vital_signs {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  patient_id integer [not null]
+  appointment_id integer [null]
+  recorded_by_user_id integer [not null]
+  recorded_at timestamp [default: `now()`]
+  blood_pressure_systolic integer [null, note: 'mmHg']
+  blood_pressure_diastolic integer [null, note: 'mmHg']
+  heart_rate integer [null, note: 'bpm']
+  temperature decimal(4,2) [null, note: 'Celsius']
+  respiratory_rate integer [null, note: 'breaths per minute']
+  oxygen_saturation integer [null, note: 'SpO2 percentage']
+  height decimal(5,2) [null, note: 'cm']
+  weight decimal(5,2) [null, note: 'kg']
+  bmi decimal(4,2) [null, note: 'Calculated']
+  notes text
+  
+  indexes {
+    patient_id
+    appointment_id
+    recorded_at
+  }
+}
+
+// fk relationship
+Ref: patients.primary_doctor_id > users.id
+Ref: patients.user_id > users.id
+
+Ref: users.nfc_card_id > nfc_cards.id [delete: set null]
+Ref: nfc_cards.assigned_user_id > users.id [delete: set null]
+Ref: nfc_cards.created_by_user_id > users.id
+
+Ref: appointments.patient_id > patients.id [delete: cascade]
+Ref: appointments.doctor_id > users.id
+Ref: appointments.created_by_user_id > users.id
+
+Ref: diagnoses.patient_id > patients.id [delete: cascade]
+Ref: diagnoses.appointment_id > appointments.id [delete: set null]
+Ref: diagnoses.doctor_id > users.id
+
+Ref: prescriptions.patient_id > patients.id [delete: cascade]
+Ref: prescriptions.appointment_id > appointments.id [delete: set null]
+Ref: prescriptions.doctor_id > users.id
+
+Ref: medical_tests.patient_id > patients.id [delete: cascade]
+Ref: medical_tests.appointment_id > appointments.id [delete: set null]
+Ref: medical_tests.ordered_by_doctor_id > users.id
+
+Ref: medical_history.patient_id > patients.id [delete: cascade]
+Ref: medical_history.added_by_doctor_id > users.id
+
+Ref: surgery_history.patient_id > patients.id [delete: cascade]
+Ref: surgery_history.added_by_doctor_id > users.id
+
+Ref: allergies.patient_id > patients.id [delete: cascade]
+Ref: allergies.added_by_doctor_id > users.id
+
+Ref: vital_signs.patient_id > patients.id [delete: cascade]
+Ref: vital_signs.appointment_id > appointments.id [delete: set null]
+Ref: vital_signs.recorded_by_user_id > users.id
