@@ -1,5 +1,6 @@
 --MedScreen projesi veritabanı test sorguları
 -- Var olan tabloları temizle
+DROP TABLE IF EXISTS devices CASCADE;
 DROP TABLE IF EXISTS vital_signs CASCADE;
 DROP TABLE IF EXISTS allergies CASCADE;
 DROP TABLE IF EXISTS surgery_history CASCADE;
@@ -251,6 +252,24 @@ CREATE INDEX idx_vital_signs_patient_id ON vital_signs(patient_id);
 CREATE INDEX idx_vital_signs_appointment_id ON vital_signs(appointment_id);
 CREATE INDEX idx_vital_signs_recorded_at ON vital_signs(recorded_at);
 
+-- Devices tablosu
+CREATE TABLE devices (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL,
+    mac_address VARCHAR(50) UNIQUE NOT NULL,
+    patient_id INTEGER NULL,
+    room_number VARCHAR(20) NULL,
+    description TEXT NULL,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+CREATE INDEX idx_devices_mac_address ON devices(mac_address);
+CREATE INDEX idx_devices_patient_id ON devices(patient_id);
+CREATE INDEX idx_devices_room_number ON devices(room_number);
+CREATE INDEX idx_devices_is_active ON devices(is_active);
+
 
 ALTER TABLE nfc_cards
     ADD CONSTRAINT fk_nfc_cards_assigned_user 
@@ -356,6 +375,10 @@ ALTER TABLE vital_signs
     ADD CONSTRAINT fk_vital_signs_recorded_by 
     FOREIGN KEY (recorded_by_user_id) REFERENCES users(id);
 
+ALTER TABLE devices
+    ADD CONSTRAINT fk_devices_patient 
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE SET NULL;
+
 -- Users (nfc_card_id will be updated after nfc_cards are inserted)
 INSERT INTO users (first_name, last_name, role, specialization, license_number, phone, is_active, nfc_card_id) VALUES
 ('Mehmet', 'Yilmaz', 'doctor', 'Kardiyoloji', 'DR123456', '05321234567', true, NULL),
@@ -368,7 +391,7 @@ INSERT INTO users (first_name, last_name, role, specialization, license_number, 
 -- NFC Cards
 INSERT INTO nfc_cards (card_uid, assigned_user_id, is_active, created_by_user_id, last_used_at) VALUES
 ('NFC-CARD-001-UID', 1, true, 6, NOW() - INTERVAL '2 hours'),
-('NFC-CARD-002-UID', 2, true, 6, NOW() - INTERVAL '1 day'),
+('041C577A8A2190', 2, true, 6, NOW() - INTERVAL '1 day'),
 ('NFC-CARD-003-UID', 3, true, 6, NOW() - INTERVAL '3 hours'),
 ('NFC-CARD-004-UID', 5, true, 6, NOW() - INTERVAL '30 minutes'),
 ('NFC-CARD-005-UID', 6, true, 6, NOW() - INTERVAL '5 hours');
@@ -444,6 +467,12 @@ INSERT INTO vital_signs (patient_id, appointment_id, recorded_by_user_id, record
 (3, 3, 3, '2024-11-19 11:00:00', 140, 90, 80, 36.7, 15, 97, 180.00, 75.00, 23.15, 'Takip gerekli'),
 (5, 5, 3, '2024-11-17 15:00:00', 110, 70, 68, 36.4, 14, 99, 172.00, 68.00, 23.00, 'Normal vital bulgular');
 
+-- Devices
+INSERT INTO devices (mac_address, patient_id, room_number, description, is_active) VALUES
+('AA:BB:CC:DD:EE:01', 1, '101', 'Bedside Tablet 101', true),
+('AA:BB:CC:DD:EE:02', 2, '102', 'Bedside Tablet 102', true),
+('AA:BB:CC:DD:EE:03', NULL, '103', 'Bedside Tablet 103', true);
+
 SELECT 
     'users' as tablo, COUNT(*) as kayit_sayisi FROM users
 UNION ALL
@@ -465,4 +494,6 @@ SELECT 'surgery_history', COUNT(*) FROM surgery_history
 UNION ALL
 SELECT 'allergies', COUNT(*) FROM allergies
 UNION ALL
-SELECT 'vital_signs', COUNT(*) FROM vital_signs;
+SELECT 'vital_signs', COUNT(*) FROM vital_signs
+UNION ALL
+SELECT 'devices', COUNT(*) FROM devices;

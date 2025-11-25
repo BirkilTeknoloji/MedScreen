@@ -8,6 +8,31 @@
 	},
 	"item": [
 		{
+			"name": "Reset",
+			"item": [
+				{
+					"name": "Reset Database",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/reset",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reset"
+							]
+						},
+						"description": "Resets the database by executing database_querytest.sql. FOR TEST USE ONLY!"
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Users",
 			"item": [
 				{
@@ -1400,7 +1425,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"card_uid\": \"NFC-CARD-002-UID\"\n}"
+							"raw": "{\n  \"card_uid\": \"041C577A8A2190\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/nfc-cards/authenticate",
@@ -1438,6 +1463,223 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Devices",
+			"item": [
+				{
+					"name": "Register Device",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mac_address\": \"AA:BB:CC:DD:EE:04\",\n  \"room_number\": \"104\",\n  \"description\": \"New Bedside Tablet\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Devices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number for pagination"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Number of items per page"
+								},
+								{
+									"key": "room_number",
+									"value": "101",
+									"description": "Filter by room number",
+									"disabled": true
+								},
+								{
+									"key": "patient_id",
+									"value": "1",
+									"description": "Filter by patient ID",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Device by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices/id/{{device_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices",
+								"id",
+								"{{device_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Device by MAC",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices/AA:BB:CC:DD:EE:01",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices",
+								"AA:BB:CC:DD:EE:01"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Device",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"room_number\": \"105\",\n  \"description\": \"Updated Bedside Tablet\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices/AA:BB:CC:DD:EE:01",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices",
+								"AA:BB:CC:DD:EE:01"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Device",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices/AA:BB:CC:DD:EE:01",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices",
+								"AA:BB:CC:DD:EE:01"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Patient to Device",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"patient_id\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices/AA:BB:CC:DD:EE:02/assign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices",
+								"AA:BB:CC:DD:EE:02",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unassign Patient from Device",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices/AA:BB:CC:DD:EE:02/unassign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices",
+								"AA:BB:CC:DD:EE:02",
+								"unassign"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -1467,7 +1709,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8080"
+			"value": "http://192.168.1.141:8080"
 		},
 		{
 			"key": "user_id",
@@ -1515,6 +1757,10 @@
 		},
 		{
 			"key": "nfc_card_id",
+			"value": "1"
+		},
+		{
+			"key": "device_id",
 			"value": "1"
 		}
 	]

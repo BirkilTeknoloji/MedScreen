@@ -246,6 +246,25 @@ Table vital_signs {
   }
 }
 
+Table devices {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  mac_address varchar(50) [unique, not null]
+  patient_id integer [null, note: 'Currently assigned patient']
+  room_number varchar(20) [null]
+  description text [null]
+  is_active boolean [default: true]
+
+  indexes {
+    mac_address
+    patient_id
+    room_number
+    is_active
+  }
+}
+
 // fk relationship
 Ref: patients.primary_doctor_id > users.id
 Ref: patients.user_id > users.id
@@ -282,3 +301,5 @@ Ref: allergies.added_by_doctor_id > users.id
 Ref: vital_signs.patient_id > patients.id [delete: cascade]
 Ref: vital_signs.appointment_id > appointments.id [delete: set null]
 Ref: vital_signs.recorded_by_user_id > users.id
+
+Ref: devices.patient_id > patients.id [delete: set null]
