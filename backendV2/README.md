@@ -32,12 +32,12 @@ DB_NAME=medscreen_test
 DB_SSLMODE=disable
 
 # Server Configuration
-SERVER_PORT=8081
-SERVER_HOST=0.0.0.0
+SERVER_PORT=8080
+SERVER_HOST=0.0.0.0 // bilgisayarın kendi IP'si girilecek (ipconfig - IPV4)
 GIN_MODE=debug
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8081
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
 CORS_ALLOWED_METHODS=GET,POST,PUT,DELETE,OPTIONS
 CORS_ALLOWED_HEADERS=Content-Type,Authorization
 
@@ -78,3 +78,4 @@ Eğer her şey doğru yapılandırıldıysa, terminalde sunucunun başladığın
 
 1. JWT tabanlı authentication sistemi
 2. RBAC (Role Based Access Control) sistemi
+3. Veritabanının kurulum verilini çekme ve update, create, delete işlevleri için HBYS ile entegrasyon
