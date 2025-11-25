@@ -53,6 +53,7 @@ func main() {
 	surgeryHistoryRepo := repository.NewSurgeryHistoryRepository(db)
 	allergyRepo := repository.NewAllergyRepository(db)
 	vitalSignRepo := repository.NewVitalSignRepository(db)
+	deviceRepo := repository.NewDeviceRepository(db)
 
 	// Initialize services with repository dependencies
 	userService := service.NewUserService(userRepo)
@@ -76,6 +77,7 @@ func main() {
 	surgeryHistoryService := service.NewSurgeryHistoryService(surgeryHistoryRepo)
 	allergyService := service.NewAllergyService(allergyRepo)
 	vitalSignService := service.NewVitalSignService(vitalSignRepo)
+	deviceService := service.NewDeviceService(deviceRepo, patientRepo)
 
 	// Initialize handlers with service dependencies
 	handlers := &routes.Handlers{
@@ -90,6 +92,7 @@ func main() {
 		Allergy:        handler.NewAllergyHandler(allergyService),
 		VitalSign:      handler.NewVitalSignHandler(vitalSignService),
 		NFCCard:        handler.NewNFCCardHandler(nfcCardService, userService),
+		Device:         handler.NewDeviceHandler(deviceService),
 	}
 
 	// Set up Gin router

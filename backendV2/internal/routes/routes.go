@@ -20,6 +20,7 @@ type Handlers struct {
 	Allergy        *handler.AllergyHandler
 	VitalSign      *handler.VitalSignHandler
 	NFCCard        *handler.NFCCardHandler
+	Device         *handler.DeviceHandler
 }
 
 // SetupRoutes registers all API endpoints
@@ -144,5 +145,18 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 		nfcCards.POST("/:id/assign", handlers.NFCCard.AssignCard)
 		nfcCards.POST("/:id/deactivate", handlers.NFCCard.DeactivateCard)
 		nfcCards.POST("/authenticate", handlers.NFCCard.AuthenticateByNFC)
+	}
+
+	// Device routes
+	devices := api.Group("/devices")
+	{
+		devices.POST("", handlers.Device.RegisterDevice)
+		devices.GET("", handlers.Device.GetDevices)
+		devices.GET("/id/:id", handlers.Device.GetDeviceByID)
+		devices.GET("/:mac_address", handlers.Device.GetDeviceByMAC)
+		devices.PUT("/:mac_address", handlers.Device.UpdateDevice)
+		devices.DELETE("/:mac_address", handlers.Device.DeleteDevice)
+		devices.POST("/:mac_address/assign", handlers.Device.AssignPatient)
+		devices.POST("/:mac_address/unassign", handlers.Device.UnassignPatient)
 	}
 }

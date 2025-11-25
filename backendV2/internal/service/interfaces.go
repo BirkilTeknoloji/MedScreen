@@ -118,3 +118,16 @@ type VitalSignService interface {
 	DeleteVitalSign(id uint) error
 	GetVitalSignsByFilters(patientID, appointmentID *uint, startDate, endDate *time.Time, page, limit int) ([]models.VitalSign, int64, error)
 }
+
+// DeviceService defines the interface for device business logic operations
+type DeviceService interface {
+	RegisterDevice(device *models.Device) error
+	GetDeviceByMAC(mac string) (*models.Device, error)
+	GetDeviceByID(id uint) (*models.Device, error)
+	GetAllDevices(page, limit int) ([]models.Device, int64, error)
+	AssignPatient(mac string, patientID uint) error
+	UnassignPatient(mac string) error
+	UpdateDevice(mac string, updates *DeviceUpdateRequest) (*models.Device, error)
+	DeleteDevice(mac string) error
+	GetDevicesByFilters(roomNumber *string, patientID *uint, page, limit int) ([]models.Device, int64, error)
+}

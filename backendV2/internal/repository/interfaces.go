@@ -145,3 +145,15 @@ type VitalSignRepository interface {
 	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.VitalSign, int64, error)
 	FindByFilters(patientID, appointmentID *uint, startDate, endDate *time.Time, page, limit int) ([]models.VitalSign, int64, error)
 }
+
+// DeviceRepository defines the interface for device data access operations
+type DeviceRepository interface {
+	Create(device *models.Device) error
+	GetByMAC(mac string) (*models.Device, error)
+	GetByID(id uint) (*models.Device, error)
+	Update(device *models.Device) error
+	Delete(id uint) error
+	FindAll(page, limit int) ([]models.Device, int64, error)
+	DeleteByMAC(mac string) error
+	FindByFilters(roomNumber *string, patientID *uint, page, limit int) ([]models.Device, int64, error)
+}
