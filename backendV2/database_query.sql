@@ -42,7 +42,6 @@ CREATE TABLE patients (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     deleted_at TIMESTAMP NULL,
-    user_id INTEGER NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     tc_number VARCHAR(11) UNIQUE NOT NULL,
@@ -269,10 +268,6 @@ ALTER TABLE nfc_cards
 ALTER TABLE patients
     ADD CONSTRAINT fk_patients_primary_doctor 
     FOREIGN KEY (primary_doctor_id) REFERENCES users(id);
-
-ALTER TABLE patients
-    ADD CONSTRAINT fk_patients_user 
-    FOREIGN KEY (user_id) REFERENCES users(id);
 
 ALTER TABLE users
     ADD CONSTRAINT fk_users_nfc_card

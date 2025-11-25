@@ -10,7 +10,6 @@ import (
 // Patient represents a patient in the medical system
 type Patient struct {
 	gorm.Model
-	UserID                *uint     `json:"user_id,omitempty"`
 	FirstName             string    `gorm:"size:100;not null" json:"first_name"`
 	LastName              string    `gorm:"size:100;not null;index" json:"last_name"`
 	TCNumber              string    `gorm:"size:11;not null;uniqueIndex" json:"tc_number"`

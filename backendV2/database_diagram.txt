@@ -39,7 +39,6 @@ Table patients {
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
   deleted_at timestamp [null]
-  user_id integer [null, note: 'If patient has portal access']
   first_name varchar(100) [not null]
   last_name varchar(100) [not null]
   tc_number varchar(11) [unique, not null, note: 'Turkish ID number']
@@ -267,7 +266,6 @@ Table devices {
 
 // fk relationship
 Ref: patients.primary_doctor_id > users.id
-Ref: patients.user_id > users.id
 
 Ref: users.nfc_card_id > nfc_cards.id [delete: set null]
 Ref: nfc_cards.assigned_user_id > users.id [delete: set null]
