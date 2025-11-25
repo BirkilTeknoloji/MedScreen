@@ -93,6 +93,7 @@ func main() {
 		VitalSign:      handler.NewVitalSignHandler(vitalSignService),
 		NFCCard:        handler.NewNFCCardHandler(nfcCardService, userService),
 		Device:         handler.NewDeviceHandler(deviceService),
+		Reset:          handler.NewResetHandler(db), //TODO: prodda sil
 	}
 
 	// Set up Gin router

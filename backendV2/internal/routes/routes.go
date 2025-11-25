@@ -21,6 +21,7 @@ type Handlers struct {
 	VitalSign      *handler.VitalSignHandler
 	NFCCard        *handler.NFCCardHandler
 	Device         *handler.DeviceHandler
+	Reset          *handler.ResetHandler //TODO: prodda sil
 }
 
 // SetupRoutes registers all API endpoints
@@ -159,4 +160,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 		devices.POST("/:mac_address/assign", handlers.Device.AssignPatient)
 		devices.POST("/:mac_address/unassign", handlers.Device.UnassignPatient)
 	}
+
+	// Reset route (prodda sil)
+	api.POST("/reset", handlers.Reset.ResetDatabase)
 }

@@ -62,7 +62,7 @@ func LoadConfig() (*Config, error) {
 		},
 		Server: ServerConfig{
 			Port:    getEnv("SERVER_PORT", "8080"),
-			Host:    getEnv("SERVER_HOST", "0.0.0.0"),
+			Host:    getEnv("SERVER_HOST", "192.168.1.141"), //buraya ve .env dosyasına ipconfig ile alınan local ip adresi girilmeli
 			GinMode: getEnv("GIN_MODE", "release"),
 		},
 		CORS: CORSConfig{
