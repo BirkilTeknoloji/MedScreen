@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, TouchableOpacity, View, Text, ScrollView, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles/DetailModalStyle';
+import AppointmentDetail from './AppointmentDetail';
 
 const DetailModal = ({ visible, selectedItem, onClose }) => {
   return (
@@ -19,7 +20,10 @@ const DetailModal = ({ visible, selectedItem, onClose }) => {
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>
-              {selectedItem?.title || selectedItem?.type || selectedItem?.name || (typeof selectedItem === 'string' ? selectedItem : 'Detay')}
+              {selectedItem?.appointment_date ? 
+                (selectedItem?.doctor?.specialization || 'Randevu Detayı') : 
+                (selectedItem?.title || selectedItem?.type || selectedItem?.name || (typeof selectedItem === 'string' ? selectedItem : 'Detay'))
+              }
             </Text>
             <TouchableOpacity 
               onPress={onClose}
@@ -31,7 +35,12 @@ const DetailModal = ({ visible, selectedItem, onClose }) => {
           </View>
 
           <ScrollView style={styles.modalBody}>
-            {selectedItem?.date && (
+            {/* Randevu Detayları */}
+            {selectedItem?.appointment_date && (
+              <AppointmentDetail appointment={selectedItem} />
+            )}
+            {/* Eski detaylar - sadece randevu değilse göster */}
+            {!selectedItem?.appointment_date && selectedItem?.date && (
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Tarih:</Text>
                 <Text style={styles.detailValue}>{selectedItem.date}</Text>

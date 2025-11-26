@@ -6,7 +6,17 @@ import AppointmentsTestsTab from './components/AppointmentsTestsTab';
 import MedicalHistoryTab from './components/MedicalHistoryTab';
 import PatientProfile from './components/PatientProfile';
 import TabBar from './components/TabBar';
-import { getPatientByDeviceId } from '../services/api';
+import {
+  getAppointmentsByPatientId,
+  getDiagnosesByPatientId,
+  getFirstPatient,
+  getPatientByDeviceId,
+  getPrescriptionsByPatientId,
+  getMedicalTestsByPatientId,
+  getMedicalHistoryByPatientId,
+  getSurgeryHistoryByPatientId,
+  getAllergiesByPatientId,
+} from '../services/api';
 import styles from './styles/PatientScreenStyle';
 import Icon from 'react-native-vector-icons/Entypo';
 import CustomDropdown from './components/CustomDropdown';
@@ -16,51 +26,81 @@ export default function PatientScreen({ route, navigation }) {
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [firstData, setFirstData] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [diagnoses, setDiagnoses] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [medicalTests, setMedicalTests] = useState([]);
+  const [medicalHistory, setMedicalHistory] = useState([]);
+  const [surgeryHistory, setSurgeryHistory] = useState([]);
+  const [allergies, setAllergies] = useState([]);
+  // Route'dan gelen parametreler
+  const { patientData, doctorData, isPatientLogin } = route.params || {};
   const [activeTab, setActiveTab] = useState('randevularTetkikler');
-  // const [dropModal, setDropModal] = useState(false);
-  // const [animation] = useState(new Animated.Value(0));
 
   useEffect(() => {
-    const deviceId = DeviceInfo.getUniqueIdSync();
-    console.log('deviceeffect:', deviceId);
-    fetchPatientData(deviceId);
-  }, [route.params]);
+    // Eğer sayfaya parametre ile gelinmediyse ilk hastayı çek
+    if (!route.params?.patientData) {
+      fetchPatientFirstData();
+    }
+  }, []);
 
-  // const toggleDropdown = () => {
-  //   const toValue = dropModal ? 0 : 1;
+  useEffect(() => {
+    // userData set edildikten sonra appointments'ları çek
+    if (userData) {
+      fetchAppointmentsOnly();
+    }
+  }, [userData]);
 
-  //   Animated.timing(animation, {
-  //     toValue,
-  //     duration: 300,
-  //     useNativeDriver: false,
-  //   }).start();
-
-  //   setDropModal(!dropModal);
-  // };
-
-  // // ✅ maxHeight interpolation eklendi
-  // const maxHeight = animation.interpolate({
-  //   inputRange: [0, 1],
-  //   outputRange: [0, 300], // 0'dan 300px'e kadar genişler
-  // });
-
-  const fetchPatientData = async deviceId => {
+  const fetchPatientFirstData = async () => {
     try {
-      const data = await getPatientByDeviceId(deviceId);
-      console.log('deviceID:', deviceId);
-      console.log('data:', data);
+      setIsLoading(true);
+
+      // ARTIK SADECE BU FONKSİYONU ÇAĞIRIYORUZ
+      // Backend'den direkt tek bir obje (ilk hasta) gelecek
+      const data = await getFirstPatient();
+
       if (data) {
-        console.log('Cihaza kayıtlı hasta bulundu:', data);
         setUserData(data);
       } else {
-        setError('Bu cihaza kayıtlı hasta bulunamadı.');
-        console.warn('Cihaza kayıtlı hasta yok');
+        setError('Görüntülenecek hasta bulunamadı.');
       }
     } catch (err) {
-      console.error('Hasta verilerini alma hatası:', err);
-      setError('Hasta verilerini alırken hata oluştu.');
+      console.error('Hata:', err);
+      setError('Veri alınamadı.');
     } finally {
       setIsLoading(false);
+    }
+  };
+  const fetchAppointmentsOnly = async () => {
+    if (!userData?.ID) return;
+
+    try {
+      // Randevuları çek
+      const appts = await getAppointmentsByPatientId(userData.ID);
+      setAppointments(appts);
+
+      // 3. TANILARI VE İLAÇLARI ÇEK
+      console.log('Tanılar isteniyor...');
+      const diags = await getDiagnosesByPatientId(userData.ID);
+      console.log('İlaçlar isteniyor...');
+      const pres = await getPrescriptionsByPatientId(userData.ID);
+      console.log('Tetkikler isteniyor...');
+      const tests = await getMedicalTestsByPatientId(userData.ID);
+      console.log('Tıbbi geçmiş isteniyor...');
+      const history = await getMedicalHistoryByPatientId(userData.ID);
+      console.log('Ameliyat geçmişi isteniyor...');
+      const surgery = await getSurgeryHistoryByPatientId(userData.ID);
+      console.log('Alerjiler isteniyor...');
+      const allergiesData = await getAllergiesByPatientId(userData.ID);
+      setDiagnoses(diags);
+      setPrescriptions(pres);
+      setMedicalTests(tests);
+      setMedicalHistory(history);
+      setSurgeryHistory(surgery);
+      setAllergies(allergiesData);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -83,9 +123,16 @@ export default function PatientScreen({ route, navigation }) {
       <>
         <PatientProfile userData={userData} />
         <View style={styles.contentRow}>
-          <AppointmentsContainer userData={userData} />
-
-
+          <AppointmentsContainer
+            userData={userData}
+            appointments={appointments}
+            diagnoses={diagnoses}
+            prescriptions={prescriptions}
+            medicalTests={medicalTests}
+            medicalHistory={medicalHistory}
+            surgeryHistory={surgeryHistory}
+            allergies={allergies}
+          />
         </View>
         <ActionButtons navigation={navigation} />
       </>

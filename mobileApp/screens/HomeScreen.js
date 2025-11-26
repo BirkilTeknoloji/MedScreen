@@ -4,7 +4,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { sendRfidToBackend, startNfcReading, stopNfcReading } from '../services/nfc/nfcHandler';
 import Toast from 'react-native-root-toast';
 import styles from './styles/HomeScreenStyle';
-import { addPatient } from '../services/api';
+import { addPatient, getPatientByUserId, getPatientById } from '../services/api';
 
 const showSuccessToast = (message) => {
     return Toast.show(message, {
@@ -63,28 +63,30 @@ export default function HomeScreen() {
         try {
             const backendResponse = await sendRfidToBackend(tag.id || JSON.stringify(tag.id));
 
-            if (backendResponse?.Role) {
+            console.log('Backend Response Keys:', Object.keys(backendResponse || {}));
+            console.log('Full Backend Response:', JSON.stringify(backendResponse, null, 2));
+            
+            if (backendResponse?.success && backendResponse?.data) {
                 const toast = showSuccessToast('✅ Giriş başarılı, yönlendiriliyorsunuz...');
 
-                setTimeout(() => {
+                setTimeout(async () => {
                     Toast.hide(toast);
-
-                    if (backendResponse.Role === 'patient') {
-                        addPatient(backendResponse.ID)
-                            .then(() => {
-                                navigation.navigate('PatientScreen', { isPatientLogin: false });
-                            })
-                            .catch(() => {
-                                showErrorToast('❌ Hasta otomatik kaydı başarısız.');
-                            })
-                            .finally(() => {
-                                isProcessingRef.current = false;
-                            });
-                    } else {
+                    console.log('Hasta verileri çekiliyor...');
+                    
+                    try {
+                        const userData = backendResponse.data;
+                        const userId = userData.ID;
+                        
                         navigation.navigate('PatientScreen', { isPatientLogin: false });
-                        isProcessingRef.current = false;
+                        
+                        console.log('Navigation tamamlandı');
+                    } catch (navError) {
+                        console.error('Navigation hatası:', navError);
+                        showErrorToast('❌ Hasta verileri alınamadı.');
                     }
-                }, 2000);
+                    
+                    isProcessingRef.current = false;
+                }, 1000);
             } else {
                 showErrorToast('❌ Giriş başarısız: Kart tanımlı değil.');
                 setTimeout(() => {

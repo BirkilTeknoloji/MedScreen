@@ -16,7 +16,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   dropwdownText: {
-    fontsize: 20,
+    fontSize: 20,
     fontWeight: '500',
   },
   dropdownContent: {
