@@ -140,6 +140,7 @@ func (s *nfcCardService) AssignCardToUser(cardID, userID uint) error {
 
 	// Update card with user assignment
 	card.AssignedUserID = &userID
+	card.AssignedUser = nil // Clear loaded association to avoid GORM issues
 	card.IsActive = true
 
 	return s.repo.Update(card)
