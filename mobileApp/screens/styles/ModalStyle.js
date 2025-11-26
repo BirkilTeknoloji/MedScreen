@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-   overlay: {
+  overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
@@ -10,7 +10,7 @@ export default StyleSheet.create({
   },
   modalContainer: {
     width: '85%',
-    maxHeight: '75%',
+    maxHeight: '70%',
     backgroundColor: '#fff',
     borderRadius: 16,
     overflow: 'hidden',
@@ -38,13 +38,11 @@ export default StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
-    backgroundColor: '#DCFCE7',
     alignSelf: 'flex-start',
   },
   statusText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#166534',
   },
   closeButton: {
     padding: 4,
@@ -82,31 +80,15 @@ export default StyleSheet.create({
     color: '#1F2937',
     lineHeight: 22,
   },
-  notesSection: {
-    marginTop: 10,
-  },
-  notesContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#F9FAFB',
-    padding: 12,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#2563EB',
-  },
-  notesIcon: {
-    marginRight: 8,
-    marginTop: 2,
-  },
-  notesText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#374151',
-    lineHeight: 20,
-  },
   divider: {
     height: 1,
     backgroundColor: '#E5E7EB',
     marginVertical: 20,
+  },
+  dividerLight: {
+    height: 1,
+    backgroundColor: '#F3F4F6',
+    marginVertical: 8,
   },
   userCard: {
     flexDirection: 'row',
@@ -114,7 +96,14 @@ export default StyleSheet.create({
     borderColor: '#E5E7EB',
     borderRadius: 12,
     padding: 12,
+    marginBottom: 12,
     alignItems: 'flex-start',
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginRight: 12,
   },
   iconAvatar: {
     width: 48,
@@ -137,11 +126,20 @@ export default StyleSheet.create({
     fontSize: 13,
     color: '#6B7280',
   },
+  userDetailsContainer: {
+    marginTop: 4,
+  },
+  userDetailText: {
+    fontSize: 13,
+    color: '#4B5563',
+    marginTop: 2,
+  },
   footer: {
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
     backgroundColor: '#F9FAFB',
+    gap: 12,
   },
   cancelButton: {
     alignSelf: 'center',
@@ -152,4 +150,5 @@ export default StyleSheet.create({
     fontWeight: '600',
     fontSize: 14,
   },
+  
 });

@@ -3,26 +3,51 @@ import { Animated, Text, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles/CustomDropwdownStyle';
 import DetailModal from './DetailModal';
-
+import AppointmentsDetail from './AppointmentsDetail';
+import DiagnosesDetail from './DiagnosesDetail';
+import PrescriptionsDetail from './PrescriptionsDetail';
+import MedicalTestsDetail from './MedicalTestsDetail';
+import MedicalHistoryDetail from './MedicalHistoryDetail';
+import SurgeryHistoryDetail from './SurgeryHistoryDetail';
+import AllergiesDetail from './AllergiesDetail';
 const CustomDropdown = ({ data, title }) => {
   const [dropModal, setDropModal] = useState(false);
   const [detailModal, setDetailModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const animation = useRef(new Animated.Value(0)).current;
-  console.log('CustomDropdown data:', data);
+
+  // ... formatDate ve toggleDropdown fonksiyonlarınız aynı kalsın ...
+  const formatDate = dateString => {
+    // ... (eski kodunuz) ...
+    if (!dateString) return 'Tarih belirtilmemiş';
+    const months = [
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
+    ];
+    const date = new Date(dateString);
+    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  };
+
   const toggleDropdown = () => {
     const toValue = dropModal ? 0 : 1;
-
     Animated.timing(animation, {
       toValue,
       duration: 300,
       useNativeDriver: false,
     }).start();
-
     setDropModal(!dropModal);
   };
 
-  // ✅ maxHeight interpolation eklendi
   const maxHeight = animation.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 300],
@@ -52,14 +77,7 @@ const CustomDropdown = ({ data, title }) => {
       </TouchableOpacity>
 
       {dropModal && (
-        <Animated.View
-          style={[
-            styles.dropdownContent,
-            {
-              maxHeight,
-            },
-          ]}
-        >
+        <Animated.View style={[styles.dropdownContent, { maxHeight }]}>
           <View>
             {data && data.length > 0 ? (
               data.map((item, index) => (
@@ -70,12 +88,43 @@ const CustomDropdown = ({ data, title }) => {
                   <View style={styles.appointmentItem}>
                     <View style={{ justifyContent: 'space-around' }}>
                       <Text style={styles.appointmentTitle}>
-                        {item.title || item.type || item.name || item}
+                        {/* Tanılar ve İlaçlar için özel görünüm */}
+                        {title === 'Tanılar'
+                          ? item.diagnosis_name || item.name || 'Tanı'
+                          : title === 'İlaçlar'
+                          ? item.medication_name || item.name || 'İlaç'
+                          : title === 'Tetkikler'
+                          ? item.test_name || item.name || 'Tetkik'
+                          : title === 'Tıbbi Geçmiş'
+                          ? item.condition_name || item.name || 'Geçmiş'
+                          : title === 'Ameliyat Geçmişi'
+                          ? item.procedure_name || item.name || 'Ameliyat'
+                          : title === 'Alerjiler'
+                          ? item.allergen || item.name || 'Alerji'
+                          : item.doctor?.specialization ||
+                            item.reason ||
+                            'Randevu'}
                       </Text>
-                      <Text style={styles.appointmentDate}>{item.date}</Text>
+                      <Text style={styles.appointmentDate}>
+                        {title === 'Tanılar'
+                          ? formatDate(item.diagnosis_date || item.date)
+                          : title === 'İlaçlar'
+                          ? formatDate(item.prescribed_date || item.date)
+                          : title === 'Tetkikler'
+                          ? formatDate(item.ordered_date || item.date)
+                          : title === 'Tıbbi Geçmiş'
+                          ? formatDate(item.diagnosed_date || item.date)
+                          : title === 'Ameliyat Geçmişi'
+                          ? formatDate(item.surgery_date || item.date)
+                          : title === 'Alerjiler'
+                          ? formatDate(item.diagnosed_date || item.date)
+                          : formatDate(item.appointment_date || item.date)}
+                      </Text>
                     </View>
                     <View style={styles.appointmentStatus}>
-                      <Text style={styles.statusText}>Gerçekleşti</Text>
+                      <Text style={styles.statusText}>
+                        {item.status || 'Durum Yok'}
+                      </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -87,11 +136,55 @@ const CustomDropdown = ({ data, title }) => {
         </Animated.View>
       )}
 
-      <DetailModal 
-        visible={detailModal}
-        selectedItem={selectedItem}
-        onClose={closeDetailModal}
-      />
+      {title === 'Randevular' ? (
+        <AppointmentsDetail
+          visible={detailModal}
+          appointment={selectedItem}
+          onClose={closeDetailModal}
+        />
+      ) : title === 'Tanılar' ? (
+        <DiagnosesDetail
+          visible={detailModal}
+          diagnosis={selectedItem}
+          onClose={closeDetailModal}
+        />
+      ) : title === 'İlaçlar' ? (
+        <PrescriptionsDetail
+          visible={detailModal}
+          prescription={selectedItem}
+          onClose={closeDetailModal}
+        />
+      ) : title === 'Tetkikler' ? (
+        <MedicalTestsDetail
+          visible={detailModal}
+          medicalTest={selectedItem}
+          onClose={closeDetailModal}
+        />
+      ) : title === 'Tıbbi Geçmiş' ? (
+        <MedicalHistoryDetail
+          visible={detailModal}
+          medicalHistory={selectedItem}
+          onClose={closeDetailModal}
+        />
+      ) : title === 'Ameliyat Geçmişi' ? (
+        <SurgeryHistoryDetail
+          visible={detailModal}
+          surgeryHistory={selectedItem}
+          onClose={closeDetailModal}
+        />
+      ) : title === 'Alerjiler' ? (
+        <AllergiesDetail
+          visible={detailModal}
+          allergy={selectedItem}
+          onClose={closeDetailModal}
+        />
+      ) : (
+        <DetailModal
+          visible={detailModal}
+          selectedItem={selectedItem}
+          onClose={closeDetailModal}
+        />
+      )}
     </>
   );
 };

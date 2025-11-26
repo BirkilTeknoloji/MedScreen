@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
-import styles from './styles/PatientProfileStyle';
+import styles from '../styles/PatientProfileStyle';
+import UserDataCom from './UserDataCom';
 
 export default function PatientProfile({ userData }) {
   const formatDate = dateString => {
@@ -12,172 +13,92 @@ export default function PatientProfile({ userData }) {
 
     return `${day}.${month}.${year}`;
   };
-  const userBd = formatDate(userData.BirthDate);
+  const userBd = formatDate(userData.birth_date);
   const created = formatDate(userData.CreatedAt);
   return (
-    <View style={cusStyle.profil}>
+    <View style={styles.profil}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', gap: 24 }}>
-          <View style={cusStyle.avatarInfo}>
+          <View style={styles.avatarInfo}>
             <View>
               <Image
                 source={{
                   uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpd4mJRIUwqgE8D_Z2znANEbtiz4GhI4M8NQ&s',
                 }}
-                style={cusStyle.profileImage}
+                style={styles.profileImage}
               />
             </View>
           </View>
           <View>
-            <View style={cusStyle.container}>
+            <View style={styles.container}>
               <View>
-                <Text style={cusStyle.textName}>{userData.Name}</Text>
-                <Text>Hasta TC: {userData.TCNumber}</Text>
+                <Text style={styles.textName}>
+                  {userData.first_name} {userData.last_name} 
+                </Text>
+                <Text>Hasta TC: {userData.tc_number}</Text>
               </View>
             </View>
-            <View style={cusStyle.row}>
+            <View style={styles.row}>
               <View>
-                <Text style={cusStyle.infoText}>📅 Doğum Tarihi</Text>
-                <Text style={cusStyle.infoText2}>{userBd}</Text>
+                <Text style={styles.infoText}>📅 Doğum Tarihi</Text>
+                <Text style={styles.infoText2}>{userBd}</Text>
               </View>
               <View>
-                <Text style={cusStyle.infoText}>Yaş</Text>
-                <Text style={cusStyle.infoText2}>23</Text>
+                <Text style={styles.infoText}>Yaş</Text>
+                <Text style={styles.infoText2}>23</Text>
               </View>
               <View>
-                <Text style={cusStyle.infoText}>Cinsiyet</Text>
-                <Text style={cusStyle.infoText2}>{userData.Gender}</Text>
+                <Text style={styles.infoText}>Cinsiyet</Text>
+                <Text style={styles.infoText2}>{userData.gender}</Text>
               </View>
               <View>
-                <Text style={cusStyle.infoText}>Kan Grubu</Text>
-                <Text style={cusStyle.infoText2}>{userData.BloodType}</Text>
+                <Text style={styles.infoText}>Kan Grubu</Text>
+                <Text style={styles.infoText2}>{userData.blood_type}</Text>
               </View>
               <View>
-                <Text style={cusStyle.infoText}>Boy(cm)</Text>
-                <Text style={cusStyle.infoText2}>{userData.Height}</Text>
+                <Text style={styles.infoText}>Boy(cm)</Text>
+                <Text style={styles.infoText2}>{userData.height}</Text>
               </View>
               <View>
-                <Text style={cusStyle.infoText}>Kilo(kg)</Text>
-                <Text style={cusStyle.infoText2}>{userData.Weight}</Text>
+                <Text style={styles.infoText}>Kilo(kg)</Text>
+                <Text style={styles.infoText2}>{userData.weight}</Text>
               </View>
             </View>
           </View>
         </View>
-        <View>
-          <View>
-            <Text
-              style={[
-                cusStyle.isActive,
-                { color: '#166534', fontWeight: '500' },
-              ]}
-            >
-              Active
-            </Text>
-            <Text style={{ textAlign: 'right' }}>Last Visit:{created}</Text>
-            <Text style={{ textAlign: 'right' }}>
-              Next Appointment:30.10.2025
-            </Text>
-          </View>
+        <View style={styles.row} >
+          <UserDataCom
+            title="Doktor İletişim Bilgileri"
+            name={userData.primary_doctor.first_name + ' ' + userData.primary_doctor.last_name}
+            phone={userData.primary_doctor.phone} 
+            color={'#1b8b05ff'}
+            bgColor={"#b0ffa0ff"}
+          />
+          <UserDataCom 
+            title="Acil Durumda İletişime Geçilecek Kişi" 
+            name={userData.emergency_contact_name} 
+            phone={userData.emergency_contact_phone} 
+            color={'#dd612fff'}
+            bgColor={"#ffb3b0ff"}
+            />
+         
         </View>
       </View>
-      <View style={cusStyle.line}></View>
-      <View style={cusStyle.profilePerson}>
+      <View style={styles.line}></View>
+      <View style={styles.profilePerson}>
         <View>
-          <Text style={cusStyle.infoText}>Telefon Numarası</Text>
-          <Text style={cusStyle.infoText2}>{userData.Phone}</Text>
+          <Text style={styles.infoText}>Telefon Numarası</Text>
+          <Text style={styles.infoText2}>{userData.phone}</Text>
         </View>
         <View>
-          <Text style={cusStyle.infoText}>Email Adresi</Text>
-          <Text style={cusStyle.infoText2}>{userData.Phone}</Text>
+          <Text style={styles.infoText}>Email Adresi</Text>
+          <Text style={styles.infoText2}>{userData.email}</Text>
         </View>
         <View>
-          <Text style={cusStyle.infoText}>Adres</Text>
-          <Text style={cusStyle.infoText2}>{userData.Address}</Text>
+          <Text style={styles.infoText}>Adres</Text>
+          <Text style={styles.infoText2}>{userData.address}</Text>
         </View>
       </View>
     </View>
   );
 }
-
-const cusStyle = StyleSheet.create({
-  profilePerson: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'flex-start',
-    padding: 8,
-  },
-  line: {
-    width: '100%',
-    height: 2,
-    backgroundColor: '#d3d3d3ff',
-    borderRadius: 12,
-  },
-  isActive: {
-    backgroundColor: '#dcfce7',
-    padding: 5,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  infoText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#000',
-    opacity: 0.6,
-  },
-  infoText2: {
-    fontSize: 18,
-    fontWeight: '600',
-    fontStyle: 'italic',
-    color: '#000',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-    gap: 24,
-  },
-  cell: {
-    flex: 1,
-    paddingHorizontal: 10,
-  },
-  label: {
-    fontSize: 12,
-    color: '#6c757d',
-    marginBottom: 2,
-  },
-  value: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#212529',
-  },
-  textName: {
-    fontWeight: 'bold',
-    fontSize: 42,
-  },
-  avatarInfo: {
-    flexDirection: 'row',
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50, // yuvarlak görünüm istiyorsan
-    borderWidth: 2,
-    borderColor: '#ddd',
-  },
-  profil: {
-    marginBottom: 20,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 10,
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    shadowColor: '#0000',
-    shadowOffset: { width:2, height: 4 }, // Gölge konumu
-    shadowOpacity: 0.55, // Gölge saydamlığı
-    shadowRadius: 2,
-  },
-  container: {
-    marginVertical: 10,
-    backgroundColor: '#fff',
-  },
-});
