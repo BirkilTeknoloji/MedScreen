@@ -38,12 +38,18 @@ type LoggingConfig struct {
 	Format string
 }
 
+// JWTConfig holds JWT settings
+type JWTConfig struct {
+	SecretKey string
+}
+
 // Config holds all configuration settings
 type Config struct {
 	Database DatabaseConfig
 	Server   ServerConfig
 	CORS     CORSConfig
 	Logging  LoggingConfig
+	JWT      JWTConfig
 }
 
 // LoadConfig loads configuration from environment variables
@@ -62,7 +68,7 @@ func LoadConfig() (*Config, error) {
 		},
 		Server: ServerConfig{
 			Port:    getEnv("SERVER_PORT", "8080"),
-			Host:    getEnv("SERVER_HOST", "192.168.1.141"), //buraya ve .env dosyasına ipconfig ile alınan local ip adresi girilmeli
+			Host:    getEnv("SERVER_HOST", "192.168.1.141"), //varsa .env dosyasına yoksa burayaa ipconfig ile alınan local ip adresi girilmeli
 			GinMode: getEnv("GIN_MODE", "release"),
 		},
 		CORS: CORSConfig{
@@ -73,6 +79,9 @@ func LoadConfig() (*Config, error) {
 		Logging: LoggingConfig{
 			Level:  getEnv("LOG_LEVEL", "info"),
 			Format: getEnv("LOG_FORMAT", "json"),
+		},
+		JWT: JWTConfig{
+			SecretKey: getEnv("JWT_SECRET_KEY", "12345667890"),
 		},
 	}
 

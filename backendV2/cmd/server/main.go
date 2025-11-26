@@ -16,6 +16,7 @@ import (
 	"medscreen/internal/repository"
 	"medscreen/internal/routes"
 	"medscreen/internal/service"
+	"medscreen/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,6 +27,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
+
+	// Set JWT secret key
+	utils.SetJWTSecretKey()
 
 	// Set Gin mode
 	gin.SetMode(cfg.Server.GinMode)

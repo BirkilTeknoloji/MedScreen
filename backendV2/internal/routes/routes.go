@@ -33,9 +33,12 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 
 	// API v1 group
 	api := router.Group("/api/v1")
+	api.POST("/nfc-cards/authenticate", handlers.NFCCard.AuthenticateByNFC)
+	protected := api.Group("/")
+	protected.Use(middleware.AuthMiddleware())
 
 	// User routes
-	users := api.Group("/users")
+	users := protected.Group("/users")
 	{
 		users.POST("", handlers.User.CreateUser)
 		users.GET("", handlers.User.GetUsers)
@@ -45,7 +48,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Patient routes
-	patients := api.Group("/patients")
+	patients := protected.Group("/patients")
 	{
 		patients.POST("", handlers.Patient.CreatePatient)
 		patients.GET("", handlers.Patient.GetPatients)
@@ -56,7 +59,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Appointment routes
-	appointments := api.Group("/appointments")
+	appointments := protected.Group("/appointments")
 	{
 		appointments.POST("", handlers.Appointment.CreateAppointment)
 		appointments.GET("", handlers.Appointment.GetAppointments)
@@ -66,7 +69,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Diagnosis routes
-	diagnoses := api.Group("/diagnoses")
+	diagnoses := protected.Group("/diagnoses")
 	{
 		diagnoses.POST("", handlers.Diagnosis.CreateDiagnosis)
 		diagnoses.GET("", handlers.Diagnosis.GetDiagnoses)
@@ -76,7 +79,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Prescription routes
-	prescriptions := api.Group("/prescriptions")
+	prescriptions := protected.Group("/prescriptions")
 	{
 		prescriptions.POST("", handlers.Prescription.CreatePrescription)
 		prescriptions.GET("", handlers.Prescription.GetPrescriptions)
@@ -86,7 +89,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Medical test routes
-	medicalTests := api.Group("/medical-tests")
+	medicalTests := protected.Group("/medical-tests")
 	{
 		medicalTests.POST("", handlers.MedicalTest.CreateMedicalTest)
 		medicalTests.GET("", handlers.MedicalTest.GetMedicalTests)
@@ -96,7 +99,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Medical history routes
-	medicalHistory := api.Group("/medical-history")
+	medicalHistory := protected.Group("/medical-history")
 	{
 		medicalHistory.POST("", handlers.MedicalHistory.CreateMedicalHistory)
 		medicalHistory.GET("", handlers.MedicalHistory.GetMedicalHistories)
@@ -106,7 +109,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Surgery history routes
-	surgeryHistory := api.Group("/surgery-history")
+	surgeryHistory := protected.Group("/surgery-history")
 	{
 		surgeryHistory.POST("", handlers.SurgeryHistory.CreateSurgeryHistory)
 		surgeryHistory.GET("", handlers.SurgeryHistory.GetSurgeryHistories)
@@ -116,7 +119,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Allergy routes
-	allergies := api.Group("/allergies")
+	allergies := protected.Group("/allergies")
 	{
 		allergies.POST("", handlers.Allergy.CreateAllergy)
 		allergies.GET("", handlers.Allergy.GetAllergies)
@@ -126,7 +129,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Vital sign routes
-	vitalSigns := api.Group("/vital-signs")
+	vitalSigns := protected.Group("/vital-signs")
 	{
 		vitalSigns.POST("", handlers.VitalSign.CreateVitalSign)
 		vitalSigns.GET("", handlers.VitalSign.GetVitalSigns)
@@ -136,7 +139,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// NFC card routes
-	nfcCards := api.Group("/nfc-cards")
+	nfcCards := protected.Group("/nfc-cards")
 	{
 		nfcCards.POST("", handlers.NFCCard.CreateCard)
 		nfcCards.GET("", handlers.NFCCard.GetCards)
@@ -145,11 +148,10 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 		nfcCards.DELETE("/:id", handlers.NFCCard.DeleteCard)
 		nfcCards.POST("/:id/assign", handlers.NFCCard.AssignCard)
 		nfcCards.POST("/:id/deactivate", handlers.NFCCard.DeactivateCard)
-		nfcCards.POST("/authenticate", handlers.NFCCard.AuthenticateByNFC)
 	}
 
 	// Device routes
-	devices := api.Group("/devices")
+	devices := protected.Group("/devices")
 	{
 		devices.POST("", handlers.Device.RegisterDevice)
 		devices.GET("", handlers.Device.GetDevices)

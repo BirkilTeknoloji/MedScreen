@@ -176,5 +176,14 @@ func (h *NFCCardHandler) AuthenticateByNFC(c *gin.Context) {
 		return
 	}
 
-	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_NFC_AUTHENTICATION, "Authentication successful", user)
+	token, err := utils.GenerateJWT(user.ID)
+	if err != nil {
+		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to generate token", err)
+		return
+	}
+
+	utils.SendSuccessResponse(c, http.StatusOK, constants.SUCCESS_NFC_AUTHENTICATION, "Authentication successful", gin.H{
+		"user":  user,
+		"token": token,
+	})
 }
