@@ -9,7 +9,7 @@ import (
 // NFCCard represents an NFC card used for user authentication
 type NFCCard struct {
 	ID              uint       `gorm:"primaryKey" json:"id"`
-	CardUID         string     `gorm:"size:100;not null;uniqueIndex" json:"card_uid"`
+	CardUID         string     `gorm:"size:100;not null;uniqueIndex:idx_nfc_cards_card_uid" json:"card_uid"`
 	AssignedUserID  *uint      `gorm:"index" json:"assigned_user_id,omitempty"`
 	AssignedUser    *User      `gorm:"foreignKey:AssignedUserID" json:"assigned_user,omitempty"`
 	IsActive        bool       `gorm:"default:true;index" json:"is_active"`

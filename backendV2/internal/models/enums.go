@@ -122,3 +122,11 @@ const (
 	GenderMale   Gender = "male"
 	GenderFemale Gender = "female"
 )
+
+// QRType represents the type of QR code token
+type QRType string
+
+const (
+	QRTypePatientAssignment QRType = "patient_assignment"
+	QRTypePrescriptionInfo  QRType = "prescription_info"
+)

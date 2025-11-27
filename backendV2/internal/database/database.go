@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"medscreen/internal/config"
+	"medscreen/internal/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -19,7 +20,7 @@ var DB *gorm.DB
 func InitDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	// Build PostgreSQL connection string
 	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s client_encoding=UTF8",
 		cfg.Host,
 		cfg.Port,
 		cfg.User,
@@ -71,12 +72,23 @@ func InitDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 func RunMigrations(db *gorm.DB) error {
 	log.Println("Running database migrations...")
 
-	// Import models package is required at the top of the file
-	// This will be handled by the import statement
-
 	// Note: Since the database already exists with tables, AutoMigrate will
 	// only add missing columns and indexes, not recreate existing tables
-	err := db.AutoMigrate()
+	err := db.AutoMigrate(
+		&models.User{},
+		&models.Patient{},
+		&models.Device{},
+		&models.Appointment{},
+		&models.Diagnosis{},
+		&models.Prescription{},
+		&models.MedicalTest{},
+		&models.MedicalHistory{},
+		&models.SurgeryHistory{},
+		&models.Allergy{},
+		&models.VitalSign{},
+		&models.NFCCard{},
+		&models.QRToken{},
+	)
 
 	if err != nil {
 		return fmt.Errorf("failed to run migrations: %w", err)

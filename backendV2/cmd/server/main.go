@@ -58,6 +58,7 @@ func main() {
 	allergyRepo := repository.NewAllergyRepository(db)
 	vitalSignRepo := repository.NewVitalSignRepository(db)
 	deviceRepo := repository.NewDeviceRepository(db)
+	qrTokenRepo := repository.NewQRTokenRepository(db)
 
 	// Initialize services with repository dependencies
 	userService := service.NewUserService(userRepo)
@@ -82,6 +83,7 @@ func main() {
 	allergyService := service.NewAllergyService(allergyRepo)
 	vitalSignService := service.NewVitalSignService(vitalSignRepo)
 	deviceService := service.NewDeviceService(deviceRepo, patientRepo)
+	qrService := service.NewQRService(qrTokenRepo, patientRepo, deviceRepo)
 
 	// Initialize handlers with service dependencies
 	handlers := &routes.Handlers{
@@ -97,6 +99,7 @@ func main() {
 		VitalSign:      handler.NewVitalSignHandler(vitalSignService),
 		NFCCard:        handler.NewNFCCardHandler(nfcCardService, userService),
 		Device:         handler.NewDeviceHandler(deviceService),
+		QR:             handler.NewQRHandler(qrService, deviceService),
 		Reset:          handler.NewResetHandler(db), //TODO: prodda sil
 	}
 

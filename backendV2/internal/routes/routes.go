@@ -21,6 +21,7 @@ type Handlers struct {
 	VitalSign      *handler.VitalSignHandler
 	NFCCard        *handler.NFCCardHandler
 	Device         *handler.DeviceHandler
+	QR             *handler.QRHandler
 	Reset          *handler.ResetHandler //TODO: prodda sil
 }
 
@@ -56,6 +57,7 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 		patients.PUT("/:id", handlers.Patient.UpdatePatient)
 		patients.DELETE("/:id", handlers.Patient.DeletePatient)
 		patients.GET("/:id/medical-history", handlers.Patient.GetPatientMedicalHistory)
+		patients.POST("/:id/generate-qr", handlers.QR.GeneratePatientQR)
 	}
 
 	// Appointment routes
@@ -161,6 +163,14 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 		devices.DELETE("/:mac_address", handlers.Device.DeleteDevice)
 		devices.POST("/:mac_address/assign", handlers.Device.AssignPatient)
 		devices.POST("/:mac_address/unassign", handlers.Device.UnassignPatient)
+		devices.POST("/:mac_address/scan-patient-qr", handlers.QR.ScanPatientQR)
+		devices.POST("/:mac_address/generate-prescription-qr/:patient_id", handlers.QR.GeneratePrescriptionQR)
+	}
+
+	// QR Token routes
+	qrTokens := protected.Group("/qr-tokens")
+	{
+		qrTokens.GET("/:token/validate", handlers.QR.ValidateQRToken)
 	}
 
 	// Reset route (prodda sil)

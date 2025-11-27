@@ -12,7 +12,7 @@ type Patient struct {
 	gorm.Model
 	FirstName             string    `gorm:"size:100;not null" json:"first_name"`
 	LastName              string    `gorm:"size:100;not null;index" json:"last_name"`
-	TCNumber              string    `gorm:"size:11;not null;uniqueIndex" json:"tc_number"`
+	TCNumber              string    `gorm:"size:11;not null;uniqueIndex:idx_patients_tc_number" json:"tc_number"`
 	BirthDate             time.Time `gorm:"not null" json:"birth_date"`
 	Gender                Gender    `gorm:"size:10;not null" json:"gender"`
 	Phone                 string    `gorm:"size:20" json:"phone"`
