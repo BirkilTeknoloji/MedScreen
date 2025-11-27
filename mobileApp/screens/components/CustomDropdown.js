@@ -16,9 +16,7 @@ const CustomDropdown = ({ data, title }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const animation = useRef(new Animated.Value(0)).current;
 
-  // ... formatDate ve toggleDropdown fonksiyonlarınız aynı kalsın ...
   const formatDate = dateString => {
-    // ... (eski kodunuz) ...
     if (!dateString) return 'Tarih belirtilmemiş';
     const months = [
       'Ocak',

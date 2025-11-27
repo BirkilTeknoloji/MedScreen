@@ -68,7 +68,7 @@ func LoadConfig() (*Config, error) {
 		},
 		Server: ServerConfig{
 			Port:    getEnv("SERVER_PORT", "8080"),
-			Host:    getEnv("SERVER_HOST", "192.168.1.141"), //varsa .env dosyasına yoksa burayaa ipconfig ile alınan local ip adresi girilmeli
+			Host:    getEnv("SERVER_HOST", "192.168.1.110"), //varsa .env dosyasına yoksa burayaa ipconfig ile alınan local ip adresi girilmeli
 			GinMode: getEnv("GIN_MODE", "release"),
 		},
 		CORS: CORSConfig{
