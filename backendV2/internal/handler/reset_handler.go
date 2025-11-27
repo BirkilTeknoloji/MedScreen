@@ -18,7 +18,7 @@ func NewResetHandler(db *gorm.DB) *ResetHandler {
 }
 
 func (h *ResetHandler) ResetDatabase(c *gin.Context) {
-	sqlFile := "database_querytest.sql"
+	sqlFile := "z_test/database_querytest.sql"
 
 	sqlBytes, err := os.ReadFile(sqlFile)
 	if err != nil {

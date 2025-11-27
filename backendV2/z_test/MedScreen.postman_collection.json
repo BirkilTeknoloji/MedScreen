@@ -1680,6 +1680,127 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "QR Codes",
+			"item": [
+				{
+					"name": "Generate Patient Assignment QR",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"expiry_hours\": 24\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}/generate-qr",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"patients",
+								"{{patient_id}}",
+								"generate-qr"
+							]
+						},
+						"description": "Generate a QR code for patient assignment. The patient can show this QR code to a device for automatic assignment. QR code expires after specified hours (max 168 hours / 7 days). One-time use only."
+					},
+					"response": []
+				},
+				{
+					"name": "Device Scan Patient QR",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"{{qr_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices/{{mac_address}}/scan-patient-qr",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices",
+								"{{mac_address}}",
+								"scan-patient-qr"
+							]
+						},
+						"description": "Device scans a patient's QR code and assigns the patient to the device. The token from the QR code must be provided. This is a one-time operation - once used, the token becomes invalid."
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Prescription Info QR",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"expiry_hours\": 168\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/devices/{{mac_address}}/generate-prescription-qr/{{patient_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"devices",
+								"{{mac_address}}",
+								"generate-prescription-qr",
+								"{{patient_id}}"
+							]
+						},
+						"description": "Doctor generates a QR code via device for patient prescription information. QR code expires after specified hours (max 720 hours / 30 days). Can be scanned multiple times."
+					},
+					"response": []
+				},
+				{
+					"name": "Validate QR Token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/qr-tokens/{{qr_token}}/validate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"qr-tokens",
+								"{{qr_token}}",
+								"validate"
+							]
+						},
+						"description": "Validate a QR token and retrieve associated data (patient, device, type, expiration). Returns error if token is expired or already used (for patient assignment tokens)."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -1762,6 +1883,14 @@
 		{
 			"key": "device_id",
 			"value": "1"
+		},
+		{
+			"key": "mac_address",
+			"value": "AA:BB:CC:DD:EE:01"
+		},
+		{
+			"key": "qr_token",
+			"value": ""
 		}
 	]
 }

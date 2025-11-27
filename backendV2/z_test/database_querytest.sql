@@ -1,5 +1,6 @@
 --MedScreen projesi veritabanı test sorguları
 -- Var olan tabloları temizle
+DROP TABLE IF EXISTS qr_tokens CASCADE;
 DROP TABLE IF EXISTS devices CASCADE;
 DROP TABLE IF EXISTS vital_signs CASCADE;
 DROP TABLE IF EXISTS allergies CASCADE;
@@ -37,7 +38,7 @@ CREATE INDEX idx_users_nfc_card_id ON users(nfc_card_id);
 -- NFC Cards tablosu
 CREATE TABLE nfc_cards (
     id SERIAL PRIMARY KEY,
-    card_uid VARCHAR(100) UNIQUE NOT NULL,
+    card_uid VARCHAR(100) NOT NULL,
     assigned_user_id INTEGER NULL,
     is_active BOOLEAN DEFAULT TRUE,
     issued_at TIMESTAMP DEFAULT NOW(),
@@ -45,7 +46,7 @@ CREATE TABLE nfc_cards (
     created_by_user_id INTEGER NOT NULL
 );
 
-CREATE INDEX idx_nfc_cards_card_uid ON nfc_cards(card_uid);
+CREATE UNIQUE INDEX idx_nfc_cards_card_uid ON nfc_cards(card_uid);
 CREATE INDEX idx_nfc_cards_assigned_user_id ON nfc_cards(assigned_user_id);
 CREATE INDEX idx_nfc_cards_is_active ON nfc_cards(is_active);
 
@@ -57,7 +58,7 @@ CREATE TABLE patients (
     deleted_at TIMESTAMP NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    tc_number VARCHAR(11) UNIQUE NOT NULL,
+    tc_number VARCHAR(11) NOT NULL,
     birth_date DATE NOT NULL,
     gender VARCHAR(20) NOT NULL,
     phone VARCHAR(20) NOT NULL,
@@ -71,7 +72,7 @@ CREATE TABLE patients (
     primary_doctor_id INTEGER NOT NULL
 );
 
-CREATE INDEX idx_patients_tc_number ON patients(tc_number);
+CREATE UNIQUE INDEX idx_patients_tc_number ON patients(tc_number);
 CREATE INDEX idx_patients_last_name ON patients(last_name);
 CREATE INDEX idx_patients_primary_doctor_id ON patients(primary_doctor_id);
 
@@ -257,17 +258,39 @@ CREATE TABLE devices (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     deleted_at TIMESTAMP NULL,
-    mac_address VARCHAR(50) UNIQUE NOT NULL,
+    mac_address VARCHAR(50) NOT NULL,
     patient_id INTEGER NULL,
     room_number VARCHAR(20) NULL,
     description TEXT NULL,
     is_active BOOLEAN DEFAULT TRUE
 );
 
-CREATE INDEX idx_devices_mac_address ON devices(mac_address);
+CREATE UNIQUE INDEX idx_devices_mac_address ON devices(mac_address);
 CREATE INDEX idx_devices_patient_id ON devices(patient_id);
 CREATE INDEX idx_devices_room_number ON devices(room_number);
 CREATE INDEX idx_devices_is_active ON devices(is_active);
+
+-- QR Tokens tablosu
+CREATE TABLE qr_tokens (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    deleted_at TIMESTAMP NULL,
+    token VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    patient_id INTEGER NOT NULL,
+    device_id INTEGER NULL,
+    expires_at TIMESTAMP NOT NULL,
+    is_used BOOLEAN DEFAULT FALSE,
+    used_at TIMESTAMP NULL
+);
+
+CREATE UNIQUE INDEX idx_qr_tokens_token ON qr_tokens(token);
+CREATE INDEX idx_qr_tokens_type ON qr_tokens(type);
+CREATE INDEX idx_qr_tokens_patient_id ON qr_tokens(patient_id);
+CREATE INDEX idx_qr_tokens_device_id ON qr_tokens(device_id);
+CREATE INDEX idx_qr_tokens_expires_at ON qr_tokens(expires_at);
+CREATE INDEX idx_qr_tokens_is_used ON qr_tokens(is_used);
 
 
 ALTER TABLE nfc_cards
@@ -371,8 +394,16 @@ ALTER TABLE vital_signs
     FOREIGN KEY (recorded_by_user_id) REFERENCES users(id);
 
 ALTER TABLE devices
-    ADD CONSTRAINT fk_devices_patient 
+    ADD CONSTRAINT fk_devices_patient
     FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE SET NULL;
+
+ALTER TABLE qr_tokens
+    ADD CONSTRAINT fk_qr_tokens_patient
+    FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE;
+
+ALTER TABLE qr_tokens
+    ADD CONSTRAINT fk_qr_tokens_device
+    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE SET NULL;
 
 -- Users (nfc_card_id will be updated after nfc_cards are inserted)
 INSERT INTO users (first_name, last_name, role, specialization, license_number, phone, is_active, nfc_card_id) VALUES
@@ -491,4 +522,6 @@ SELECT 'allergies', COUNT(*) FROM allergies
 UNION ALL
 SELECT 'vital_signs', COUNT(*) FROM vital_signs
 UNION ALL
-SELECT 'devices', COUNT(*) FROM devices;
+SELECT 'devices', COUNT(*) FROM devices
+UNION ALL
+SELECT 'qr_tokens', COUNT(*) FROM qr_tokens;
