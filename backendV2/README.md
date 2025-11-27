@@ -76,6 +76,5 @@ Eğer her şey doğru yapılandırıldıysa, terminalde sunucunun başladığın
 
 ## Yapılacaklar
 
-1. JWT tabanlı authentication sistemi
-2. RBAC (Role Based Access Control) sistemi
-3. Veritabanının kurulum verilini çekme ve update, create, delete işlevleri için HBYS ile entegrasyon
+1. RBAC (Role Based Access Control) sistemi
+2. Veritabanının kurulum verilini çekme ve update, create, delete işlevleri için HBYS ile entegrasyon
