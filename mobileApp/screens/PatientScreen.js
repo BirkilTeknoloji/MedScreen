@@ -34,19 +34,16 @@ export default function PatientScreen({ route, navigation }) {
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [surgeryHistory, setSurgeryHistory] = useState([]);
   const [allergies, setAllergies] = useState([]);
-  // Route'dan gelen parametreler
   const { patientData, doctorData, isPatientLogin } = route.params || {};
   const [activeTab, setActiveTab] = useState('randevularTetkikler');
 
   useEffect(() => {
-    // Eğer sayfaya parametre ile gelinmediyse ilk hastayı çek
     if (!route.params?.patientData) {
       fetchPatientFirstData();
     }
   }, []);
 
   useEffect(() => {
-    // userData set edildikten sonra appointments'ları çek
     if (userData) {
       fetchAppointmentsOnly();
     }
@@ -56,8 +53,7 @@ export default function PatientScreen({ route, navigation }) {
     try {
       setIsLoading(true);
 
-      // ARTIK SADECE BU FONKSİYONU ÇAĞIRIYORUZ
-      // Backend'den direkt tek bir obje (ilk hasta) gelecek
+
       const data = await getFirstPatient();
 
       if (data) {

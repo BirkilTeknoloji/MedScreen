@@ -1,5 +1,6 @@
 import { BASE_API_URL } from '@env';
 import DeviceInfo from 'react-native-device-info';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const addPatient = async userId => {
   try {
@@ -41,16 +42,24 @@ export const getPatientData = async id => {
     return null;
   }
 };
-
 export const getFirstPatient = async () => {
+  const token = await AsyncStorage.getItem('userToken');
+
+  if (!token) {
+    console.warn('Hata: Token bulunamadı, istek atılmıyor.');
+    return null;
+  }
+
   try {
     const url = `${BASE_API_URL}/patients`;
     console.log('İlk hasta isteniyor:', url);
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, 
+      },
     });
 
     if (!response.ok) {
@@ -58,20 +67,18 @@ export const getFirstPatient = async () => {
       return null;
     }
 
-    const responseJson = await response.json(); // Tüm yanıtı alıyoruz
+    const responseJson = await response.json();
 
-    // KONTROL: responseJson.data bir dizi mi?
-    // JSON yapınızda asıl liste 'data' anahtarının içinde
     if (
-      responseJson.success &&
+      responseJson.success && 
       Array.isArray(responseJson.data) &&
       responseJson.data.length > 0
     ) {
-      const firstPatient = responseJson.data[0]; // Listenin ilk elemanı
+      const firstPatient = responseJson.data[0];
       console.log('İlk hasta başarıyla çekildi:', firstPatient.first_name);
       return firstPatient;
     } else {
-      console.warn('Liste boş veya beklenen formatta değil.');
+      console.warn('Liste boş veya beklenen formatta değil.', responseJson);
       return null;
     }
   } catch (error) {
@@ -79,7 +86,6 @@ export const getFirstPatient = async () => {
     throw error;
   }
 };
-
 export const getPatientByUserId = async userId => {
   try {
     const url = `${BASE_API_URL}/patients`;
@@ -98,7 +104,6 @@ export const getPatientByUserId = async userId => {
     const data = await response.json();
     console.log('All patients data:', data);
 
-    // User ID'ye göre hasta bul (primary_doctor_id veya başka ilişki)
     const patient = data.find(
       p => p.primary_doctor_id === userId || p.id === userId,
     );
@@ -168,13 +173,17 @@ export const getPatientMedicalHistory = async patientId => {
 };
 
 export const getAppointmentsByPatientId = async patientId => {
+  const token = await AsyncStorage.getItem('userToken');
   try {
     const url = `${BASE_API_URL}/appointments`;
     console.log(`Randevular çekiliyor (Hedef Hasta ID: ${patientId})...`);
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -184,15 +193,10 @@ export const getAppointmentsByPatientId = async patientId => {
 
     const responseJson = await response.json();
 
-    //
-
-    // 1. Veri yapısının doğru olup olmadığını kontrol et
     if (responseJson.success && Array.isArray(responseJson.data)) {
       const allAppointments = responseJson.data;
 
-      // 2. FİLTRELEME İŞLEMİ (Javascript tarafında)
-      // Gelen listedeki 'patient_id' alanı, bizim aradığımız 'patientId'ye eşit mi?
-      // patientId olarak userData'nın tamamı geldiği için ID'yi çıkar
+
       const actualPatientId = patientId?.ID || patientId?.id || patientId;
       const filteredAppointments = allAppointments.filter(
         appointment => appointment.patient_id === actualPatientId,
@@ -216,13 +220,17 @@ export const getAppointmentsByPatientId = async patientId => {
 };
 
 export const getDiagnosesByPatientId = async patientId => {
+  const token = await AsyncStorage.getItem('userToken');
   try {
     const url = `${BASE_API_URL}/diagnoses`;
     console.log(`Tanılar çekiliyor (Hasta ID: ${patientId})...`);
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -253,13 +261,17 @@ export const getDiagnosesByPatientId = async patientId => {
 };
 
 export const getPrescriptionsByPatientId = async patientId => {
+  const token = await AsyncStorage.getItem('userToken');
   try {
     const url = `${BASE_API_URL}/prescriptions`;
     console.log(`ilaçlar çekiliyor (Hasta ID: ${patientId})...`);
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -290,13 +302,17 @@ export const getPrescriptionsByPatientId = async patientId => {
 };
 
 export const getMedicalTestsByPatientId = async patientId => {
+  const token = await AsyncStorage.getItem('userToken');
   try {
     const url = `${BASE_API_URL}/medical-tests`;
     console.log(`Tetkikler çekiliyor (Hasta ID: ${patientId})...`);
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -327,13 +343,17 @@ export const getMedicalTestsByPatientId = async patientId => {
 };
 
 export const getMedicalHistoryByPatientId = async patientId => {
+  const token = await AsyncStorage.getItem('userToken');
   try {
     const url = `${BASE_API_URL}/medical-history`;
     console.log(`Tıbbi geçmiş çekiliyor (Hasta ID: ${patientId})...`);
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -348,8 +368,10 @@ export const getMedicalHistoryByPatientId = async patientId => {
       const filteredHistory = allHistory.filter(
         history => history.patient_id === patientId,
       );
-      
-      console.log(`Toplam ${allHistory.length} tıbbi geçmişten, bu hastaya ait ${filteredHistory.length} kayıt bulundu.`);
+
+      console.log(
+        `Toplam ${allHistory.length} tıbbi geçmişten, bu hastaya ait ${filteredHistory.length} kayıt bulundu.`,
+      );
       return filteredHistory;
     } else {
       console.warn('Tıbbi geçmiş API yanıtı beklenen formatta değil.');
@@ -362,13 +384,17 @@ export const getMedicalHistoryByPatientId = async patientId => {
 };
 
 export const getSurgeryHistoryByPatientId = async patientId => {
+  const token = await AsyncStorage.getItem('userToken');
   try {
     const url = `${BASE_API_URL}/surgery-history`;
     console.log(`Ameliyat geçmişi çekiliyor (Hasta ID: ${patientId})...`);
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -383,8 +409,10 @@ export const getSurgeryHistoryByPatientId = async patientId => {
       const filteredSurgeries = allSurgeries.filter(
         surgery => surgery.patient_id === patientId,
       );
-      
-      console.log(`Toplam ${allSurgeries.length} ameliyat geçmişinden, bu hastaya ait ${filteredSurgeries.length} kayıt bulundu.`);
+
+      console.log(
+        `Toplam ${allSurgeries.length} ameliyat geçmişinden, bu hastaya ait ${filteredSurgeries.length} kayıt bulundu.`,
+      );
       return filteredSurgeries;
     } else {
       console.warn('Ameliyat geçmişi API yanıtı beklenen formatta değil.');
@@ -397,13 +425,17 @@ export const getSurgeryHistoryByPatientId = async patientId => {
 };
 
 export const getAllergiesByPatientId = async patientId => {
+  const token = await AsyncStorage.getItem('userToken');
   try {
     const url = `${BASE_API_URL}/allergies`;
     console.log(`Alerjiler çekiliyor (Hasta ID: ${patientId})...`);
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -418,8 +450,10 @@ export const getAllergiesByPatientId = async patientId => {
       const filteredAllergies = allAllergies.filter(
         allergy => allergy.patient_id === patientId,
       );
-      
-      console.log(`Toplam ${allAllergies.length} alerjiden, bu hastaya ait ${filteredAllergies.length} kayıt bulundu.`);
+
+      console.log(
+        `Toplam ${allAllergies.length} alerjiden, bu hastaya ait ${filteredAllergies.length} kayıt bulundu.`,
+      );
       return filteredAllergies;
     } else {
       console.warn('Alerji API yanıtı beklenen formatta değil.');
