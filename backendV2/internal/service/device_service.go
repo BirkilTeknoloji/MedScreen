@@ -66,6 +66,7 @@ func (s *deviceService) AssignPatient(mac string, patientID uint) error {
 	}
 
 	device.PatientID = &patientID
+	device.Patient = nil // Clear loaded association to avoid GORM issues
 	return s.deviceRepo.Update(device)
 }
 
@@ -79,6 +80,7 @@ func (s *deviceService) UnassignPatient(mac string) error {
 	}
 
 	device.PatientID = nil
+	device.Patient = nil // Clear loaded association to avoid GORM issues
 	return s.deviceRepo.Update(device)
 }
 
