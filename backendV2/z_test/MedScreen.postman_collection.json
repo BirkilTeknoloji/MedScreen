@@ -1801,6 +1801,37 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Audit Logs",
+			"item": [
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/protected/audit-logs",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"protected",
+								"audit-logs"
+							]
+						},
+						"description": "Get all audit logs. Admin only endpoint. Returns audit log entries with user info, action, entity details, and timestamps."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -1831,6 +1862,10 @@
 		{
 			"key": "base_url",
 			"value": "http://192.168.1.141:8080"
+		},
+		{
+			"key": "admin_token",
+			"value": ""
 		},
 		{
 			"key": "user_id",

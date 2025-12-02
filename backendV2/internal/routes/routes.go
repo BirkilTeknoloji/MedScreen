@@ -24,6 +24,7 @@ type Handlers struct {
 	Device         *handler.DeviceHandler
 	QR             *handler.QRHandler
 	Reset          *handler.ResetHandler //TODO: prodda sil
+	AuditLog       *handler.AuditLogHandler
 }
 
 // SetupRoutes registers all API endpoints
@@ -202,6 +203,13 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	qrTokens := protected.Group("/qr-tokens")
 	{
 		qrTokens.GET("/:token/validate", handlers.QR.ValidateQRToken)
+	}
+
+	// Audit Log routes - Admin only
+	auditLogs := protected.Group("/audit-logs")
+	auditLogs.Use(middleware.RoleMiddleware(models.RoleAdmin))
+	{
+		auditLogs.GET("", handlers.AuditLog.GetAuditLogs)
 	}
 
 	// Reset route (prodda sil)
