@@ -3,6 +3,7 @@ package routes
 import (
 	"medscreen/internal/handler"
 	"medscreen/internal/middleware"
+	"medscreen/internal/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,8 +39,9 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	protected := api.Group("/")
 	protected.Use(middleware.AuthMiddleware())
 
-	// User routes
+	// User routes - Admin only
 	users := protected.Group("/users")
+	users.Use(middleware.RoleMiddleware(models.RoleAdmin))
 	{
 		users.POST("", handlers.User.CreateUser)
 		users.GET("", handlers.User.GetUsers)
@@ -49,99 +51,127 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 	}
 
 	// Patient routes
+	// Read: Admin, Doctor, Nurse, Receptionist
+	// Create/Update: Admin, Receptionist
+	// Delete: Admin
 	patients := protected.Group("/patients")
 	{
-		patients.POST("", handlers.Patient.CreatePatient)
-		patients.GET("", handlers.Patient.GetPatients)
-		patients.GET("/:id", handlers.Patient.GetPatient)
-		patients.PUT("/:id", handlers.Patient.UpdatePatient)
-		patients.DELETE("/:id", handlers.Patient.DeletePatient)
-		patients.GET("/:id/medical-history", handlers.Patient.GetPatientMedicalHistory)
-		patients.POST("/:id/generate-qr", handlers.QR.GeneratePatientQR)
+		patients.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleReceptionist), handlers.Patient.CreatePatient)
+		patients.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse, models.RoleReceptionist), handlers.Patient.GetPatients)
+		patients.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse, models.RoleReceptionist), handlers.Patient.GetPatient)
+		patients.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleReceptionist), handlers.Patient.UpdatePatient)
+		patients.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.Patient.DeletePatient)
+		patients.GET("/:id/medical-history", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Patient.GetPatientMedicalHistory)
+		patients.POST("/:id/generate-qr", middleware.RoleMiddleware(models.RoleAdmin, models.RoleReceptionist), handlers.QR.GeneratePatientQR)
 	}
 
 	// Appointment routes
+	// Read: Admin, Doctor, Nurse, Receptionist
+	// Create/Update: Admin, Doctor, Receptionist
+	// Delete: Admin, Receptionist
 	appointments := protected.Group("/appointments")
 	{
-		appointments.POST("", handlers.Appointment.CreateAppointment)
-		appointments.GET("", handlers.Appointment.GetAppointments)
-		appointments.GET("/:id", handlers.Appointment.GetAppointment)
-		appointments.PUT("/:id", handlers.Appointment.UpdateAppointment)
-		appointments.DELETE("/:id", handlers.Appointment.DeleteAppointment)
+		appointments.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleReceptionist), handlers.Appointment.CreateAppointment)
+		appointments.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse, models.RoleReceptionist), handlers.Appointment.GetAppointments)
+		appointments.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse, models.RoleReceptionist), handlers.Appointment.GetAppointment)
+		appointments.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleReceptionist), handlers.Appointment.UpdateAppointment)
+		appointments.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleReceptionist), handlers.Appointment.DeleteAppointment)
 	}
 
 	// Diagnosis routes
+	// Read: Admin, Doctor, Nurse
+	// Create/Update: Admin, Doctor
+	// Delete: Admin
 	diagnoses := protected.Group("/diagnoses")
 	{
-		diagnoses.POST("", handlers.Diagnosis.CreateDiagnosis)
-		diagnoses.GET("", handlers.Diagnosis.GetDiagnoses)
-		diagnoses.GET("/:id", handlers.Diagnosis.GetDiagnosis)
-		diagnoses.PUT("/:id", handlers.Diagnosis.UpdateDiagnosis)
-		diagnoses.DELETE("/:id", handlers.Diagnosis.DeleteDiagnosis)
+		diagnoses.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor), handlers.Diagnosis.CreateDiagnosis)
+		diagnoses.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Diagnosis.GetDiagnoses)
+		diagnoses.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Diagnosis.GetDiagnosis)
+		diagnoses.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor), handlers.Diagnosis.UpdateDiagnosis)
+		diagnoses.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.Diagnosis.DeleteDiagnosis)
 	}
 
 	// Prescription routes
+	// Read: Admin, Doctor, Nurse
+	// Create/Update: Admin, Doctor
+	// Delete: Admin
 	prescriptions := protected.Group("/prescriptions")
 	{
-		prescriptions.POST("", handlers.Prescription.CreatePrescription)
-		prescriptions.GET("", handlers.Prescription.GetPrescriptions)
-		prescriptions.GET("/:id", handlers.Prescription.GetPrescription)
-		prescriptions.PUT("/:id", handlers.Prescription.UpdatePrescription)
-		prescriptions.DELETE("/:id", handlers.Prescription.DeletePrescription)
+		prescriptions.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor), handlers.Prescription.CreatePrescription)
+		prescriptions.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Prescription.GetPrescriptions)
+		prescriptions.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Prescription.GetPrescription)
+		prescriptions.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor), handlers.Prescription.UpdatePrescription)
+		prescriptions.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.Prescription.DeletePrescription)
 	}
 
 	// Medical test routes
+	// Read: Admin, Doctor, Nurse
+	// Create/Update: Admin, Doctor, Nurse
+	// Delete: Admin
 	medicalTests := protected.Group("/medical-tests")
 	{
-		medicalTests.POST("", handlers.MedicalTest.CreateMedicalTest)
-		medicalTests.GET("", handlers.MedicalTest.GetMedicalTests)
-		medicalTests.GET("/:id", handlers.MedicalTest.GetMedicalTest)
-		medicalTests.PUT("/:id", handlers.MedicalTest.UpdateMedicalTest)
-		medicalTests.DELETE("/:id", handlers.MedicalTest.DeleteMedicalTest)
+		medicalTests.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalTest.CreateMedicalTest)
+		medicalTests.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalTest.GetMedicalTests)
+		medicalTests.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalTest.GetMedicalTest)
+		medicalTests.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalTest.UpdateMedicalTest)
+		medicalTests.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.MedicalTest.DeleteMedicalTest)
 	}
 
 	// Medical history routes
+	// Read: Admin, Doctor, Nurse
+	// Create/Update: Admin, Doctor, Nurse
+	// Delete: Admin
 	medicalHistory := protected.Group("/medical-history")
 	{
-		medicalHistory.POST("", handlers.MedicalHistory.CreateMedicalHistory)
-		medicalHistory.GET("", handlers.MedicalHistory.GetMedicalHistories)
-		medicalHistory.GET("/:id", handlers.MedicalHistory.GetMedicalHistory)
-		medicalHistory.PUT("/:id", handlers.MedicalHistory.UpdateMedicalHistory)
-		medicalHistory.DELETE("/:id", handlers.MedicalHistory.DeleteMedicalHistory)
+		medicalHistory.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalHistory.CreateMedicalHistory)
+		medicalHistory.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalHistory.GetMedicalHistories)
+		medicalHistory.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalHistory.GetMedicalHistory)
+		medicalHistory.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalHistory.UpdateMedicalHistory)
+		medicalHistory.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.MedicalHistory.DeleteMedicalHistory)
 	}
 
 	// Surgery history routes
+	// Read: Admin, Doctor, Nurse
+	// Create/Update: Admin, Doctor, Nurse
+	// Delete: Admin
 	surgeryHistory := protected.Group("/surgery-history")
 	{
-		surgeryHistory.POST("", handlers.SurgeryHistory.CreateSurgeryHistory)
-		surgeryHistory.GET("", handlers.SurgeryHistory.GetSurgeryHistories)
-		surgeryHistory.GET("/:id", handlers.SurgeryHistory.GetSurgeryHistory)
-		surgeryHistory.PUT("/:id", handlers.SurgeryHistory.UpdateSurgeryHistory)
-		surgeryHistory.DELETE("/:id", handlers.SurgeryHistory.DeleteSurgeryHistory)
+		surgeryHistory.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.SurgeryHistory.CreateSurgeryHistory)
+		surgeryHistory.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.SurgeryHistory.GetSurgeryHistories)
+		surgeryHistory.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.SurgeryHistory.GetSurgeryHistory)
+		surgeryHistory.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.SurgeryHistory.UpdateSurgeryHistory)
+		surgeryHistory.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.SurgeryHistory.DeleteSurgeryHistory)
 	}
 
 	// Allergy routes
+	// Read: Admin, Doctor, Nurse
+	// Create/Update: Admin, Doctor, Nurse
+	// Delete: Admin
 	allergies := protected.Group("/allergies")
 	{
-		allergies.POST("", handlers.Allergy.CreateAllergy)
-		allergies.GET("", handlers.Allergy.GetAllergies)
-		allergies.GET("/:id", handlers.Allergy.GetAllergy)
-		allergies.PUT("/:id", handlers.Allergy.UpdateAllergy)
-		allergies.DELETE("/:id", handlers.Allergy.DeleteAllergy)
+		allergies.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Allergy.CreateAllergy)
+		allergies.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Allergy.GetAllergies)
+		allergies.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Allergy.GetAllergy)
+		allergies.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Allergy.UpdateAllergy)
+		allergies.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.Allergy.DeleteAllergy)
 	}
 
 	// Vital sign routes
+	// Read: Admin, Doctor, Nurse
+	// Create/Update: Admin, Doctor, Nurse
+	// Delete: Admin
 	vitalSigns := protected.Group("/vital-signs")
 	{
-		vitalSigns.POST("", handlers.VitalSign.CreateVitalSign)
-		vitalSigns.GET("", handlers.VitalSign.GetVitalSigns)
-		vitalSigns.GET("/:id", handlers.VitalSign.GetVitalSign)
-		vitalSigns.PUT("/:id", handlers.VitalSign.UpdateVitalSign)
-		vitalSigns.DELETE("/:id", handlers.VitalSign.DeleteVitalSign)
+		vitalSigns.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.VitalSign.CreateVitalSign)
+		vitalSigns.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.VitalSign.GetVitalSigns)
+		vitalSigns.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.VitalSign.GetVitalSign)
+		vitalSigns.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.VitalSign.UpdateVitalSign)
+		vitalSigns.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.VitalSign.DeleteVitalSign)
 	}
 
-	// NFC card routes
+	// NFC card routes - Admin only
 	nfcCards := protected.Group("/nfc-cards")
+	nfcCards.Use(middleware.RoleMiddleware(models.RoleAdmin))
 	{
 		nfcCards.POST("", handlers.NFCCard.CreateCard)
 		nfcCards.GET("", handlers.NFCCard.GetCards)
@@ -152,8 +182,9 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 		nfcCards.POST("/:id/deactivate", handlers.NFCCard.DeactivateCard)
 	}
 
-	// Device routes
+	// Device routes - Admin only
 	devices := protected.Group("/devices")
+	devices.Use(middleware.RoleMiddleware(models.RoleAdmin))
 	{
 		devices.POST("", handlers.Device.RegisterDevice)
 		devices.GET("", handlers.Device.GetDevices)

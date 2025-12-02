@@ -21,18 +21,19 @@ func SetJWTSecretKey() {
 	jwtSecretKey = []byte(cfg.JWT.SecretKey)
 }
 
-// GenerateJWT generates a JWT token for a given user ID
-func GenerateJWT(userID uint) (string, error) {
+// GenerateJWT generates a JWT token for a given user ID and role
+func GenerateJWT(userID uint, role string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
+		"role":    role,
 		"exp":     jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // 24 hours expiration
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecretKey)
 }
 
-// ParseJWT parses and validates a JWT token and returns the user ID
-func ParseJWT(tokenString string) (uint, error) {
+// ParseJWT parses and validates a JWT token and returns the user ID and role
+func ParseJWT(tokenString string) (uint, string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
@@ -40,12 +41,15 @@ func ParseJWT(tokenString string) (uint, error) {
 		return jwtSecretKey, nil
 	})
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if userIDFloat, ok := claims["user_id"].(float64); ok {
-			return uint(userIDFloat), nil
+		userIDFloat, okID := claims["user_id"].(float64)
+		role, okRole := claims["role"].(string)
+
+		if okID && okRole {
+			return uint(userIDFloat), role, nil
 		}
 	}
-	return 0, jwt.ErrInvalidKey
+	return 0, "", jwt.ErrInvalidKey
 }
