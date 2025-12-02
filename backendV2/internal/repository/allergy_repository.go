@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 
 	"gorm.io/gorm"
@@ -16,8 +17,8 @@ func NewAllergyRepository(db *gorm.DB) AllergyRepository {
 }
 
 // Create creates a new allergy entry in the database
-func (r *allergyRepository) Create(allergy *models.Allergy) error {
-	return r.db.Create(allergy).Error
+func (r *allergyRepository) Create(ctx context.Context, allergy *models.Allergy) error {
+	return r.db.WithContext(ctx).Create(allergy).Error
 }
 
 // FindByID retrieves an allergy entry by ID with preloaded relationships
@@ -54,13 +55,13 @@ func (r *allergyRepository) FindAll(page, limit int) ([]models.Allergy, int64, e
 }
 
 // Update updates an existing allergy entry
-func (r *allergyRepository) Update(allergy *models.Allergy) error {
-	return r.db.Save(allergy).Error
+func (r *allergyRepository) Update(ctx context.Context, allergy *models.Allergy) error {
+	return r.db.WithContext(ctx).Save(allergy).Error
 }
 
 // Delete soft deletes an allergy entry by ID
-func (r *allergyRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Allergy{}, id).Error
+func (r *allergyRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.Allergy{}, id).Error
 }
 
 // FindByPatientID retrieves allergy entries by patient ID with pagination

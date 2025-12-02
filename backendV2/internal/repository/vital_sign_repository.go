@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 	"time"
 
@@ -17,8 +18,8 @@ func NewVitalSignRepository(db *gorm.DB) VitalSignRepository {
 }
 
 // Create creates a new vital sign entry in the database
-func (r *vitalSignRepository) Create(vitalSign *models.VitalSign) error {
-	return r.db.Create(vitalSign).Error
+func (r *vitalSignRepository) Create(ctx context.Context, vitalSign *models.VitalSign) error {
+	return r.db.WithContext(ctx).Create(vitalSign).Error
 }
 
 // FindByID retrieves a vital sign entry by ID with preloaded relationships
@@ -55,13 +56,13 @@ func (r *vitalSignRepository) FindAll(page, limit int) ([]models.VitalSign, int6
 }
 
 // Update updates an existing vital sign entry
-func (r *vitalSignRepository) Update(vitalSign *models.VitalSign) error {
-	return r.db.Save(vitalSign).Error
+func (r *vitalSignRepository) Update(ctx context.Context, vitalSign *models.VitalSign) error {
+	return r.db.WithContext(ctx).Save(vitalSign).Error
 }
 
 // Delete deletes a vital sign entry by ID
-func (r *vitalSignRepository) Delete(id uint) error {
-	return r.db.Delete(&models.VitalSign{}, id).Error
+func (r *vitalSignRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.VitalSign{}, id).Error
 }
 
 // FindByPatientID retrieves vital sign entries by patient ID with pagination

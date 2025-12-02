@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -17,7 +18,7 @@ func NewNFCCardService(repo repository.NFCCardRepository) NFCCardService {
 }
 
 // CreateCard creates a new NFC card with validation
-func (s *nfcCardService) CreateCard(card *models.NFCCard) error {
+func (s *nfcCardService) CreateCard(ctx context.Context, card *models.NFCCard) error {
 	if card == nil {
 		return errors.New("card cannot be nil")
 	}
@@ -38,7 +39,7 @@ func (s *nfcCardService) CreateCard(card *models.NFCCard) error {
 		card.IssuedAt = time.Now()
 	}
 
-	return s.repo.Create(card)
+	return s.repo.Create(ctx, card)
 }
 
 // GetCard retrieves an NFC card by ID
@@ -71,7 +72,7 @@ func (s *nfcCardService) GetCards(page, limit int) ([]models.NFCCard, int64, err
 }
 
 // UpdateCard updates an existing NFC card with validation
-func (s *nfcCardService) UpdateCard(id uint, card *models.NFCCard) error {
+func (s *nfcCardService) UpdateCard(ctx context.Context, id uint, card *models.NFCCard) error {
 	if id == 0 {
 		return errors.New("invalid card id")
 	}
@@ -99,11 +100,11 @@ func (s *nfcCardService) UpdateCard(id uint, card *models.NFCCard) error {
 	// Set the ID to ensure we're updating the correct record
 	card.ID = id
 
-	return s.repo.Update(card)
+	return s.repo.Update(ctx, card)
 }
 
 // DeleteCard soft deletes an NFC card
-func (s *nfcCardService) DeleteCard(id uint) error {
+func (s *nfcCardService) DeleteCard(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid card id")
 	}
@@ -117,11 +118,11 @@ func (s *nfcCardService) DeleteCard(id uint) error {
 		return errors.New("card not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // AssignCardToUser assigns an NFC card to a user
-func (s *nfcCardService) AssignCardToUser(cardID, userID uint) error {
+func (s *nfcCardService) AssignCardToUser(ctx context.Context, cardID, userID uint) error {
 	if cardID == 0 {
 		return errors.New("invalid card id")
 	}
@@ -143,11 +144,11 @@ func (s *nfcCardService) AssignCardToUser(cardID, userID uint) error {
 	card.AssignedUser = nil // Clear loaded association to avoid GORM issues
 	card.IsActive = true
 
-	return s.repo.Update(card)
+	return s.repo.Update(ctx, card)
 }
 
 // DeactivateCard deactivates an NFC card
-func (s *nfcCardService) DeactivateCard(cardID uint) error {
+func (s *nfcCardService) DeactivateCard(ctx context.Context, cardID uint) error {
 	if cardID == 0 {
 		return errors.New("invalid card id")
 	}
@@ -164,7 +165,7 @@ func (s *nfcCardService) DeactivateCard(cardID uint) error {
 	// Deactivate the card
 	card.IsActive = false
 
-	return s.repo.Update(card)
+	return s.repo.Update(ctx, card)
 }
 
 // GetCardByUID retrieves an NFC card by card UID

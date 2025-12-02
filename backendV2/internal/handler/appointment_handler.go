@@ -30,7 +30,7 @@ func (h *AppointmentHandler) CreateAppointment(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateAppointment(&appointment); err != nil {
+	if err := h.service.CreateAppointment(c.Request.Context(), &appointment); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_APPOINTMENT_CREATE_FAILED, "Failed to create appointment", err)
 		return
 	}
@@ -141,7 +141,7 @@ func (h *AppointmentHandler) UpdateAppointment(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateAppointment(uint(id), &appointment); err != nil {
+	if err := h.service.UpdateAppointment(c.Request.Context(), uint(id), &appointment); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_APPOINTMENT_UPDATE_FAILED, "Failed to update appointment", err)
 		return
 	}
@@ -157,7 +157,7 @@ func (h *AppointmentHandler) DeleteAppointment(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteAppointment(uint(id)); err != nil {
+	if err := h.service.DeleteAppointment(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_APPOINTMENT_DELETE_FAILED, "Failed to delete appointment", err)
 		return
 	}

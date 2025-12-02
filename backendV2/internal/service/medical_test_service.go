@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -17,7 +18,7 @@ func NewMedicalTestService(repo repository.MedicalTestRepository) MedicalTestSer
 }
 
 // CreateMedicalTest creates a new medical test with validation
-func (s *medicalTestService) CreateMedicalTest(test *models.MedicalTest) error {
+func (s *medicalTestService) CreateMedicalTest(ctx context.Context, test *models.MedicalTest) error {
 	if test == nil {
 		return errors.New("medical test cannot be nil")
 	}
@@ -46,7 +47,7 @@ func (s *medicalTestService) CreateMedicalTest(test *models.MedicalTest) error {
 		return err
 	}
 
-	return s.repo.Create(test)
+	return s.repo.Create(ctx, test)
 }
 
 // GetMedicalTest retrieves a medical test by ID
@@ -79,7 +80,7 @@ func (s *medicalTestService) GetMedicalTests(page, limit int) ([]models.MedicalT
 }
 
 // UpdateMedicalTest updates an existing medical test with validation
-func (s *medicalTestService) UpdateMedicalTest(id uint, test *models.MedicalTest) error {
+func (s *medicalTestService) UpdateMedicalTest(ctx context.Context, id uint, test *models.MedicalTest) error {
 	if id == 0 {
 		return errors.New("invalid medical test id")
 	}
@@ -113,11 +114,11 @@ func (s *medicalTestService) UpdateMedicalTest(id uint, test *models.MedicalTest
 	// Set the ID to ensure we're updating the correct record
 	test.ID = id
 
-	return s.repo.Update(test)
+	return s.repo.Update(ctx, test)
 }
 
 // DeleteMedicalTest soft deletes a medical test
-func (s *medicalTestService) DeleteMedicalTest(id uint) error {
+func (s *medicalTestService) DeleteMedicalTest(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid medical test id")
 	}
@@ -131,7 +132,7 @@ func (s *medicalTestService) DeleteMedicalTest(id uint) error {
 		return errors.New("medical test not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // GetMedicalTestsByFilters retrieves medical tests with filters

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 
 	"gorm.io/gorm"
@@ -15,8 +16,8 @@ func NewDeviceRepository(db *gorm.DB) DeviceRepository {
 	return &deviceRepository{db: db}
 }
 
-func (r *deviceRepository) Create(device *models.Device) error {
-	return r.db.Create(device).Error
+func (r *deviceRepository) Create(ctx context.Context, device *models.Device) error {
+	return r.db.WithContext(ctx).Create(device).Error
 }
 
 func (r *deviceRepository) GetByMAC(mac string) (*models.Device, error) {
@@ -37,12 +38,12 @@ func (r *deviceRepository) GetByID(id uint) (*models.Device, error) {
 	return &device, nil
 }
 
-func (r *deviceRepository) Update(device *models.Device) error {
-	return r.db.Save(device).Error
+func (r *deviceRepository) Update(ctx context.Context, device *models.Device) error {
+	return r.db.WithContext(ctx).Save(device).Error
 }
 
-func (r *deviceRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Device{}, id).Error
+func (r *deviceRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.Device{}, id).Error
 }
 
 func (r *deviceRepository) FindAll(page, limit int) ([]models.Device, int64, error) {
@@ -62,13 +63,13 @@ func (r *deviceRepository) FindAll(page, limit int) ([]models.Device, int64, err
 	return devices, total, nil
 }
 
-func (r *deviceRepository) DeleteByMAC(mac string) error {
+func (r *deviceRepository) DeleteByMAC(ctx context.Context, mac string) error {
 	var device models.Device
 	err := r.db.Where("mac_address = ?", mac).First(&device).Error
 	if err != nil {
 		return err
 	}
-	return r.db.Delete(&device).Error
+	return r.db.WithContext(ctx).Delete(&device).Error
 }
 
 func (r *deviceRepository) FindByFilters(roomNumber *string, patientID *uint, page, limit int) ([]models.Device, int64, error) {

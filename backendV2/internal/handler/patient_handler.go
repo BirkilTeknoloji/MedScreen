@@ -29,7 +29,7 @@ func (h *PatientHandler) CreatePatient(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreatePatient(&patient); err != nil {
+	if err := h.service.CreatePatient(c.Request.Context(), &patient); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_PATIENT_CREATE_FAILED, "Failed to create patient", err)
 		return
 	}
@@ -116,7 +116,7 @@ func (h *PatientHandler) UpdatePatient(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdatePatient(uint(id), &patient); err != nil {
+	if err := h.service.UpdatePatient(c.Request.Context(), uint(id), &patient); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_PATIENT_UPDATE_FAILED, "Failed to update patient", err)
 		return
 	}
@@ -132,7 +132,7 @@ func (h *PatientHandler) DeletePatient(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeletePatient(uint(id)); err != nil {
+	if err := h.service.DeletePatient(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_PATIENT_DELETE_FAILED, "Failed to delete patient", err)
 		return
 	}

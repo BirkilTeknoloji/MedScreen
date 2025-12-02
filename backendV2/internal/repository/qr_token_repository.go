@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 	"time"
 
@@ -9,11 +10,11 @@ import (
 
 // QRTokenRepository defines the interface for QR token data operations
 type QRTokenRepository interface {
-	Create(token *models.QRToken) error
+	Create(ctx context.Context, token *models.QRToken) error
 	FindByToken(tokenStr string) (*models.QRToken, error)
-	Update(token *models.QRToken) error
-	Delete(id uint) error
-	DeleteExpiredTokens() error
+	Update(ctx context.Context, token *models.QRToken) error
+	Delete(ctx context.Context, id uint) error
+	DeleteExpiredTokens(ctx context.Context) error
 }
 
 type qrTokenRepository struct {
@@ -26,8 +27,8 @@ func NewQRTokenRepository(db *gorm.DB) QRTokenRepository {
 }
 
 // Create creates a new QR token
-func (r *qrTokenRepository) Create(token *models.QRToken) error {
-	return r.db.Create(token).Error
+func (r *qrTokenRepository) Create(ctx context.Context, token *models.QRToken) error {
+	return r.db.WithContext(ctx).Create(token).Error
 }
 
 // FindByToken finds a QR token by token string with patient and device relationships
@@ -44,16 +45,16 @@ func (r *qrTokenRepository) FindByToken(tokenStr string) (*models.QRToken, error
 }
 
 // Update updates a QR token
-func (r *qrTokenRepository) Update(token *models.QRToken) error {
-	return r.db.Save(token).Error
+func (r *qrTokenRepository) Update(ctx context.Context, token *models.QRToken) error {
+	return r.db.WithContext(ctx).Save(token).Error
 }
 
 // Delete deletes a QR token by ID
-func (r *qrTokenRepository) Delete(id uint) error {
-	return r.db.Delete(&models.QRToken{}, id).Error
+func (r *qrTokenRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.QRToken{}, id).Error
 }
 
 // DeleteExpiredTokens deletes all expired tokens
-func (r *qrTokenRepository) DeleteExpiredTokens() error {
-	return r.db.Where("expires_at < ?", time.Now()).Delete(&models.QRToken{}).Error
+func (r *qrTokenRepository) DeleteExpiredTokens(ctx context.Context) error {
+	return r.db.WithContext(ctx).Where("expires_at < ?", time.Now()).Delete(&models.QRToken{}).Error
 }

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 
 	"gorm.io/gorm"
@@ -16,8 +17,8 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 // Create creates a new user in the database
-func (r *userRepository) Create(user *models.User) error {
-	return r.db.Create(user).Error
+func (r *userRepository) Create(ctx context.Context, user *models.User) error {
+	return r.db.WithContext(ctx).Create(user).Error
 }
 
 // FindByID retrieves a user by ID
@@ -53,13 +54,13 @@ func (r *userRepository) FindAll(page, limit int) ([]models.User, int64, error) 
 }
 
 // Update updates an existing user
-func (r *userRepository) Update(user *models.User) error {
-	return r.db.Save(user).Error
+func (r *userRepository) Update(ctx context.Context, user *models.User) error {
+	return r.db.WithContext(ctx).Save(user).Error
 }
 
 // Delete soft deletes a user by ID
-func (r *userRepository) Delete(id uint) error {
-	return r.db.Delete(&models.User{}, id).Error
+func (r *userRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.User{}, id).Error
 }
 
 // FindByRole retrieves users by role with pagination

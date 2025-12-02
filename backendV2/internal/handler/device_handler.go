@@ -26,7 +26,7 @@ func (h *DeviceHandler) RegisterDevice(c *gin.Context) {
 		return
 	}
 
-	if err := h.deviceService.RegisterDevice(&device); err != nil {
+	if err := h.deviceService.RegisterDevice(c.Request.Context(), &device); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, "REGISTRATION_FAILED", "Failed to register device", err)
 		return
 	}
@@ -67,7 +67,7 @@ func (h *DeviceHandler) AssignPatient(c *gin.Context) {
 		return
 	}
 
-	if err := h.deviceService.AssignPatient(mac, req.PatientID); err != nil {
+	if err := h.deviceService.AssignPatient(c.Request.Context(), mac, req.PatientID); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, "ASSIGNMENT_FAILED", "Failed to assign patient", err)
 		return
 	}
@@ -83,7 +83,7 @@ func (h *DeviceHandler) UnassignPatient(c *gin.Context) {
 		return
 	}
 
-	if err := h.deviceService.UnassignPatient(mac); err != nil {
+	if err := h.deviceService.UnassignPatient(c.Request.Context(), mac); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, "UNASSIGNMENT_FAILED", "Failed to unassign patient", err)
 		return
 	}
@@ -137,7 +137,7 @@ func (h *DeviceHandler) UpdateDevice(c *gin.Context) {
 		return
 	}
 
-	device, err := h.deviceService.UpdateDevice(mac, &req)
+	device, err := h.deviceService.UpdateDevice(c.Request.Context(), mac, &req)
 	if err != nil {
 		if err.Error() == "device not found" {
 			utils.SendErrorResponse(c, http.StatusNotFound, "DEVICE_NOT_FOUND", "Device not found", err)
@@ -158,7 +158,7 @@ func (h *DeviceHandler) DeleteDevice(c *gin.Context) {
 		return
 	}
 
-	if err := h.deviceService.DeleteDevice(mac); err != nil {
+	if err := h.deviceService.DeleteDevice(c.Request.Context(), mac); err != nil {
 		if err.Error() == "device not found" {
 			utils.SendErrorResponse(c, http.StatusNotFound, "DEVICE_NOT_FOUND", "Device not found", err)
 			return

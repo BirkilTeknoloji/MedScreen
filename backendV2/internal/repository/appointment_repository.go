@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 	"time"
 
@@ -17,8 +18,8 @@ func NewAppointmentRepository(db *gorm.DB) AppointmentRepository {
 }
 
 // Create creates a new appointment in the database
-func (r *appointmentRepository) Create(appointment *models.Appointment) error {
-	return r.db.Create(appointment).Error
+func (r *appointmentRepository) Create(ctx context.Context, appointment *models.Appointment) error {
+	return r.db.WithContext(ctx).Create(appointment).Error
 }
 
 // FindByID retrieves an appointment by ID with preloaded patient and doctor relationships
@@ -55,13 +56,13 @@ func (r *appointmentRepository) FindAll(page, limit int) ([]models.Appointment, 
 }
 
 // Update updates an existing appointment
-func (r *appointmentRepository) Update(appointment *models.Appointment) error {
-	return r.db.Save(appointment).Error
+func (r *appointmentRepository) Update(ctx context.Context, appointment *models.Appointment) error {
+	return r.db.WithContext(ctx).Save(appointment).Error
 }
 
 // Delete soft deletes an appointment by ID
-func (r *appointmentRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Appointment{}, id).Error
+func (r *appointmentRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.Appointment{}, id).Error
 }
 
 // FindByDoctorID retrieves appointments by doctor ID with pagination

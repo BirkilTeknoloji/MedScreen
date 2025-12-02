@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -17,7 +18,7 @@ func NewPrescriptionService(repo repository.PrescriptionRepository) Prescription
 }
 
 // CreatePrescription creates a new prescription with validation
-func (s *prescriptionService) CreatePrescription(prescription *models.Prescription) error {
+func (s *prescriptionService) CreatePrescription(ctx context.Context, prescription *models.Prescription) error {
 	if prescription == nil {
 		return errors.New("prescription cannot be nil")
 	}
@@ -55,7 +56,7 @@ func (s *prescriptionService) CreatePrescription(prescription *models.Prescripti
 		return err
 	}
 
-	return s.repo.Create(prescription)
+	return s.repo.Create(ctx, prescription)
 }
 
 // GetPrescription retrieves a prescription by ID
@@ -88,7 +89,7 @@ func (s *prescriptionService) GetPrescriptions(page, limit int) ([]models.Prescr
 }
 
 // UpdatePrescription updates an existing prescription with validation
-func (s *prescriptionService) UpdatePrescription(id uint, prescription *models.Prescription) error {
+func (s *prescriptionService) UpdatePrescription(ctx context.Context, id uint, prescription *models.Prescription) error {
 	if id == 0 {
 		return errors.New("invalid prescription id")
 	}
@@ -120,11 +121,11 @@ func (s *prescriptionService) UpdatePrescription(id uint, prescription *models.P
 	// Set the ID to ensure we're updating the correct record
 	prescription.ID = id
 
-	return s.repo.Update(prescription)
+	return s.repo.Update(ctx, prescription)
 }
 
 // DeletePrescription soft deletes a prescription
-func (s *prescriptionService) DeletePrescription(id uint) error {
+func (s *prescriptionService) DeletePrescription(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid prescription id")
 	}
@@ -138,7 +139,7 @@ func (s *prescriptionService) DeletePrescription(id uint) error {
 		return errors.New("prescription not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // GetPrescriptionsByFilters retrieves prescriptions with filters

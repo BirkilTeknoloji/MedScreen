@@ -30,7 +30,7 @@ func (h *DiagnosisHandler) CreateDiagnosis(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateDiagnosis(&diagnosis); err != nil {
+	if err := h.service.CreateDiagnosis(c.Request.Context(), &diagnosis); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_DIAGNOSIS_CREATE_FAILED, "Failed to create diagnosis", err)
 		return
 	}
@@ -142,7 +142,7 @@ func (h *DiagnosisHandler) UpdateDiagnosis(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateDiagnosis(uint(id), &diagnosis); err != nil {
+	if err := h.service.UpdateDiagnosis(c.Request.Context(), uint(id), &diagnosis); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_DIAGNOSIS_UPDATE_FAILED, "Failed to update diagnosis", err)
 		return
 	}
@@ -158,7 +158,7 @@ func (h *DiagnosisHandler) DeleteDiagnosis(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteDiagnosis(uint(id)); err != nil {
+	if err := h.service.DeleteDiagnosis(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_DIAGNOSIS_DELETE_FAILED, "Failed to delete diagnosis", err)
 		return
 	}

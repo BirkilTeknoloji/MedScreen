@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -17,7 +18,7 @@ func NewVitalSignService(repo repository.VitalSignRepository) VitalSignService {
 }
 
 // CreateVitalSign creates a new vital sign entry with validation
-func (s *vitalSignService) CreateVitalSign(vitalSign *models.VitalSign) error {
+func (s *vitalSignService) CreateVitalSign(ctx context.Context, vitalSign *models.VitalSign) error {
 	if vitalSign == nil {
 		return errors.New("vital sign cannot be nil")
 	}
@@ -46,7 +47,7 @@ func (s *vitalSignService) CreateVitalSign(vitalSign *models.VitalSign) error {
 		vitalSign.BMI = &bmi
 	}
 
-	return s.repo.Create(vitalSign)
+	return s.repo.Create(ctx, vitalSign)
 }
 
 // GetVitalSign retrieves a vital sign entry by ID
@@ -79,7 +80,7 @@ func (s *vitalSignService) GetVitalSigns(page, limit int) ([]models.VitalSign, i
 }
 
 // UpdateVitalSign updates an existing vital sign entry with validation
-func (s *vitalSignService) UpdateVitalSign(id uint, vitalSign *models.VitalSign) error {
+func (s *vitalSignService) UpdateVitalSign(ctx context.Context, id uint, vitalSign *models.VitalSign) error {
 	if id == 0 {
 		return errors.New("invalid vital sign id")
 	}
@@ -120,11 +121,11 @@ func (s *vitalSignService) UpdateVitalSign(id uint, vitalSign *models.VitalSign)
 	// Set the ID to ensure we're updating the correct record
 	vitalSign.ID = id
 
-	return s.repo.Update(vitalSign)
+	return s.repo.Update(ctx, vitalSign)
 }
 
 // DeleteVitalSign soft deletes a vital sign entry
-func (s *vitalSignService) DeleteVitalSign(id uint) error {
+func (s *vitalSignService) DeleteVitalSign(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid vital sign id")
 	}
@@ -138,7 +139,7 @@ func (s *vitalSignService) DeleteVitalSign(id uint) error {
 		return errors.New("vital sign not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // GetVitalSignsByFilters retrieves vital sign entries with filters

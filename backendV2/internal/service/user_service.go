@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -16,7 +17,7 @@ func NewUserService(repo repository.UserRepository) UserService {
 }
 
 // CreateUser creates a new user with validation
-func (s *userService) CreateUser(user *models.User) error {
+func (s *userService) CreateUser(ctx context.Context, user *models.User) error {
 	if user == nil {
 		return errors.New("user cannot be nil")
 	}
@@ -37,7 +38,7 @@ func (s *userService) CreateUser(user *models.User) error {
 		return err
 	}
 
-	return s.repo.Create(user)
+	return s.repo.Create(ctx, user)
 }
 
 // GetUser retrieves a user by ID
@@ -78,7 +79,7 @@ func (s *userService) GetUsers(page, limit int, role *models.UserRole) ([]models
 }
 
 // UpdateUser updates an existing user with validation
-func (s *userService) UpdateUser(id uint, user *models.User) error {
+func (s *userService) UpdateUser(ctx context.Context, id uint, user *models.User) error {
 	if id == 0 {
 		return errors.New("invalid user id")
 	}
@@ -105,11 +106,11 @@ func (s *userService) UpdateUser(id uint, user *models.User) error {
 	// Set the ID to ensure we're updating the correct record
 	user.ID = id
 
-	return s.repo.Update(user)
+	return s.repo.Update(ctx, user)
 }
 
 // DeleteUser soft deletes a user
-func (s *userService) DeleteUser(id uint) error {
+func (s *userService) DeleteUser(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid user id")
 	}
@@ -123,7 +124,7 @@ func (s *userService) DeleteUser(id uint) error {
 		return errors.New("user not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // AuthenticateByNFC authenticates a user by NFC card UID

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -17,7 +18,7 @@ func NewAppointmentService(repo repository.AppointmentRepository) AppointmentSer
 }
 
 // CreateAppointment creates a new appointment with validation
-func (s *appointmentService) CreateAppointment(appointment *models.Appointment) error {
+func (s *appointmentService) CreateAppointment(ctx context.Context, appointment *models.Appointment) error {
 	if appointment == nil {
 		return errors.New("appointment cannot be nil")
 	}
@@ -54,7 +55,7 @@ func (s *appointmentService) CreateAppointment(appointment *models.Appointment) 
 		return err
 	}
 
-	return s.repo.Create(appointment)
+	return s.repo.Create(ctx, appointment)
 }
 
 // GetAppointment retrieves an appointment by ID
@@ -87,7 +88,7 @@ func (s *appointmentService) GetAppointments(page, limit int) ([]models.Appointm
 }
 
 // UpdateAppointment updates an existing appointment with validation
-func (s *appointmentService) UpdateAppointment(id uint, appointment *models.Appointment) error {
+func (s *appointmentService) UpdateAppointment(ctx context.Context, id uint, appointment *models.Appointment) error {
 	if id == 0 {
 		return errors.New("invalid appointment id")
 	}
@@ -128,11 +129,11 @@ func (s *appointmentService) UpdateAppointment(id uint, appointment *models.Appo
 	// Set the ID to ensure we're updating the correct record
 	appointment.ID = id
 
-	return s.repo.Update(appointment)
+	return s.repo.Update(ctx, appointment)
 }
 
 // DeleteAppointment soft deletes an appointment
-func (s *appointmentService) DeleteAppointment(id uint) error {
+func (s *appointmentService) DeleteAppointment(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid appointment id")
 	}
@@ -146,7 +147,7 @@ func (s *appointmentService) DeleteAppointment(id uint) error {
 		return errors.New("appointment not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // GetAppointmentsByFilters retrieves appointments with filters

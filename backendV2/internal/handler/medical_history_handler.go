@@ -29,7 +29,7 @@ func (h *MedicalHistoryHandler) CreateMedicalHistory(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateMedicalHistory(&history); err != nil {
+	if err := h.service.CreateMedicalHistory(c.Request.Context(), &history); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_MEDICAL_HISTORY_CREATE_FAILED, "Failed to create medical history", err)
 		return
 	}
@@ -120,7 +120,7 @@ func (h *MedicalHistoryHandler) UpdateMedicalHistory(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateMedicalHistory(uint(id), &history); err != nil {
+	if err := h.service.UpdateMedicalHistory(c.Request.Context(), uint(id), &history); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_MEDICAL_HISTORY_UPDATE_FAILED, "Failed to update medical history", err)
 		return
 	}
@@ -136,7 +136,7 @@ func (h *MedicalHistoryHandler) DeleteMedicalHistory(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteMedicalHistory(uint(id)); err != nil {
+	if err := h.service.DeleteMedicalHistory(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_MEDICAL_HISTORY_DELETE_FAILED, "Failed to delete medical history", err)
 		return
 	}

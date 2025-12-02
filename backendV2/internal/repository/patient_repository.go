@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 
 	"gorm.io/gorm"
@@ -16,8 +17,8 @@ func NewPatientRepository(db *gorm.DB) PatientRepository {
 }
 
 // Create creates a new patient in the database
-func (r *patientRepository) Create(patient *models.Patient) error {
-	return r.db.Create(patient).Error
+func (r *patientRepository) Create(ctx context.Context, patient *models.Patient) error {
+	return r.db.WithContext(ctx).Create(patient).Error
 }
 
 // FindByID retrieves a patient by ID with preloaded primary doctor relationship
@@ -53,13 +54,13 @@ func (r *patientRepository) FindAll(page, limit int) ([]models.Patient, int64, e
 }
 
 // Update updates an existing patient
-func (r *patientRepository) Update(patient *models.Patient) error {
-	return r.db.Save(patient).Error
+func (r *patientRepository) Update(ctx context.Context, patient *models.Patient) error {
+	return r.db.WithContext(ctx).Save(patient).Error
 }
 
 // Delete soft deletes a patient by ID
-func (r *patientRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Patient{}, id).Error
+func (r *patientRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.Patient{}, id).Error
 }
 
 // FindByTCNumber retrieves a patient by TC number with preloaded primary doctor relationship
