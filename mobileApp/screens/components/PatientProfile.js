@@ -67,7 +67,7 @@ export default function PatientProfile({ userData }) {
           </View>
         </View>
         <View style={styles.row} >
-          <UserDataCom
+          {/* <UserDataCom
             title="Doktor İletişim Bilgileri"
             name={userData.primary_doctor.first_name + ' ' + userData.primary_doctor.last_name}
             phone={userData.primary_doctor.phone} 
@@ -81,7 +81,7 @@ export default function PatientProfile({ userData }) {
             color={'#dd612fff'}
             bgColor={"#ffb3b0ff"}
             />
-         
+          */}
         </View>
       </View>
       <View style={styles.line}></View>

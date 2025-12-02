@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "119f4936-cafa-441d-900a-b0dd663d9a2b",
+		"_postman_id": "155edd0b-14d3-4066-ba29-5409b4fa7773",
 		"name": "MedScreen API",
 		"description": "Complete API collection for MedScreen medical system backend",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -1365,6 +1365,16 @@
 				{
 					"name": "Assign NFC Card",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -1415,6 +1425,26 @@
 				},
 				{
 					"name": "Authenticate by NFC",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the JSON response",
+									"var jsonData = pm.response.json();",
+									"",
+									"// Extract the token from data.token",
+									"var token = jsonData.data.token;",
+									"",
+									"// Save the token to the environment variable",
+									"pm.environment.set(\"token\", token);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1686,6 +1716,26 @@
 			"item": [
 				{
 					"name": "Generate Patient Assignment QR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the JSON response",
+									"const jsonData = pm.response.json();",
+									"",
+									"// Extract the token from data.token",
+									"const token = jsonData.data.token;",
+									"",
+									"// Save the token to the environment variable \"qr_token\"",
+									"pm.environment.set(\"qr_token\", token);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1699,7 +1749,7 @@
 							"raw": "{\n  \"expiry_hours\": 24\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/patients/{{patient_id}}/generate-qr",
+							"raw": "{{base_url}}/api/v1/patients/2/generate-qr",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1707,7 +1757,7 @@
 								"api",
 								"v1",
 								"patients",
-								"{{patient_id}}",
+								"2",
 								"generate-qr"
 							]
 						},
@@ -1730,7 +1780,7 @@
 							"raw": "{\n  \"token\": \"{{qr_token}}\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/devices/{{mac_address}}/scan-patient-qr",
+							"raw": "{{base_url}}/api/v1/devices/AA:BB:CC:DD:EE:02/scan-patient-qr",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1738,7 +1788,7 @@
 								"api",
 								"v1",
 								"devices",
-								"{{mac_address}}",
+								"AA:BB:CC:DD:EE:02",
 								"scan-patient-qr"
 							]
 						},
@@ -1748,6 +1798,26 @@
 				},
 				{
 					"name": "Generate Prescription Info QR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the JSON response\r",
+									"const jsonData = pm.response.json();\r",
+									"\r",
+									"// Extract the token from data.token\r",
+									"const token = jsonData.data.token;\r",
+									"\r",
+									"// Save the token to the environment variable \"qr_token\"\r",
+									"pm.environment.set(\"qr_prescription_token\", token);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -1761,7 +1831,7 @@
 							"raw": "{\n  \"expiry_hours\": 168\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/v1/devices/{{mac_address}}/generate-prescription-qr/{{patient_id}}",
+							"raw": "{{base_url}}/api/v1/devices/AA:BB:CC:DD:EE:02/generate-prescription-qr/2",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1769,9 +1839,9 @@
 								"api",
 								"v1",
 								"devices",
-								"{{mac_address}}",
+								"AA:BB:CC:DD:EE:02",
 								"generate-prescription-qr",
-								"{{patient_id}}"
+								"2"
 							]
 						},
 						"description": "Doctor generates a QR code via device for patient prescription information. QR code expires after specified hours (max 720 hours / 30 days). Can be scanned multiple times."
@@ -1784,7 +1854,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/qr-tokens/{{qr_token}}/validate",
+							"raw": "{{base_url}}/api/v1/qr-tokens/{{qr_prescription_token}}/validate",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1792,7 +1862,7 @@
 								"api",
 								"v1",
 								"qr-tokens",
-								"{{qr_token}}",
+								"{{qr_prescription_token}}",
 								"validate"
 							]
 						},
@@ -1803,6 +1873,16 @@
 			]
 		}
 	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
 	"event": [
 		{
 			"listen": "prerequest",

@@ -373,10 +373,12 @@ INSERT INTO users (first_name, last_name, role, specialization, license_number, 
 -- NFC Cards
 INSERT INTO nfc_cards (card_uid, assigned_user_id, is_active, created_by_user_id, last_used_at) VALUES
 ('NFC-CARD-001-UID', 1, true, 6, NOW() - INTERVAL '2 hours'),
-('041C577A8A2190', 2, true, 6, NOW() - INTERVAL '1 day'),
+('031F8D0F', 2, true, 6, NOW() - INTERVAL '1 day'),
 ('NFC-CARD-003-UID', 3, true, 6, NOW() - INTERVAL '3 hours'),
 ('NFC-CARD-004-UID', 5, true, 6, NOW() - INTERVAL '30 minutes'),
-('NFC-CARD-005-UID', 6, true, 6, NOW() - INTERVAL '5 hours');
+('NFC-CARD-005-UID', 6, true, 6, NOW() - INTERVAL '5 hours'),
+('TEST-NFC-CARD', 1, true, 6, NOW()),
+('04', 1, true, 6, NOW());
 
 -- Update users with their nfc_card_id (foreign key)
 UPDATE users SET nfc_card_id = 1 WHERE id = 1;

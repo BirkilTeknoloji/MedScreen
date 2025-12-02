@@ -10,6 +10,7 @@ import {
   getAppointmentsByPatientId,
   getDiagnosesByPatientId,
   getFirstPatient,
+  getPatientById,
   getPatientByDeviceId,
   getPrescriptionsByPatientId,
   getMedicalTestsByPatientId,
@@ -34,12 +35,18 @@ export default function PatientScreen({ route, navigation }) {
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [surgeryHistory, setSurgeryHistory] = useState([]);
   const [allergies, setAllergies] = useState([]);
-  const { patientData, doctorData, isPatientLogin } = route.params || {};
+  const { patientData, doctorData, isPatientLogin, qrTokenData, qrTokenType, isQrNavigation } = route.params || {};
   const [activeTab, setActiveTab] = useState('randevularTetkikler');
 
   useEffect(() => {
     if (!route.params?.patientData) {
-      fetchPatientFirstData();
+      // Check if coming from QR navigation with patient_id
+      if (isQrNavigation && qrTokenData?.patient_id) {
+        console.log('Fetching patient data from QR token:', qrTokenData.patient_id);
+        fetchPatientDataById(qrTokenData.patient_id);
+      } else {
+        fetchPatientFirstData();
+      }
     }
   }, []);
 
@@ -53,7 +60,6 @@ export default function PatientScreen({ route, navigation }) {
     try {
       setIsLoading(true);
 
-
       const data = await getFirstPatient();
 
       if (data) {
@@ -63,6 +69,26 @@ export default function PatientScreen({ route, navigation }) {
       }
     } catch (err) {
       console.error('Hata:', err);
+      setError('Veri alınamadı.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchPatientDataById = async (patientId) => {
+    try {
+      setIsLoading(true);
+      // Fetch specific patient by ID from QR token
+      const patient = await getPatientById(patientId);
+      
+      if (patient) {
+        setUserData(patient);
+      } else {
+        console.warn('Patient not found for ID:', patientId);
+        setError('Hasta verisi alınamadı.');
+      }
+    } catch (err) {
+      console.error('Patient fetch error:', err);
       setError('Veri alınamadı.');
     } finally {
       setIsLoading(false);
@@ -117,6 +143,13 @@ export default function PatientScreen({ route, navigation }) {
     }
     return (
       <>
+        {isQrNavigation && (
+          <View style={{ backgroundColor: '#e3f2fd', padding: 12, marginBottom: 8, borderRadius: 4 }}>
+            <Text style={{ fontSize: 12, color: '#1976d2', fontWeight: 'bold' }}>
+              ✅ QR Token ile Yüklendi ({qrTokenType})
+            </Text>
+          </View>
+        )}
         <PatientProfile userData={userData} />
         <View style={styles.contentRow}>
           <AppointmentsContainer
