@@ -8,6 +8,12 @@ export async function sendRfidToBackend(tagId) {
   const url = `${BASE_API_URL}/nfc-cards/authenticate`;
 
   try {
+    console.log('🔍 NFC tag ID received:', tagId);
+    console.log('🔍 Tag type:', typeof tagId);
+    if (typeof tagId === 'object') {
+      console.log('🔍 Tag object:', JSON.stringify(tagId, null, 2));
+    }
+    console.log('📡 NFC authenticate isteği gönderiliyor:', url);
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -17,42 +23,88 @@ export async function sendRfidToBackend(tagId) {
       body: JSON.stringify({ card_uid: tagId }),
     });
 
+    console.log('NFC response status:', response.status);
+
     if (!response.ok) {
-      console.error('Backend error:', response.status);
+      console.error('NFC Backend error:', response.status);
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
       return null;
     }
 
     const resJson = await response.json();
+    console.log('NFC response data:', resJson);
 
-    // 🛠️ DÜZELTME BURADA:
-    // Token bazen direkt { token: ... } olarak, bazen { data: { token: ... } } olarak gelebilir.
-    // İkisini de kontrol ediyoruz:
-    const token = resJson.token || resJson.data?.token;
-    const user = resJson.user || resJson.data?.user;
+    // backendV2 response format: { success: true, code: "SUCCESS_NFC_AUTHENTICATION", message: "...", data: { user: {...}, token: "..." } }
+    const data = resJson.data || resJson;
+    const token = data.token || resJson.token;
+    const user = data.user || resJson.user;
 
-    if (token) {
+    if (token && user) {
       try {
         console.log('✅ Token bulundu, hafızaya kaydediliyor:', token.substring(0, 10) + '...');
         await AsyncStorage.setItem('userToken', token);
+        await AsyncStorage.setItem('userInfo', JSON.stringify(user));
         
-        if (user) {
-          await AsyncStorage.setItem('userInfo', JSON.stringify(user));
+        // Device MAC'i AsyncStorage'a kaydet (QR token atama için)
+        if (user.id) {
+          const deviceMac = await getDeviceMacFromBackend(user.id, token);
+          if (deviceMac) {
+            await AsyncStorage.setItem('device_mac', deviceMac);
+            console.log('Device MAC kaydedildi:', deviceMac);
+          }
         }
         
-        // Fonksiyonun döndürdüğü veriyi standartlaştıralım ki HomeScreen şaşırmasın
-        // HomeScreen'e her zaman { token: "...", success: true } dönelim
-        return { success: true, token: token, user: user, originalData: resJson };
+        return { 
+          success: true, 
+          token: token, 
+          user: user,
+          originalData: resJson 
+        };
 
       } catch (e) {
-        console.error('Token kaydetme hatası:', e);
+        console.error('Token/User kaydetme hatası:', e);
+        return null;
       }
     } else {
-        console.warn("⚠️ Yanıtta Token bulunamadı!", resJson);
+      console.warn("⚠️ Yanıtta Token veya User bulunamadı!", resJson);
+      return null;
+    }
+  } catch (error) {
+    console.error('NFC Network request failed:', error.message);
+    return null;
+  }
+}
+
+// Helper: Device MAC'i backend'den al
+async function getDeviceMacFromBackend(userId, token) {
+  try {
+    // Bu endpoint'i backend'e eklemek gerekebilir
+    // Şu an için cihazların genel listesinden ilkini al
+    const url = `${BASE_API_URL}/devices`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.warn('Device listesi alınamadı');
+      return null;
     }
 
-    return resJson;
+    const resJson = await response.json();
+    const devices = resJson.data || resJson;
+    
+    if (Array.isArray(devices) && devices.length > 0) {
+      return devices[0].mac_address;
+    }
+
+    return null;
   } catch (error) {
-    console.error('Network request failed:', error.message);
+    console.error('Device MAC alınamadı:', error);
     return null;
   }
 }

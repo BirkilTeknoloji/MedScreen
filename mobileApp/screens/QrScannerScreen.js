@@ -3,6 +3,8 @@ import { View, Text, Alert, ActivityIndicator, TouchableOpacity, Modal, Pressabl
 import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
 import styles from './styles/QrScannerScreenStyle';
 import { BASE_API_URL } from '@env';
+import { parseQrCode, getPrescriptionsByPatientId } from '../services/api';
+import PrescriptionsDetail from './components/PrescriptionsDetail';
 
 export default function QrScannerScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(false);
@@ -13,6 +15,9 @@ export default function QrScannerScreen({ navigation }) {
   const [fetchingInfo, setFetchingInfo] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState(null);
+  const [prescriptionModalVisible, setPrescriptionModalVisible] = useState(false);
+  const [prescriptionData, setPrescriptionData] = useState(null);
+  const [qrTokenType, setQrTokenType] = useState(null);
   const device = useCameraDevice('front');
 
   useEffect(() => {
@@ -57,16 +62,112 @@ export default function QrScannerScreen({ navigation }) {
       setPatientInfo(null);
 
       try {
+        // First try new backend QR token validation
+        const parseResult = await parseQrCode(value);
+        
+        if (parseResult) {
+          // Handle token already used
+          if (parseResult.type === 'token_used') {
+            console.warn('QR token already used:', parseResult.token);
+            Alert.alert('Geçersiz QR', 'Bu QR daha önce kullanılmış. Yeni bir QR oluşturun veya yetkilinize başvurun.');
+            setIsScanning(true);
+            setScannedData(null);
+            return;
+          }
+
+          // Handle prescription_info token type
+          if (parseResult.tokenType === 'prescription_info' && parseResult.data) {
+            console.log('📋 QR Token data from QR:', parseResult.data);
+            setQrTokenType('prescription_info');
+            setFetchingInfo(true);
+            
+            // Get patient ID from QR token
+            const patientId = parseResult.data.patient_id || parseResult.data.patient?.id;
+            console.log('👤 Patient ID from QR token:', patientId);
+            
+            if (patientId) {
+              // Fetch prescriptions for this patient
+              const prescriptions = await getPrescriptionsByPatientId(patientId);
+              
+              if (prescriptions && prescriptions.length > 0) {
+                console.log(`📋 Retrieved ${prescriptions.length} prescriptions`);
+                // Show first prescription or create a list
+                const firstPrescription = prescriptions[0];
+                setPrescriptionData(firstPrescription);
+                setPrescriptionModalVisible(true);
+              } else {
+                console.warn('No prescriptions found for patient');
+                Alert.alert('Bilgi', 'Bu hasta için reçete kaydı bulunamadı.');
+              }
+            } else {
+              console.error('No patient ID found in QR token');
+              Alert.alert('Hata', 'QR token\'de hasta ID bulunamadı.');
+            }
+            
+            setFetchingInfo(false);
+            return;
+          }
+          
+          // Handle different response types from parseQrCode
+          if (parseResult.type === 'assignment_success') {
+            Alert.alert(
+              'Başarı',
+              'Hasta cihaza başarıyla atanmıştır',
+              [
+                {
+                  text: 'Tamam',
+                  onPress: () => {
+                    setPatientInfo({
+                      title: 'Hasta Atama Başarılı',
+                      result: {
+                        message: 'Hasta cihaza başarıyla atanmıştır',
+                        tokenType: parseResult.tokenType,
+                        token: parseResult.token,
+                      },
+                    });
+                  },
+                },
+              ]
+            );
+            return;
+          } else if (parseResult.type === 'assignment_failed') {
+            Alert.alert(
+              'Atama Başarısız',
+              'Hasta cihaza atanırken hata oluştu. Token doğruysa, manuel olarak atayabilirsiniz.',
+              [
+                {
+                  text: 'Bilgiyorum',
+                  onPress: () => {
+                    setPatientInfo({
+                      title: 'Hasta Atama Başarısız',
+                      result: parseResult.data,
+                    });
+                  },
+                },
+              ]
+            );
+            return;
+          } else if (parseResult.type === 'token_validated') {
+            // Token validated successfully
+            setPatientInfo({
+              title: `Token Doğrulandı (${parseResult.tokenType})`,
+              result: parseResult.data,
+            });
+            return;
+          }
+        }
+
+        // Fallback to old format: QR contains JSON with { id, field, itemId }
         const parsed = JSON.parse(value.trim());
         if (parsed.id && parsed.field && parsed.itemId) {
           await fetchPatientInfo(parsed);
         } else {
-          Alert.alert('Missing Data', 'QR code content does not contain required fields: id, field, itemId');
+          Alert.alert('Missing Data', 'QR code content does not contain required fields');
           setIsScanning(true);
           setScannedData(null);
         }
       } catch {
-        Alert.alert('JSON Parse Error', 'QR code content is not in valid JSON format or is corrupted.');
+        Alert.alert('JSON Parse Error', 'QR code content is not in valid format');
         setIsScanning(true);
         setScannedData(null);
       }
@@ -275,6 +376,16 @@ export default function QrScannerScreen({ navigation }) {
           />
         </Pressable>
       </Modal>
+
+      {/* Prescription Detail Modal - for QR prescription_info tokens */}
+      <PrescriptionsDetail
+        visible={prescriptionModalVisible}
+        prescription={prescriptionData}
+        onClose={() => {
+          setPrescriptionModalVisible(false);
+          handleRescan();
+        }}
+      />
     </View>
   );
 }

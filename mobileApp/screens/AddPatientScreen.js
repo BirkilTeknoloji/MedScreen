@@ -4,6 +4,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import Toast from 'react-native-root-toast';
 import { startNfcReading, stopNfcReading, sendRfidToBackend } from '../services/nfc/nfcHandler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addPatient } from '../services/api';
 import styles from './styles/AddPatientScreenStyle';
 import { TouchableOpacity } from 'react-native';
@@ -29,11 +30,19 @@ export default function AddPatientScreen() {
         isProcessingRef.current = true;
 
         try {
-            const user = await sendRfidToBackend(tag.id);
-            if (!user?.ID || !user?.PatientInfo) throw new Error('Kullanıcı bulunamadı');
-            setUserData(user);
+            const response = await sendRfidToBackend(tag.id);
+            if (response && response.success && response.user) {
+              const user = response.user;
+              console.log('NFC ile giriş başarılı:', user.first_name);
+              setUserData(user);
+              showToast('✅ Kart okutma başarılı', '#4caf50');
+            } else {
+              console.warn('NFC authentication failed in AddPatientScreen');
+              showToast('❌ Kart tanımlanmadı', '#b00020');
+            }
         } catch (error) {
-            console.error('❌ Hata:', error);
+            console.error('❌ NFC Hata:', error);
+            showToast('❌ NFC işleminde hata oluştu', '#b00020');
         } finally {
             setTimeout(() => {
                 isProcessingRef.current = false;
@@ -42,7 +51,7 @@ export default function AddPatientScreen() {
     };
 
     const handleAddPatient = async () => {
-        if (!userData?.ID || !userData?.PatientInfo) {
+        if (!userData?.id) {
             showToast('Lütfen geçerli bir kart okutun.', '#f57c00');
             return;
         }

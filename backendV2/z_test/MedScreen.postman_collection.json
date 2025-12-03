@@ -4564,6 +4564,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -5831,7 +5841,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/v1/qr-tokens/{{qr_token}}/validate",
+							"raw": "{{base_url}}/api/v1/qr-tokens/{{qr_prescription_token}}/validate",
 							"host": [
 								"{{base_url}}"
 							],
@@ -5839,7 +5849,7 @@
 								"api",
 								"v1",
 								"qr-tokens",
-								"{{qr_token}}",
+								"{{qr_prescription_token}}",
 								"validate"
 							]
 						},
