@@ -8,19 +8,24 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import styles from './styles/DetailModalStyle';
+import styles from '../styles/DetailModalStyle';
+import InfoRow from '../InfoRow';
+import UserCard from '../UserCard';
 
 const AppointmentsDetail = ({ visible, appointment, onClose }) => {
   if (!visible || !appointment) return null;
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return 'Tarih belirtilmemiş';
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
 
-  const formatTime = (dateString) => {
+  const formatTime = dateString => {
     if (!dateString) return 'Saat belirtilmemiş';
-    return new Date(dateString).toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
+    return new Date(dateString).toLocaleTimeString('tr-TR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
@@ -49,46 +54,63 @@ const AppointmentsDetail = ({ visible, appointment, onClose }) => {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <Text style={styles.sectionTitle}>Randevu Bilgileri</Text>
 
-            <InfoRow
-              icon="calendar-blank-outline"
-              label="Tarih"
-              value={formatDate(appointment.appointment_date)}
-            />
-
-            <InfoRow
-              icon="clock-time-four-outline"
-              label="Saat"
-              value={formatTime(appointment.appointment_date)}
-            />
-
-            {appointment.duration_minutes && (
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+              }}
+            >
               <InfoRow
-                icon="timer-outline"
-                label="Süre"
-                value={`${appointment.duration_minutes} dakika`}
+                style={{ width: '48%' }}
+                icon="calendar-blank-outline"
+                label="Tarih"
+                value={formatDate(appointment.appointment_date)}
               />
-            )}
 
-            {appointment.appointment_type && (
               <InfoRow
-                icon="medical-bag"
-                label="Randevu Türü"
-                value={appointment.appointment_type}
+                style={{ width: '48%' }}
+                icon="clock-time-four-outline"
+                label="Saat"
+                value={formatTime(appointment.appointment_date)}
               />
-            )}
 
-            <InfoRow
-              icon="text-subject"
-              label="Sebep"
-              value={appointment.reason || 'Belirtilmemiş'}
-            />
+              {appointment.duration_minutes && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="timer-outline"
+                  label="Süre"
+                  value={`${appointment.duration_minutes} dakika`}
+                />
+              )}
+
+              {appointment.appointment_type && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="medical-bag"
+                  label="Randevu Türü"
+                  value={appointment.appointment_type}
+                />
+              )}
+
+              <InfoRow
+                style={{ width: '100%' }}
+                icon="text-subject"
+                label="Sebep"
+                value={appointment.reason || 'Belirtilmemiş'}
+              />
+            </View>
 
             {appointment.notes && (
               <View style={styles.notesSection}>
                 <View style={styles.divider} />
                 <Text style={styles.sectionTitle}>Notlar</Text>
                 <View style={styles.notesContainer}>
-                  <Icon name="note-text" size={20} color="#2563EB" style={styles.notesIcon} />
+                  <Icon
+                    name="note-text"
+                    size={20}
+                    color="#2563EB"
+                    style={styles.notesIcon}
+                  />
                   <Text style={styles.notesText}>{appointment.notes}</Text>
                 </View>
               </View>
@@ -116,32 +138,4 @@ const AppointmentsDetail = ({ visible, appointment, onClose }) => {
     </Modal>
   );
 };
-
-const InfoRow = ({ icon, label, value, isLast }) => (
-  <View style={[styles.infoRow, isLast && { marginBottom: 0 }]}>
-    <View style={styles.iconContainer}>
-      <Icon name={icon} size={20} color="#2563EB" />
-    </View>
-    <View style={styles.infoTextContainer}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
-  </View>
-);
-
-const UserCard = ({ icon, name, role }) => (
-  <View style={styles.userCard}>
-    <View style={styles.iconAvatar}>
-      <Icon name={icon} size={24} color="#2563EB" />
-    </View>
-    <View style={styles.userInfo}>
-      <Text style={styles.userName}>{name}</Text>
-      <Text style={styles.userRole}>{role}</Text>
-    </View>
-  </View>
-);
-
-
-
-
 export default AppointmentsDetail;

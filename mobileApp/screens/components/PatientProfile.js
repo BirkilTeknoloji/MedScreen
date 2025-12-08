@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
 import styles from '../styles/PatientProfileStyle';
-import UserDataCom from './UserDataCom';
 
 export default function PatientProfile({ userData }) {
   const formatDate = dateString => {
@@ -33,7 +32,7 @@ export default function PatientProfile({ userData }) {
             <View style={styles.container}>
               <View>
                 <Text style={styles.textName}>
-                  {userData.first_name} {userData.last_name} 
+                  {userData.first_name} {userData.last_name}
                 </Text>
                 <Text>Hasta TC: {userData.tc_number}</Text>
               </View>
@@ -66,7 +65,7 @@ export default function PatientProfile({ userData }) {
             </View>
           </View>
         </View>
-        <View style={styles.row} >
+        <View style={styles.row}>
           {/* <UserDataCom
             title="Doktor İletişim Bilgileri"
             name={userData.primary_doctor.first_name + ' ' + userData.primary_doctor.last_name}

@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Animated } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
 import ActionButtons from './components/ActionButtons';
-import AppointmentsTestsTab from './components/AppointmentsTestsTab';
-import MedicalHistoryTab from './components/MedicalHistoryTab';
 import PatientProfile from './components/PatientProfile';
-import TabBar from './components/TabBar';
 import {
   getAppointmentsByPatientId,
   getDiagnosesByPatientId,
@@ -19,8 +15,7 @@ import {
   getAllergiesByPatientId,
 } from '../services/api';
 import styles from './styles/PatientScreenStyle';
-import Icon from 'react-native-vector-icons/Entypo';
-import CustomDropdown from './components/CustomDropdown';
+
 import AppointmentsContainer from './components/AppointmentsContainer';
 
 export default function PatientScreen({ route, navigation }) {
@@ -35,14 +30,24 @@ export default function PatientScreen({ route, navigation }) {
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [surgeryHistory, setSurgeryHistory] = useState([]);
   const [allergies, setAllergies] = useState([]);
-  const { patientData, doctorData, isPatientLogin, qrTokenData, qrTokenType, isQrNavigation } = route.params || {};
+  const {
+    patientData,
+    doctorData,
+    isPatientLogin,
+    qrTokenData,
+    qrTokenType,
+    isQrNavigation,
+  } = route.params || {};
   const [activeTab, setActiveTab] = useState('randevularTetkikler');
 
   useEffect(() => {
     if (!route.params?.patientData) {
       // Check if coming from QR navigation with patient_id
       if (isQrNavigation && qrTokenData?.patient_id) {
-        console.log('Fetching patient data from QR token:', qrTokenData.patient_id);
+        console.log(
+          'Fetching patient data from QR token:',
+          qrTokenData.patient_id,
+        );
         fetchPatientDataById(qrTokenData.patient_id);
       } else {
         fetchPatientFirstData();
@@ -75,12 +80,12 @@ export default function PatientScreen({ route, navigation }) {
     }
   };
 
-  const fetchPatientDataById = async (patientId) => {
+  const fetchPatientDataById = async patientId => {
     try {
       setIsLoading(true);
       // Fetch specific patient by ID from QR token
       const patient = await getPatientById(patientId);
-      
+
       if (patient) {
         setUserData(patient);
       } else {
@@ -144,8 +149,17 @@ export default function PatientScreen({ route, navigation }) {
     return (
       <>
         {isQrNavigation && (
-          <View style={{ backgroundColor: '#e3f2fd', padding: 12, marginBottom: 8, borderRadius: 4 }}>
-            <Text style={{ fontSize: 12, color: '#1976d2', fontWeight: 'bold' }}>
+          <View
+            style={{
+              backgroundColor: '#e3f2fd',
+              padding: 12,
+              marginBottom: 8,
+              borderRadius: 4,
+            }}
+          >
+            <Text
+              style={{ fontSize: 12, color: '#1976d2', fontWeight: 'bold' }}
+            >
               ✅ QR Token ile Yüklendi ({qrTokenType})
             </Text>
           </View>

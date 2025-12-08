@@ -1,16 +1,18 @@
 import React, { useState, useRef } from 'react';
 import { Animated, Text, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import TitleIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './styles/CustomDropwdownStyle';
 import DetailModal from './DetailModal';
-import AppointmentsDetail from './AppointmentsDetail';
-import DiagnosesDetail from './DiagnosesDetail';
-import PrescriptionsDetail from './PrescriptionsDetail';
-import MedicalTestsDetail from './MedicalTestsDetail';
-import MedicalHistoryDetail from './MedicalHistoryDetail';
-import SurgeryHistoryDetail from './SurgeryHistoryDetail';
-import AllergiesDetail from './AllergiesDetail';
-const CustomDropdown = ({ data, title }) => {
+import AppointmentsDetail from './modal/AppointmentsDetail';
+import DiagnosesDetail from './modal/DiagnosesDetail';
+import PrescriptionsDetail from './modal/PrescriptionsDetail';
+import MedicalTestsDetail from './modal/MedicalTestsDetail';
+import MedicalHistoryDetail from './modal/MedicalHistoryDetail';
+import SurgeryHistoryDetail from './modal/SurgeryHistoryDetail';
+import AllergiesDetail from './modal/AllergiesDetail';
+
+const CustomDropdown = ({ data, title, icon }) => {
   const [dropModal, setDropModal] = useState(false);
   const [detailModal, setDetailModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -65,7 +67,10 @@ const CustomDropdown = ({ data, title }) => {
     <>
       <TouchableOpacity activeOpacity={0.3} onPress={toggleDropdown}>
         <View style={styles.dropdownBtn}>
-          <Text style={styles.dropwdownText}>{title}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            {icon && <TitleIcon name={icon} size={24} color="#5e6977" />}
+            <Text style={styles.dropwdownText}>{title}</Text>
+          </View>
           <Icon
             name={dropModal ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
             size={30}

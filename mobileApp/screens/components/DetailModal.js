@@ -1,5 +1,12 @@
 import React from 'react';
-import { Modal, TouchableOpacity, View, Text, ScrollView, Image } from 'react-native';
+import {
+  Modal,
+  TouchableOpacity,
+  View,
+  Text,
+  ScrollView,
+  Image,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles/DetailModalStyle';
 import AppointmentDetail from './AppointmentDetail';
@@ -12,23 +19,25 @@ const DetailModal = ({ visible, selectedItem, onClose }) => {
       animationType="slide"
       onRequestClose={onClose}
     >
-      <TouchableOpacity 
-        style={styles.modalOverlay} 
-        activeOpacity={1} 
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
         onPress={onClose}
       >
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>
-              {selectedItem?.appointment_date ? 
-                (selectedItem?.doctor?.specialization || 'Randevu Detayı') : 
-                (selectedItem?.title || selectedItem?.type || selectedItem?.name || (typeof selectedItem === 'string' ? selectedItem : 'Detay'))
-              }
+              {selectedItem?.appointment_date
+                ? selectedItem?.doctor?.specialization || 'Randevu Detayı'
+                : selectedItem?.title ||
+                  selectedItem?.type ||
+                  selectedItem?.name ||
+                  (typeof selectedItem === 'string' ? selectedItem : 'Detay')}
             </Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={onClose}
-              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
-              style={{padding: 5}}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={{ padding: 5 }}
             >
               <Icon name="close" size={24} color="#666" />
             </TouchableOpacity>
@@ -46,8 +55,8 @@ const DetailModal = ({ visible, selectedItem, onClose }) => {
                 <Text style={styles.detailValue}>{selectedItem.date}</Text>
               </View>
             )}
-            {selectedItem?.result && (
-              Array.isArray(selectedItem.result) ? (
+            {selectedItem?.result &&
+              (Array.isArray(selectedItem.result) ? (
                 selectedItem.result[0]?.imageUrl ? (
                   selectedItem.result.map((res, idx) => (
                     <Image
@@ -71,12 +80,14 @@ const DetailModal = ({ visible, selectedItem, onClose }) => {
                         <Text style={styles.tableCell}>{res.value}</Text>
                         <Text style={styles.tableCell}>{res.unit}</Text>
                         <Text style={styles.tableCell}>{res.normalRange}</Text>
-                        <Text style={[
-                          styles.tableCell,
-                          res.status === 'normal' && styles.statusNormal,
-                          res.status === 'high' && styles.statusHigh,
-                          res.status === 'low' && styles.statusLow,
-                        ]}>
+                        <Text
+                          style={[
+                            styles.tableCell,
+                            res.status === 'normal' && styles.statusNormal,
+                            res.status === 'high' && styles.statusHigh,
+                            res.status === 'low' && styles.statusLow,
+                          ]}
+                        >
                           {res.status}
                         </Text>
                       </View>
@@ -90,8 +101,7 @@ const DetailModal = ({ visible, selectedItem, onClose }) => {
                     style={styles.image}
                   />
                 )
-              )
-            )}
+              ))}
             {selectedItem?.pastIllnesses && (
               <View style={styles.listContainer}>
                 <Text style={styles.listTitle}>Geçmiş Hastalıklar:</Text>

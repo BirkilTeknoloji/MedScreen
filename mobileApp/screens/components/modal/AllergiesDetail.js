@@ -8,7 +8,9 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import styles from './styles/DetailModalStyle';
+import styles from '../styles/DetailModalStyle';
+import InfoRow from '../InfoRow';
+import UserCard from '../UserCard';
 
 const AllergiesDetail = ({ visible, allergy, onClose }) => {
   if (!visible || !allergy) return null;
@@ -85,17 +87,27 @@ const AllergiesDetail = ({ visible, allergy, onClose }) => {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <Text style={styles.sectionTitle}>Alerji Bilgileri</Text>
 
-            <InfoRow
-              icon="tag-outline"
-              label="Alerji Türü"
-              value={getAllergyTypeText(allergy.allergy_type)}
-            />
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+              }}
+            >
+              <InfoRow
+                style={{ width: '48%' }}
+                icon="tag-outline"
+                label="Alerji Türü"
+                value={getAllergyTypeText(allergy.allergy_type)}
+              />
 
-            <InfoRow
-              icon="calendar-blank-outline"
-              label="Tanı Tarihi"
-              value={formatDate(allergy.diagnosed_date)}
-            />
+              <InfoRow
+                style={{ width: '48%' }}
+                icon="calendar-blank-outline"
+                label="Tanı Tarihi"
+                value={formatDate(allergy.diagnosed_date)}
+              />
+            </View>
 
             {/* --- REAKSİYON (Önemli - Kırmızı Kutu) --- */}
             {allergy.reaction && (
@@ -165,32 +177,5 @@ const AllergiesDetail = ({ visible, allergy, onClose }) => {
     </Modal>
   );
 };
-
-// --- ALT BİLEŞENLER (SurgeryHistoryDetail ile Aynı) ---
-
-const InfoRow = ({ icon, label, value, isLast }) => (
-  <View style={[styles.infoRow, isLast && { marginBottom: 0 }]}>
-    <View style={styles.iconContainer}>
-      <Icon name={icon} size={20} color="#2563EB" />
-    </View>
-    <View style={styles.infoTextContainer}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
-  </View>
-);
-
-const UserCard = ({ icon, name, role }) => (
-  <View style={styles.userCard}>
-    <View style={styles.iconAvatar}>
-      <Icon name={icon} size={24} color="#2563EB" />
-    </View>
-    <View style={styles.userInfo}>
-      <Text style={styles.userName}>{name}</Text>
-      <Text style={styles.userRole}>{role}</Text>
-    </View>
-  </View>
-);
-
 
 export default AllergiesDetail;

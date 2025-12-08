@@ -1,10 +1,23 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Alert, ActivityIndicator, TouchableOpacity, Modal, Pressable, Image } from 'react-native';
-import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
+import {
+  View,
+  Text,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  Image,
+} from 'react-native';
+import {
+  Camera,
+  useCameraDevice,
+  useCodeScanner,
+} from 'react-native-vision-camera';
 import styles from './styles/QrScannerScreenStyle';
 import { BASE_API_URL } from '@env';
 import { parseQrCode, getPrescriptionsByPatientId } from '../services/api';
-import PrescriptionsDetail from './components/PrescriptionsDetail';
+import PrescriptionsDetail from './components/modal/PrescriptionsDetail';
 
 export default function QrScannerScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(false);
@@ -15,7 +28,8 @@ export default function QrScannerScreen({ navigation }) {
   const [fetchingInfo, setFetchingInfo] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState(null);
-  const [prescriptionModalVisible, setPrescriptionModalVisible] = useState(false);
+  const [prescriptionModalVisible, setPrescriptionModalVisible] =
+    useState(false);
   const [prescriptionData, setPrescriptionData] = useState(null);
   const [qrTokenType, setQrTokenType] = useState(null);
   const device = useCameraDevice('front');
@@ -38,14 +52,19 @@ export default function QrScannerScreen({ navigation }) {
   const fetchPatientInfo = async ({ id, field, itemId }) => {
     try {
       setFetchingInfo(true);
-      const response = await fetch(`${BASE_API_URL}/users/${id}/patientinfo/${field}/${itemId}`);
+      const response = await fetch(
+        `${BASE_API_URL}/users/${id}/patientinfo/${field}/${itemId}`,
+      );
       if (!response.ok) throw new Error(`API error: ${response.status}`);
 
       const data = await response.json();
       setPatientInfo(data);
     } catch (error) {
       console.error('Failed to retrieve patient information:', error);
-      Alert.alert('Error', 'Failed to retrieve patient information. Please try again.');
+      Alert.alert(
+        'Error',
+        'Failed to retrieve patient information. Please try again.',
+      );
       setPatientInfo(null);
       setIsScanning(true);
       setScannedData(null);
@@ -54,43 +73,58 @@ export default function QrScannerScreen({ navigation }) {
     }
   };
 
-  const handleScan = async (codes) => {
+  const handleScan = async codes => {
     if (codes.length > 0 && isScanning) {
       const value = codes[0].value;
       setIsScanning(false);
-      setScannedData({ content: value, type: typeof value, length: value.length });
+      setScannedData({
+        content: value,
+        type: typeof value,
+        length: value.length,
+      });
       setPatientInfo(null);
 
       try {
         // First try new backend QR token validation
         const parseResult = await parseQrCode(value);
-        
+
         if (parseResult) {
           // Handle token already used
           if (parseResult.type === 'token_used') {
             console.warn('QR token already used:', parseResult.token);
-            Alert.alert('Geçersiz QR', 'Bu QR daha önce kullanılmış. Yeni bir QR oluşturun veya yetkilinize başvurun.');
+            Alert.alert(
+              'Geçersiz QR',
+              'Bu QR daha önce kullanılmış. Yeni bir QR oluşturun veya yetkilinize başvurun.',
+            );
             setIsScanning(true);
             setScannedData(null);
             return;
           }
 
           // Handle prescription_info token type
-          if (parseResult.tokenType === 'prescription_info' && parseResult.data) {
+          if (
+            parseResult.tokenType === 'prescription_info' &&
+            parseResult.data
+          ) {
             console.log('📋 QR Token data from QR:', parseResult.data);
             setQrTokenType('prescription_info');
             setFetchingInfo(true);
-            
+
             // Get patient ID from QR token
-            const patientId = parseResult.data.patient_id || parseResult.data.patient?.id;
+            const patientId =
+              parseResult.data.patient_id || parseResult.data.patient?.id;
             console.log('👤 Patient ID from QR token:', patientId);
-            
+
             if (patientId) {
               // Fetch prescriptions for this patient
-              const prescriptions = await getPrescriptionsByPatientId(patientId);
-              
+              const prescriptions = await getPrescriptionsByPatientId(
+                patientId,
+              );
+
               if (prescriptions && prescriptions.length > 0) {
-                console.log(`📋 Retrieved ${prescriptions.length} prescriptions`);
+                console.log(
+                  `📋 Retrieved ${prescriptions.length} prescriptions`,
+                );
                 // Show first prescription or create a list
                 const firstPrescription = prescriptions[0];
                 setPrescriptionData(firstPrescription);
@@ -101,34 +135,30 @@ export default function QrScannerScreen({ navigation }) {
               }
             } else {
               console.error('No patient ID found in QR token');
-              Alert.alert('Hata', 'QR token\'de hasta ID bulunamadı.');
+              Alert.alert('Hata', "QR token'de hasta ID bulunamadı.");
             }
-            
+
             setFetchingInfo(false);
             return;
           }
-          
+
           // Handle different response types from parseQrCode
           if (parseResult.type === 'assignment_success') {
-            Alert.alert(
-              'Başarı',
-              'Hasta cihaza başarıyla atanmıştır',
-              [
-                {
-                  text: 'Tamam',
-                  onPress: () => {
-                    setPatientInfo({
-                      title: 'Hasta Atama Başarılı',
-                      result: {
-                        message: 'Hasta cihaza başarıyla atanmıştır',
-                        tokenType: parseResult.tokenType,
-                        token: parseResult.token,
-                      },
-                    });
-                  },
+            Alert.alert('Başarı', 'Hasta cihaza başarıyla atanmıştır', [
+              {
+                text: 'Tamam',
+                onPress: () => {
+                  setPatientInfo({
+                    title: 'Hasta Atama Başarılı',
+                    result: {
+                      message: 'Hasta cihaza başarıyla atanmıştır',
+                      tokenType: parseResult.tokenType,
+                      token: parseResult.token,
+                    },
+                  });
                 },
-              ]
-            );
+              },
+            ]);
             return;
           } else if (parseResult.type === 'assignment_failed') {
             Alert.alert(
@@ -144,7 +174,7 @@ export default function QrScannerScreen({ navigation }) {
                     });
                   },
                 },
-              ]
+              ],
             );
             return;
           } else if (parseResult.type === 'token_validated') {
@@ -162,12 +192,18 @@ export default function QrScannerScreen({ navigation }) {
         if (parsed.id && parsed.field && parsed.itemId) {
           await fetchPatientInfo(parsed);
         } else {
-          Alert.alert('Missing Data', 'QR code content does not contain required fields');
+          Alert.alert(
+            'Missing Data',
+            'QR code content does not contain required fields',
+          );
           setIsScanning(true);
           setScannedData(null);
         }
       } catch {
-        Alert.alert('JSON Parse Error', 'QR code content is not in valid format');
+        Alert.alert(
+          'JSON Parse Error',
+          'QR code content is not in valid format',
+        );
         setIsScanning(true);
         setScannedData(null);
       }
@@ -185,7 +221,7 @@ export default function QrScannerScreen({ navigation }) {
     setIsScanning(true);
   };
 
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
 
   if (isLoading) {
     return (
@@ -200,7 +236,9 @@ export default function QrScannerScreen({ navigation }) {
     return (
       <View style={styles.center}>
         <Text style={styles.errorText}>Kamera izni gerekli</Text>
-        <Text style={styles.infoText}>Lütfen uygulama ayarlarından kamera iznini etkinleştirin</Text>
+        <Text style={styles.infoText}>
+          Lütfen uygulama ayarlarından kamera iznini etkinleştirin
+        </Text>
       </View>
     );
   }
@@ -209,7 +247,9 @@ export default function QrScannerScreen({ navigation }) {
     return (
       <View style={styles.center}>
         <Text style={styles.errorText}>Kamera bulunamadı</Text>
-        <Text style={styles.infoText}>Cihazınızda kullanılabilir kamera yok</Text>
+        <Text style={styles.infoText}>
+          Cihazınızda kullanılabilir kamera yok
+        </Text>
       </View>
     );
   }
@@ -231,8 +271,12 @@ export default function QrScannerScreen({ navigation }) {
         </View>
         {isScanning && (
           <View style={styles.infoContainer}>
-            <Text style={styles.instructionText}>QR kodu kamera görüş alanına yerleştirin</Text>
-            <Text style={styles.cameraInfoText}>📱 Kamera: {device.position === 'front' ? 'Ön' : 'Arka'}</Text>
+            <Text style={styles.instructionText}>
+              QR kodu kamera görüş alanına yerleştirin
+            </Text>
+            <Text style={styles.cameraInfoText}>
+              📱 Kamera: {device.position === 'front' ? 'Ön' : 'Arka'}
+            </Text>
           </View>
         )}
       </View>
@@ -250,7 +294,14 @@ export default function QrScannerScreen({ navigation }) {
             <Text style={styles.resultTitle}>{patientInfo.title}</Text>
 
             <View style={{ marginTop: 16 }}>
-              <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 8 }}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  color: '#333',
+                  marginBottom: 8,
+                }}
+              >
                 Sonuç:
               </Text>
 
@@ -268,7 +319,10 @@ export default function QrScannerScreen({ navigation }) {
                     }}
                   >
                     {Object.entries(item).map(([key, value]) => {
-                      if (key.toLowerCase() === 'imageurl' && typeof value === 'string') {
+                      if (
+                        key.toLowerCase() === 'imageurl' &&
+                        typeof value === 'string'
+                      ) {
                         return (
                           <Pressable
                             key={key}
@@ -279,15 +333,29 @@ export default function QrScannerScreen({ navigation }) {
                           >
                             <Image
                               source={{ uri: value }}
-                              style={{ width: 150, height: 150, marginBottom: 8, borderRadius: 8 }}
+                              style={{
+                                width: 150,
+                                height: 150,
+                                marginBottom: 8,
+                                borderRadius: 8,
+                              }}
                               resizeMode="contain"
                             />
                           </Pressable>
                         );
                       }
                       return (
-                        <Text key={key} style={{ fontSize: 14, marginBottom: 4, color: '#444' }}>
-                          <Text style={{ fontWeight: 'bold' }}>{capitalize(key)}: </Text>
+                        <Text
+                          key={key}
+                          style={{
+                            fontSize: 14,
+                            marginBottom: 4,
+                            color: '#444',
+                          }}
+                        >
+                          <Text style={{ fontWeight: 'bold' }}>
+                            {capitalize(key)}:{' '}
+                          </Text>
                           {String(value)}
                         </Text>
                       );
@@ -306,7 +374,10 @@ export default function QrScannerScreen({ navigation }) {
                   }}
                 >
                   {Object.entries(patientInfo.result).map(([key, value]) => {
-                    if (key.toLowerCase() === 'imageurl' && typeof value === 'string') {
+                    if (
+                      key.toLowerCase() === 'imageurl' &&
+                      typeof value === 'string'
+                    ) {
                       return (
                         <Pressable
                           key={key}
@@ -317,15 +388,25 @@ export default function QrScannerScreen({ navigation }) {
                         >
                           <Image
                             source={{ uri: value }}
-                            style={{ width: 150, height: 150, marginBottom: 8, borderRadius: 8 }}
+                            style={{
+                              width: 150,
+                              height: 150,
+                              marginBottom: 8,
+                              borderRadius: 8,
+                            }}
                             resizeMode="contain"
                           />
                         </Pressable>
                       );
                     }
                     return (
-                      <Text key={key} style={{ fontSize: 14, marginBottom: 4, color: '#444' }}>
-                        <Text style={{ fontWeight: 'bold' }}>{capitalize(key)}: </Text>
+                      <Text
+                        key={key}
+                        style={{ fontSize: 14, marginBottom: 4, color: '#444' }}
+                      >
+                        <Text style={{ fontWeight: 'bold' }}>
+                          {capitalize(key)}:{' '}
+                        </Text>
                         {String(value)}
                       </Text>
                     );

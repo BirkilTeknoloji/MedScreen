@@ -45,6 +45,16 @@ export async function sendRfidToBackend(tagId) {
         console.log('✅ Token bulundu, hafızaya kaydediliyor:', token.substring(0, 10) + '...');
         await AsyncStorage.setItem('userToken', token);
         await AsyncStorage.setItem('userInfo', JSON.stringify(user));
+
+        // Persist user roles separately for quick checks in the UI
+        // Backend may provide roles as `roles` (array) or `role` (single string)
+        try {
+          const roles = user.roles || (user.role ? [user.role] : []);
+          await AsyncStorage.setItem('userRoles', JSON.stringify(roles));
+          console.log('User roles saved:', roles);
+        } catch (e) {
+          console.warn('Could not persist user roles:', e);
+        }
         
         // Device MAC'i AsyncStorage'a kaydet (QR token atama için)
         if (user.id) {

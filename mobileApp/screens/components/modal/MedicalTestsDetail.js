@@ -8,12 +8,14 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import styles from './styles/DetailModalStyle';
+import styles from '../styles/DetailModalStyle';
+import UserCard from '../UserCard';
+import InfoRow from '../InfoRow';
 
 const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
   if (!visible || !medicalTest) return null;
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return 'Tarih belirtilmemiş';
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
@@ -44,54 +46,73 @@ const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <Text style={styles.sectionTitle}>Tetkik Bilgileri</Text>
 
-            <InfoRow
-              icon="test-tube"
-              label="Tetkik Adı"
-              value={medicalTest.test_name || 'Belirtilmemiş'}
-            />
-
-            <InfoRow
-              icon="medical-bag"
-              label="Tetkik Türü"
-              value={medicalTest.test_type || 'Belirtilmemiş'}
-            />
-
-            <InfoRow
-              icon="calendar-blank-outline"
-              label="İstenme Tarihi"
-              value={formatDate(medicalTest.ordered_date)}
-            />
-
-            {medicalTest.scheduled_date && (
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+              }}
+            >
               <InfoRow
-                icon="calendar-clock"
-                label="Planlanan Tarih"
-                value={formatDate(medicalTest.scheduled_date)}
+                style={{ width: '48%' }}
+                icon="test-tube"
+                label="Tetkik Adı"
+                value={medicalTest.test_name || 'Belirtilmemiş'}
               />
-            )}
 
-            {medicalTest.completed_date && (
               <InfoRow
-                icon="calendar-check"
-                label="Tamamlanma Tarihi"
-                value={formatDate(medicalTest.completed_date)}
+                style={{ width: '48%' }}
+                icon="medical-bag"
+                label="Tetkik Türü"
+                value={medicalTest.test_type || 'Belirtilmemiş'}
               />
-            )}
 
-            {medicalTest.lab_name && (
               <InfoRow
-                icon="hospital-building"
-                label="Laboratuvar"
-                value={medicalTest.lab_name}
+                style={{ width: '48%' }}
+                icon="calendar-blank-outline"
+                label="İstenme Tarihi"
+                value={formatDate(medicalTest.ordered_date)}
               />
-            )}
+
+              {medicalTest.scheduled_date && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="calendar-clock"
+                  label="Planlanan Tarih"
+                  value={formatDate(medicalTest.scheduled_date)}
+                />
+              )}
+
+              {medicalTest.completed_date && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="calendar-check"
+                  label="Tamamlanma Tarihi"
+                  value={formatDate(medicalTest.completed_date)}
+                />
+              )}
+
+              {medicalTest.lab_name && (
+                <InfoRow
+                  style={{ width: '100%' }}
+                  icon="hospital-building"
+                  label="Laboratuvar"
+                  value={medicalTest.lab_name}
+                />
+              )}
+            </View>
 
             {medicalTest.results && (
               <View style={styles.notesSection}>
                 <View style={styles.divider} />
                 <Text style={styles.sectionTitle}>Sonuçlar</Text>
                 <View style={styles.notesContainer}>
-                  <Icon name="clipboard-text" size={20} color="#059669" style={styles.notesIcon} />
+                  <Icon
+                    name="clipboard-text"
+                    size={20}
+                    color="#059669"
+                    style={styles.notesIcon}
+                  />
                   <Text style={styles.notesText}>{medicalTest.results}</Text>
                 </View>
               </View>
@@ -102,7 +123,12 @@ const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
                 <View style={styles.divider} />
                 <Text style={styles.sectionTitle}>Notlar</Text>
                 <View style={styles.notesContainer}>
-                  <Icon name="note-text" size={20} color="#2563EB" style={styles.notesIcon} />
+                  <Icon
+                    name="note-text"
+                    size={20}
+                    color="#2563EB"
+                    style={styles.notesIcon}
+                  />
                   <Text style={styles.notesText}>{medicalTest.notes}</Text>
                 </View>
               </View>
@@ -130,33 +156,4 @@ const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
     </Modal>
   );
 };
-
-const InfoRow = ({ icon, label, value, isLast }) => (
-  <View style={[styles.infoRow, isLast && { marginBottom: 0 }]}>
-    <View style={styles.iconContainer}>
-      <Icon name={icon} size={20} color="#2563EB" />
-    </View>
-    <View style={styles.infoTextContainer}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
-  </View>
-);
-
-const UserCard = ({ icon, name, role }) => (
-  <View style={styles.userCard}>
-    <View style={styles.iconAvatar}>
-      <Icon name={icon} size={24} color="#2563EB" />
-    </View>
-    <View style={styles.userInfo}>
-      <Text style={styles.userName}>{name}</Text>
-      <Text style={styles.userRole}>{role}</Text>
-    </View>
-  </View>
-);
-
-
-
-
-
 export default MedicalTestsDetail;

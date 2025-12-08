@@ -8,11 +8,13 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import styles from './styles/DetailModalStyle';
+import styles from '../styles/DetailModalStyle';
+import UserCard from '../UserCard';
+import InfoRow from '../InfoRow';
 const MedicalHistoryDetail = ({ visible, medicalHistory, onClose }) => {
   if (!visible || !medicalHistory) return null;
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return 'Tarih belirtilmemiş';
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
@@ -43,59 +45,83 @@ const MedicalHistoryDetail = ({ visible, medicalHistory, onClose }) => {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <Text style={styles.sectionTitle}>Geçmiş Bilgileri</Text>
 
-            <InfoRow
-              icon="medical-bag"
-              label="Durum/Hastalık"
-              value={medicalHistory.condition_name || 'Belirtilmemiş'}
-            />
-
-            <InfoRow
-              icon="calendar-blank-outline"
-              label="Tanı Tarihi"
-              value={formatDate(medicalHistory.diagnosed_date)}
-            />
-
-            {medicalHistory.treatment && (
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+              }}
+            >
               <InfoRow
-                icon="pill"
-                label="Tedavi"
-                value={medicalHistory.treatment}
+                style={{ width: '48%' }}
+                icon="medical-bag"
+                label="Durum/Hastalık"
+                value={medicalHistory.condition_name || 'Belirtilmemiş'}
               />
-            )}
 
-            {medicalHistory.severity && (
               <InfoRow
-                icon="alert-circle-outline"
-                label="Şiddet"
-                value={medicalHistory.severity}
+                style={{ width: '48%' }}
+                icon="calendar-blank-outline"
+                label="Tanı Tarihi"
+                value={formatDate(medicalHistory.diagnosed_date)}
               />
-            )}
 
-            {medicalHistory.outcome && (
-              <InfoRow
-                icon="check-circle-outline"
-                label="Sonuç"
-                value={medicalHistory.outcome}
-              />
-            )}
+              {medicalHistory.treatment && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="pill"
+                  label="Tedavi"
+                  value={medicalHistory.treatment}
+                />
+              )}
+
+              {medicalHistory.severity && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="alert-circle-outline"
+                  label="Şiddet"
+                  value={medicalHistory.severity}
+                />
+              )}
+
+              {medicalHistory.outcome && (
+                <InfoRow
+                  style={{ width: '100%' }}
+                  icon="check-circle-outline"
+                  label="Sonuç"
+                  value={medicalHistory.outcome}
+                />
+              )}
+            </View>
 
             {medicalHistory.family_history && (
               <View style={styles.notesSection}>
                 <View style={styles.divider} />
                 <Text style={styles.sectionTitle}>Aile Geçmişi</Text>
                 <View style={styles.notesContainer}>
-                  <Icon name="account-group" size={20} color="#7C3AED" style={styles.notesIcon} />
-                  <Text style={styles.notesText}>{medicalHistory.family_history}</Text>
+                  <Icon
+                    name="account-group"
+                    size={20}
+                    color="#7C3AED"
+                    style={styles.notesIcon}
+                  />
+                  <Text style={styles.notesText}>
+                    {medicalHistory.family_history}
+                  </Text>
                 </View>
               </View>
             )}
-
             {medicalHistory.notes && (
               <View style={styles.notesSection}>
                 <View style={styles.divider} />
                 <Text style={styles.sectionTitle}>Notlar</Text>
                 <View style={styles.notesContainer}>
-                  <Icon name="note-text" size={20} color="#2563EB" style={styles.notesIcon} />
+                  <Icon
+                    name="note-text"
+                    size={20}
+                    color="#2563EB"
+                    style={styles.notesIcon}
+                  />
                   <Text style={styles.notesText}>{medicalHistory.notes}</Text>
                 </View>
               </View>
@@ -123,29 +149,5 @@ const MedicalHistoryDetail = ({ visible, medicalHistory, onClose }) => {
     </Modal>
   );
 };
-
-const InfoRow = ({ icon, label, value, isLast }) => (
-  <View style={[styles.infoRow, isLast && { marginBottom: 0 }]}>
-    <View style={styles.iconContainer}>
-      <Icon name={icon} size={20} color="#2563EB" />
-    </View>
-    <View style={styles.infoTextContainer}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
-  </View>
-);
-
-const UserCard = ({ icon, name, role }) => (
-  <View style={styles.userCard}>
-    <View style={styles.iconAvatar}>
-      <Icon name={icon} size={24} color="#2563EB" />
-    </View>
-    <View style={styles.userInfo}>
-      <Text style={styles.userName}>{name}</Text>
-      <Text style={styles.userRole}>{role}</Text>
-    </View>
-  </View>
-);
 
 export default MedicalHistoryDetail;

@@ -8,11 +8,13 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import styles from './styles/DetailModalStyle';
+import styles from '../styles/DetailModalStyle';
+import UserCard from '../UserCard';
+import InfoRow from '../InfoRow';
 const DiagnosesDetail = ({ visible, diagnosis, onClose }) => {
   if (!visible || !diagnosis) return null;
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return 'Tarih belirtilmemiş';
     return new Date(dateString).toLocaleDateString('tr-TR');
   };
@@ -43,48 +45,68 @@ const DiagnosesDetail = ({ visible, diagnosis, onClose }) => {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <Text style={styles.sectionTitle}>Tanı Bilgileri</Text>
 
-            <InfoRow
-              icon="medical-bag"
-              label="Tanı Adı"
-              value={diagnosis.diagnosis_name || diagnosis.name || 'Belirtilmemiş'}
-            />
-
-            <InfoRow
-              icon="calendar-blank-outline"
-              label="Tanı Tarihi"
-              value={formatDate(diagnosis.diagnosis_date || diagnosis.date)}
-            />
-
-            {diagnosis.icd_code && (
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+              }}
+            >
               <InfoRow
-                icon="barcode"
-                label="ICD Kodu"
-                value={diagnosis.icd_code}
+                style={{ width: '48%' }}
+                icon="medical-bag"
+                label="Tanı Adı"
+                value={
+                  diagnosis.diagnosis_name || diagnosis.name || 'Belirtilmemiş'
+                }
               />
-            )}
 
-            {diagnosis.description && (
               <InfoRow
-                icon="text-subject"
-                label="Açıklama"
-                value={diagnosis.description}
+                style={{ width: '48%' }}
+                icon="calendar-blank-outline"
+                label="Tanı Tarihi"
+                value={formatDate(diagnosis.diagnosis_date || diagnosis.date)}
               />
-            )}
 
-            {diagnosis.severity && (
-              <InfoRow
-                icon="alert-circle-outline"
-                label="Şiddet"
-                value={diagnosis.severity}
-              />
-            )}
+              {diagnosis.icd_code && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="barcode"
+                  label="ICD Kodu"
+                  value={diagnosis.icd_code}
+                />
+              )}
+
+              {diagnosis.severity && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="alert-circle-outline"
+                  label="Şiddet"
+                  value={diagnosis.severity}
+                />
+              )}
+
+              {diagnosis.description && (
+                <InfoRow
+                  style={{ width: '100%' }}
+                  icon="text-subject"
+                  label="Açıklama"
+                  value={diagnosis.description}
+                />
+              )}
+            </View>
 
             {diagnosis.notes && (
               <View style={styles.notesSection}>
                 <View style={styles.divider} />
                 <Text style={styles.sectionTitle}>Notlar</Text>
                 <View style={styles.notesContainer}>
-                  <Icon name="note-text" size={20} color="#2563EB" style={styles.notesIcon} />
+                  <Icon
+                    name="note-text"
+                    size={20}
+                    color="#2563EB"
+                    style={styles.notesIcon}
+                  />
                   <Text style={styles.notesText}>{diagnosis.notes}</Text>
                 </View>
               </View>
@@ -112,32 +134,5 @@ const DiagnosesDetail = ({ visible, diagnosis, onClose }) => {
     </Modal>
   );
 };
-
-const InfoRow = ({ icon, label, value, isLast }) => (
-  <View style={[styles.infoRow, isLast && { marginBottom: 0 }]}>
-    <View style={styles.iconContainer}>
-      <Icon name={icon} size={20} color="#2563EB" />
-    </View>
-    <View style={styles.infoTextContainer}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
-  </View>
-);
-
-const UserCard = ({ icon, name, role }) => (
-  <View style={styles.userCard}>
-    <View style={styles.iconAvatar}>
-      <Icon name={icon} size={24} color="#2563EB" />
-    </View>
-    <View style={styles.userInfo}>
-      <Text style={styles.userName}>{name}</Text>
-      <Text style={styles.userRole}>{role}</Text>
-    </View>
-  </View>
-);
-
-
-
 
 export default DiagnosesDetail;

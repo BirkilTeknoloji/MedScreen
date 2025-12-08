@@ -2,6 +2,45 @@ import { BASE_API_URL } from '@env';
 import DeviceInfo from 'react-native-device-info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// --- Auth / Role helpers ---
+// getUserInfo: returns parsed userInfo object from AsyncStorage or null
+export const getUserInfo = async () => {
+  try {
+    const raw = await AsyncStorage.getItem('userInfo');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('getUserInfo error:', e);
+    return null;
+  }
+};
+
+// getUserRoles: returns array of role strings (may be empty)
+export const getUserRoles = async () => {
+  try {
+    const raw = await AsyncStorage.getItem('userRoles');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [parsed];
+  } catch (e) {
+    console.error('getUserRoles error:', e);
+    return [];
+  }
+};
+
+// hasRole: checks if current user has one of the required roles
+export const hasRole = async (requiredRoles) => {
+  try {
+    if (!requiredRoles) return false;
+    const roles = await getUserRoles();
+    const required = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+    return required.some(r => roles.includes(r));
+  } catch (e) {
+    console.error('hasRole error:', e);
+    return false;
+  }
+};
+
 export const addPatient = async userId => {
   try {
     const deviceId = DeviceInfo.getUniqueIdSync();
