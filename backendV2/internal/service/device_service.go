@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -26,13 +27,13 @@ func NewDeviceService(deviceRepo repository.DeviceRepository, patientRepo reposi
 	}
 }
 
-func (s *deviceService) RegisterDevice(device *models.Device) error {
+func (s *deviceService) RegisterDevice(ctx context.Context, device *models.Device) error {
 	// Check if device already exists
 	existingDevice, _ := s.deviceRepo.GetByMAC(device.MACAddress)
 	if existingDevice != nil {
 		return errors.New("device with this mac address already exists")
 	}
-	return s.deviceRepo.Create(device)
+	return s.deviceRepo.Create(ctx, device)
 }
 
 func (s *deviceService) GetDeviceByMAC(mac string) (*models.Device, error) {
@@ -47,7 +48,7 @@ func (s *deviceService) GetAllDevices(page, limit int) ([]models.Device, int64, 
 	return s.deviceRepo.FindAll(page, limit)
 }
 
-func (s *deviceService) AssignPatient(mac string, patientID uint) error {
+func (s *deviceService) AssignPatient(ctx context.Context, mac string, patientID uint) error {
 	device, err := s.deviceRepo.GetByMAC(mac)
 	if err != nil {
 		return err
@@ -67,10 +68,10 @@ func (s *deviceService) AssignPatient(mac string, patientID uint) error {
 
 	device.PatientID = &patientID
 	device.Patient = nil // Clear loaded association to avoid GORM issues
-	return s.deviceRepo.Update(device)
+	return s.deviceRepo.Update(ctx, device)
 }
 
-func (s *deviceService) UnassignPatient(mac string) error {
+func (s *deviceService) UnassignPatient(ctx context.Context, mac string) error {
 	device, err := s.deviceRepo.GetByMAC(mac)
 	if err != nil {
 		return err
@@ -81,10 +82,10 @@ func (s *deviceService) UnassignPatient(mac string) error {
 
 	device.PatientID = nil
 	device.Patient = nil // Clear loaded association to avoid GORM issues
-	return s.deviceRepo.Update(device)
+	return s.deviceRepo.Update(ctx, device)
 }
 
-func (s *deviceService) UpdateDevice(mac string, updates *DeviceUpdateRequest) (*models.Device, error) {
+func (s *deviceService) UpdateDevice(ctx context.Context, mac string, updates *DeviceUpdateRequest) (*models.Device, error) {
 	device, err := s.deviceRepo.GetByMAC(mac)
 	if err != nil {
 		return nil, err
@@ -104,15 +105,15 @@ func (s *deviceService) UpdateDevice(mac string, updates *DeviceUpdateRequest) (
 		device.IsActive = *updates.IsActive
 	}
 
-	if err := s.deviceRepo.Update(device); err != nil {
+	if err := s.deviceRepo.Update(ctx, device); err != nil {
 		return nil, err
 	}
 
 	return device, nil
 }
 
-func (s *deviceService) DeleteDevice(mac string) error {
-	return s.deviceRepo.DeleteByMAC(mac)
+func (s *deviceService) DeleteDevice(ctx context.Context, mac string) error {
+	return s.deviceRepo.DeleteByMAC(ctx, mac)
 }
 
 func (s *deviceService) GetDevicesByFilters(roomNumber *string, patientID *uint, page, limit int) ([]models.Device, int64, error) {

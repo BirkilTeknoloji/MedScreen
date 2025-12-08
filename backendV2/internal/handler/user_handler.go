@@ -29,7 +29,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateUser(&user); err != nil {
+	if err := h.service.CreateUser(c.Request.Context(), &user); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_USER_CREATE_FAILED, "Failed to create user", err)
 		return
 	}
@@ -96,7 +96,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateUser(uint(id), &user); err != nil {
+	if err := h.service.UpdateUser(c.Request.Context(), uint(id), &user); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_USER_UPDATE_FAILED, "Failed to update user", err)
 		return
 	}
@@ -112,7 +112,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteUser(uint(id)); err != nil {
+	if err := h.service.DeleteUser(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_USER_DELETE_FAILED, "Failed to delete user", err)
 		return
 	}

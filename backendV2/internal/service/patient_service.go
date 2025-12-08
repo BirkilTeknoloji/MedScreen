@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -44,7 +45,7 @@ func NewPatientService(
 }
 
 // CreatePatient creates a new patient with validation
-func (s *patientService) CreatePatient(patient *models.Patient) error {
+func (s *patientService) CreatePatient(ctx context.Context, patient *models.Patient) error {
 	if patient == nil {
 		return errors.New("patient cannot be nil")
 	}
@@ -79,7 +80,7 @@ func (s *patientService) CreatePatient(patient *models.Patient) error {
 		return err
 	}
 
-	return s.patientRepo.Create(patient)
+	return s.patientRepo.Create(ctx, patient)
 }
 
 // GetPatient retrieves a patient by ID
@@ -112,7 +113,7 @@ func (s *patientService) GetPatients(page, limit int) ([]models.Patient, int64, 
 }
 
 // UpdatePatient updates an existing patient with validation
-func (s *patientService) UpdatePatient(id uint, patient *models.Patient) error {
+func (s *patientService) UpdatePatient(ctx context.Context, id uint, patient *models.Patient) error {
 	if id == 0 {
 		return errors.New("invalid patient id")
 	}
@@ -154,11 +155,11 @@ func (s *patientService) UpdatePatient(id uint, patient *models.Patient) error {
 	// Set the ID to ensure we're updating the correct record
 	patient.ID = id
 
-	return s.patientRepo.Update(patient)
+	return s.patientRepo.Update(ctx, patient)
 }
 
 // DeletePatient soft deletes a patient
-func (s *patientService) DeletePatient(id uint) error {
+func (s *patientService) DeletePatient(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid patient id")
 	}
@@ -172,7 +173,7 @@ func (s *patientService) DeletePatient(id uint) error {
 		return errors.New("patient not found")
 	}
 
-	return s.patientRepo.Delete(id)
+	return s.patientRepo.Delete(ctx, id)
 }
 
 // GetPatientByTCNumber retrieves a patient by TC number

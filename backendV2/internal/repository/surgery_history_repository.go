@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 	"time"
 
@@ -17,8 +18,8 @@ func NewSurgeryHistoryRepository(db *gorm.DB) SurgeryHistoryRepository {
 }
 
 // Create creates a new surgery history entry in the database
-func (r *surgeryHistoryRepository) Create(surgery *models.SurgeryHistory) error {
-	return r.db.Create(surgery).Error
+func (r *surgeryHistoryRepository) Create(ctx context.Context, surgery *models.SurgeryHistory) error {
+	return r.db.WithContext(ctx).Create(surgery).Error
 }
 
 // FindByID retrieves a surgery history entry by ID with preloaded relationships
@@ -55,13 +56,13 @@ func (r *surgeryHistoryRepository) FindAll(page, limit int) ([]models.SurgeryHis
 }
 
 // Update updates an existing surgery history entry
-func (r *surgeryHistoryRepository) Update(surgery *models.SurgeryHistory) error {
-	return r.db.Save(surgery).Error
+func (r *surgeryHistoryRepository) Update(ctx context.Context, surgery *models.SurgeryHistory) error {
+	return r.db.WithContext(ctx).Save(surgery).Error
 }
 
 // Delete soft deletes a surgery history entry by ID
-func (r *surgeryHistoryRepository) Delete(id uint) error {
-	return r.db.Delete(&models.SurgeryHistory{}, id).Error
+func (r *surgeryHistoryRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.SurgeryHistory{}, id).Error
 }
 
 // FindByPatientID retrieves surgery history entries by patient ID with pagination

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -17,7 +18,7 @@ func NewDiagnosisService(repo repository.DiagnosisRepository) DiagnosisService {
 }
 
 // CreateDiagnosis creates a new diagnosis with validation
-func (s *diagnosisService) CreateDiagnosis(diagnosis *models.Diagnosis) error {
+func (s *diagnosisService) CreateDiagnosis(ctx context.Context, diagnosis *models.Diagnosis) error {
 	if diagnosis == nil {
 		return errors.New("diagnosis cannot be nil")
 	}
@@ -46,7 +47,7 @@ func (s *diagnosisService) CreateDiagnosis(diagnosis *models.Diagnosis) error {
 		return err
 	}
 
-	return s.repo.Create(diagnosis)
+	return s.repo.Create(ctx, diagnosis)
 }
 
 // GetDiagnosis retrieves a diagnosis by ID
@@ -79,7 +80,7 @@ func (s *diagnosisService) GetDiagnoses(page, limit int) ([]models.Diagnosis, in
 }
 
 // UpdateDiagnosis updates an existing diagnosis with validation
-func (s *diagnosisService) UpdateDiagnosis(id uint, diagnosis *models.Diagnosis) error {
+func (s *diagnosisService) UpdateDiagnosis(ctx context.Context, id uint, diagnosis *models.Diagnosis) error {
 	if id == 0 {
 		return errors.New("invalid diagnosis id")
 	}
@@ -113,11 +114,11 @@ func (s *diagnosisService) UpdateDiagnosis(id uint, diagnosis *models.Diagnosis)
 	// Set the ID to ensure we're updating the correct record
 	diagnosis.ID = id
 
-	return s.repo.Update(diagnosis)
+	return s.repo.Update(ctx, diagnosis)
 }
 
 // DeleteDiagnosis soft deletes a diagnosis
-func (s *diagnosisService) DeleteDiagnosis(id uint) error {
+func (s *diagnosisService) DeleteDiagnosis(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid diagnosis id")
 	}
@@ -131,7 +132,7 @@ func (s *diagnosisService) DeleteDiagnosis(id uint) error {
 		return errors.New("diagnosis not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // GetDiagnosesByFilters retrieves diagnoses with filters

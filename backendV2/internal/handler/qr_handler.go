@@ -61,7 +61,7 @@ func (h *QRHandler) GeneratePatientQR(c *gin.Context) {
 		return
 	}
 
-	token, qrImage, err := h.qrService.GeneratePatientAssignmentQR(uint(patientID), request.ExpiryHours)
+	token, qrImage, err := h.qrService.GeneratePatientAssignmentQR(c.Request.Context(), uint(patientID), request.ExpiryHours)
 	if err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to generate QR code", err)
 		return
@@ -91,7 +91,7 @@ func (h *QRHandler) ScanPatientQR(c *gin.Context) {
 		return
 	}
 
-	err := h.qrService.AssignPatientToDevice(request.Token, macAddress)
+	err := h.qrService.AssignPatientToDevice(c.Request.Context(), request.Token, macAddress)
 	if err != nil {
 		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INTERNAL_SERVER, err.Error(), err)
 		return
@@ -127,7 +127,7 @@ func (h *QRHandler) GeneratePrescriptionQR(c *gin.Context) {
 		return
 	}
 
-	token, qrImage, err := h.qrService.GeneratePrescriptionInfoQR(uint(patientID), device.ID, request.ExpiryHours)
+	token, qrImage, err := h.qrService.GeneratePrescriptionInfoQR(c.Request.Context(), uint(patientID), device.ID, request.ExpiryHours)
 	if err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to generate QR code", err)
 		return

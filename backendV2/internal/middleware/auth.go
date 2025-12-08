@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"medscreen/internal/database"
 	"medscreen/internal/models"
 	"medscreen/internal/utils"
 	"net/http"
@@ -27,6 +28,11 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		c.Set("userID", userID)
 		c.Set("userRole", role)
+
+		// Add audit info to context
+		ctx := database.WithAuditContext(c.Request.Context(), &userID, c.ClientIP(), c.Request.UserAgent())
+		c.Request = c.Request.WithContext(ctx)
+
 		c.Next()
 	}
 }

@@ -30,7 +30,7 @@ func (h *VitalSignHandler) CreateVitalSign(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateVitalSign(&vitalSign); err != nil {
+	if err := h.service.CreateVitalSign(c.Request.Context(), &vitalSign); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_VITAL_SIGN_CREATE_FAILED, "Failed to create vital sign", err)
 		return
 	}
@@ -135,7 +135,7 @@ func (h *VitalSignHandler) UpdateVitalSign(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateVitalSign(uint(id), &vitalSign); err != nil {
+	if err := h.service.UpdateVitalSign(c.Request.Context(), uint(id), &vitalSign); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_VITAL_SIGN_UPDATE_FAILED, "Failed to update vital sign", err)
 		return
 	}
@@ -151,7 +151,7 @@ func (h *VitalSignHandler) DeleteVitalSign(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteVitalSign(uint(id)); err != nil {
+	if err := h.service.DeleteVitalSign(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_VITAL_SIGN_DELETE_FAILED, "Failed to delete vital sign", err)
 		return
 	}

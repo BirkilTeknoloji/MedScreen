@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -17,7 +18,7 @@ func NewSurgeryHistoryService(repo repository.SurgeryHistoryRepository) SurgeryH
 }
 
 // CreateSurgeryHistory creates a new surgery history entry with validation
-func (s *surgeryHistoryService) CreateSurgeryHistory(surgery *models.SurgeryHistory) error {
+func (s *surgeryHistoryService) CreateSurgeryHistory(ctx context.Context, surgery *models.SurgeryHistory) error {
 	if surgery == nil {
 		return errors.New("surgery history cannot be nil")
 	}
@@ -41,7 +42,7 @@ func (s *surgeryHistoryService) CreateSurgeryHistory(surgery *models.SurgeryHist
 		return errors.New("surgery_date cannot be in the future")
 	}
 
-	return s.repo.Create(surgery)
+	return s.repo.Create(ctx, surgery)
 }
 
 // GetSurgeryHistory retrieves a surgery history entry by ID
@@ -74,7 +75,7 @@ func (s *surgeryHistoryService) GetSurgeryHistories(page, limit int) ([]models.S
 }
 
 // UpdateSurgeryHistory updates an existing surgery history entry with validation
-func (s *surgeryHistoryService) UpdateSurgeryHistory(id uint, surgery *models.SurgeryHistory) error {
+func (s *surgeryHistoryService) UpdateSurgeryHistory(ctx context.Context, id uint, surgery *models.SurgeryHistory) error {
 	if id == 0 {
 		return errors.New("invalid surgery history id")
 	}
@@ -99,11 +100,11 @@ func (s *surgeryHistoryService) UpdateSurgeryHistory(id uint, surgery *models.Su
 	// Set the ID to ensure we're updating the correct record
 	surgery.ID = id
 
-	return s.repo.Update(surgery)
+	return s.repo.Update(ctx, surgery)
 }
 
 // DeleteSurgeryHistory soft deletes a surgery history entry
-func (s *surgeryHistoryService) DeleteSurgeryHistory(id uint) error {
+func (s *surgeryHistoryService) DeleteSurgeryHistory(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid surgery history id")
 	}
@@ -117,7 +118,7 @@ func (s *surgeryHistoryService) DeleteSurgeryHistory(id uint) error {
 		return errors.New("surgery history not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // GetSurgeryHistoriesByFilters retrieves surgery history entries with filters

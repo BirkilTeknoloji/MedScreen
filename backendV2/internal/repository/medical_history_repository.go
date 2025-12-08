@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 
 	"gorm.io/gorm"
@@ -16,8 +17,8 @@ func NewMedicalHistoryRepository(db *gorm.DB) MedicalHistoryRepository {
 }
 
 // Create creates a new medical history entry in the database
-func (r *medicalHistoryRepository) Create(history *models.MedicalHistory) error {
-	return r.db.Create(history).Error
+func (r *medicalHistoryRepository) Create(ctx context.Context, history *models.MedicalHistory) error {
+	return r.db.WithContext(ctx).Create(history).Error
 }
 
 // FindByID retrieves a medical history entry by ID with preloaded relationships
@@ -54,13 +55,13 @@ func (r *medicalHistoryRepository) FindAll(page, limit int) ([]models.MedicalHis
 }
 
 // Update updates an existing medical history entry
-func (r *medicalHistoryRepository) Update(history *models.MedicalHistory) error {
-	return r.db.Save(history).Error
+func (r *medicalHistoryRepository) Update(ctx context.Context, history *models.MedicalHistory) error {
+	return r.db.WithContext(ctx).Save(history).Error
 }
 
 // Delete soft deletes a medical history entry by ID
-func (r *medicalHistoryRepository) Delete(id uint) error {
-	return r.db.Delete(&models.MedicalHistory{}, id).Error
+func (r *medicalHistoryRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.MedicalHistory{}, id).Error
 }
 
 // FindByPatientID retrieves medical history entries by patient ID with pagination

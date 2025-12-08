@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 
 	"gorm.io/gorm"
@@ -16,8 +17,8 @@ func NewNFCCardRepository(db *gorm.DB) NFCCardRepository {
 }
 
 // Create creates a new NFC card in the database
-func (r *nfcCardRepository) Create(card *models.NFCCard) error {
-	return r.db.Create(card).Error
+func (r *nfcCardRepository) Create(ctx context.Context, card *models.NFCCard) error {
+	return r.db.WithContext(ctx).Create(card).Error
 }
 
 // FindByID retrieves an NFC card by ID with preloaded relationships
@@ -54,13 +55,13 @@ func (r *nfcCardRepository) FindAll(page, limit int) ([]models.NFCCard, int64, e
 }
 
 // Update updates an existing NFC card
-func (r *nfcCardRepository) Update(card *models.NFCCard) error {
-	return r.db.Save(card).Error
+func (r *nfcCardRepository) Update(ctx context.Context, card *models.NFCCard) error {
+	return r.db.WithContext(ctx).Save(card).Error
 }
 
 // Delete deletes an NFC card by ID (hard delete since NFCCard doesn't use gorm.Model)
-func (r *nfcCardRepository) Delete(id uint) error {
-	return r.db.Delete(&models.NFCCard{}, id).Error
+func (r *nfcCardRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.NFCCard{}, id).Error
 }
 
 // FindByCardUID retrieves an NFC card by card UID with preloaded relationships

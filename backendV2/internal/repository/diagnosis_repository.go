@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 	"time"
 
@@ -17,8 +18,8 @@ func NewDiagnosisRepository(db *gorm.DB) DiagnosisRepository {
 }
 
 // Create creates a new diagnosis in the database
-func (r *diagnosisRepository) Create(diagnosis *models.Diagnosis) error {
-	return r.db.Create(diagnosis).Error
+func (r *diagnosisRepository) Create(ctx context.Context, diagnosis *models.Diagnosis) error {
+	return r.db.WithContext(ctx).Create(diagnosis).Error
 }
 
 // FindByID retrieves a diagnosis by ID with preloaded relationships
@@ -55,13 +56,13 @@ func (r *diagnosisRepository) FindAll(page, limit int) ([]models.Diagnosis, int6
 }
 
 // Update updates an existing diagnosis
-func (r *diagnosisRepository) Update(diagnosis *models.Diagnosis) error {
-	return r.db.Save(diagnosis).Error
+func (r *diagnosisRepository) Update(ctx context.Context, diagnosis *models.Diagnosis) error {
+	return r.db.WithContext(ctx).Save(diagnosis).Error
 }
 
 // Delete soft deletes a diagnosis by ID
-func (r *diagnosisRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Diagnosis{}, id).Error
+func (r *diagnosisRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.Diagnosis{}, id).Error
 }
 
 // FindByPatientID retrieves diagnoses by patient ID with pagination

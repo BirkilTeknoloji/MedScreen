@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -16,7 +17,7 @@ func NewMedicalHistoryService(repo repository.MedicalHistoryRepository) MedicalH
 }
 
 // CreateMedicalHistory creates a new medical history entry with validation
-func (s *medicalHistoryService) CreateMedicalHistory(history *models.MedicalHistory) error {
+func (s *medicalHistoryService) CreateMedicalHistory(ctx context.Context, history *models.MedicalHistory) error {
 	if history == nil {
 		return errors.New("medical history cannot be nil")
 	}
@@ -40,7 +41,7 @@ func (s *medicalHistoryService) CreateMedicalHistory(history *models.MedicalHist
 		return err
 	}
 
-	return s.repo.Create(history)
+	return s.repo.Create(ctx, history)
 }
 
 // GetMedicalHistory retrieves a medical history entry by ID
@@ -73,7 +74,7 @@ func (s *medicalHistoryService) GetMedicalHistories(page, limit int) ([]models.M
 }
 
 // UpdateMedicalHistory updates an existing medical history entry with validation
-func (s *medicalHistoryService) UpdateMedicalHistory(id uint, history *models.MedicalHistory) error {
+func (s *medicalHistoryService) UpdateMedicalHistory(ctx context.Context, id uint, history *models.MedicalHistory) error {
 	if id == 0 {
 		return errors.New("invalid medical history id")
 	}
@@ -100,11 +101,11 @@ func (s *medicalHistoryService) UpdateMedicalHistory(id uint, history *models.Me
 	// Set the ID to ensure we're updating the correct record
 	history.ID = id
 
-	return s.repo.Update(history)
+	return s.repo.Update(ctx, history)
 }
 
 // DeleteMedicalHistory soft deletes a medical history entry
-func (s *medicalHistoryService) DeleteMedicalHistory(id uint) error {
+func (s *medicalHistoryService) DeleteMedicalHistory(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid medical history id")
 	}
@@ -118,7 +119,7 @@ func (s *medicalHistoryService) DeleteMedicalHistory(id uint) error {
 		return errors.New("medical history not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // GetMedicalHistoriesByFilters retrieves medical history entries with filters

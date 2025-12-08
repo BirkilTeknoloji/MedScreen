@@ -1,5 +1,6 @@
 --MedScreen projesi veritabanı test sorguları
 -- Var olan tabloları temizle
+DROP TABLE IF EXISTS audit_logs CASCADE;
 DROP TABLE IF EXISTS qr_tokens CASCADE;
 DROP TABLE IF EXISTS devices CASCADE;
 DROP TABLE IF EXISTS vital_signs CASCADE;
@@ -292,6 +293,26 @@ CREATE INDEX idx_qr_tokens_device_id ON qr_tokens(device_id);
 CREATE INDEX idx_qr_tokens_expires_at ON qr_tokens(expires_at);
 CREATE INDEX idx_qr_tokens_is_used ON qr_tokens(is_used);
 
+-- Audit Logs tablosu
+CREATE TABLE audit_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NULL,
+    action VARCHAR(50) NOT NULL,
+    entity_name VARCHAR(100) NOT NULL,
+    entity_id INTEGER NOT NULL,
+    old_values TEXT NULL,
+    new_values TEXT NULL,
+    ip_address VARCHAR(50) NULL,
+    user_agent VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX idx_audit_logs_entity_name ON audit_logs(entity_name);
+CREATE INDEX idx_audit_logs_entity_id ON audit_logs(entity_id);
+CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
+
 
 ALTER TABLE nfc_cards
     ADD CONSTRAINT fk_nfc_cards_assigned_user 
@@ -405,6 +426,10 @@ ALTER TABLE qr_tokens
     ADD CONSTRAINT fk_qr_tokens_device
     FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE SET NULL;
 
+ALTER TABLE audit_logs
+    ADD CONSTRAINT fk_audit_logs_user
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;
+
 -- Users (nfc_card_id will be updated after nfc_cards are inserted)
 INSERT INTO users (first_name, last_name, role, specialization, license_number, phone, is_active, nfc_card_id) VALUES
 ('Mehmet', 'Yilmaz', 'doctor', 'Kardiyoloji', 'DR123456', '05321234567', true, NULL),
@@ -417,10 +442,10 @@ INSERT INTO users (first_name, last_name, role, specialization, license_number, 
 -- NFC Cards
 INSERT INTO nfc_cards (card_uid, assigned_user_id, is_active, created_by_user_id, last_used_at) VALUES
 ('NFC-CARD-001-UID', 1, true, 6, NOW() - INTERVAL '2 hours'),
-('041C577A8A2190', 2, true, 6, NOW() - INTERVAL '1 day'),
+('041C577A8A2190', 6, true, 6, NOW() - INTERVAL '1 day'),
 ('NFC-CARD-003-UID', 3, true, 6, NOW() - INTERVAL '3 hours'),
 ('NFC-CARD-004-UID', 5, true, 6, NOW() - INTERVAL '30 minutes'),
-('NFC-CARD-005-UID', 6, true, 6, NOW() - INTERVAL '5 hours');
+('NFC-CARD-005-UID', 2, true, 6, NOW() - INTERVAL '5 hours');
 
 -- Update users with their nfc_card_id (foreign key)
 UPDATE users SET nfc_card_id = 1 WHERE id = 1;

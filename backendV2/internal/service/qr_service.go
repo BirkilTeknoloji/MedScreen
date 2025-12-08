@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
 	"encoding/base64"
@@ -14,10 +15,10 @@ import (
 
 // QRService defines the interface for QR code operations
 type QRService interface {
-	GeneratePatientAssignmentQR(patientID uint, expiryHours int) (string, string, error)
-	GeneratePrescriptionInfoQR(patientID uint, deviceID uint, expiryHours int) (string, string, error)
+	GeneratePatientAssignmentQR(ctx context.Context, patientID uint, expiryHours int) (string, string, error)
+	GeneratePrescriptionInfoQR(ctx context.Context, patientID uint, deviceID uint, expiryHours int) (string, string, error)
 	ValidateToken(tokenStr string) (*models.QRToken, error)
-	AssignPatientToDevice(tokenStr string, macAddress string) error
+	AssignPatientToDevice(ctx context.Context, tokenStr string, macAddress string) error
 }
 
 type qrService struct {
@@ -40,7 +41,7 @@ func NewQRService(
 }
 
 // GeneratePatientAssignmentQR generates a QR code for patient assignment
-func (s *qrService) GeneratePatientAssignmentQR(patientID uint, expiryHours int) (string, string, error) {
+func (s *qrService) GeneratePatientAssignmentQR(ctx context.Context, patientID uint, expiryHours int) (string, string, error) {
 	// Verify patient exists
 	_, err := s.patientRepo.FindByID(patientID)
 	if err != nil {
@@ -62,7 +63,7 @@ func (s *qrService) GeneratePatientAssignmentQR(patientID uint, expiryHours int)
 		IsUsed:    false,
 	}
 
-	if err := s.qrTokenRepo.Create(qrToken); err != nil {
+	if err := s.qrTokenRepo.Create(ctx, qrToken); err != nil {
 		return "", "", err
 	}
 
@@ -76,7 +77,7 @@ func (s *qrService) GeneratePatientAssignmentQR(patientID uint, expiryHours int)
 }
 
 // GeneratePrescriptionInfoQR generates a QR code for prescription information
-func (s *qrService) GeneratePrescriptionInfoQR(patientID uint, deviceID uint, expiryHours int) (string, string, error) {
+func (s *qrService) GeneratePrescriptionInfoQR(ctx context.Context, patientID uint, deviceID uint, expiryHours int) (string, string, error) {
 	// Verify patient exists
 	_, err := s.patientRepo.FindByID(patientID)
 	if err != nil {
@@ -99,7 +100,7 @@ func (s *qrService) GeneratePrescriptionInfoQR(patientID uint, deviceID uint, ex
 		IsUsed:    false,
 	}
 
-	if err := s.qrTokenRepo.Create(qrToken); err != nil {
+	if err := s.qrTokenRepo.Create(ctx, qrToken); err != nil {
 		return "", "", err
 	}
 
@@ -133,7 +134,7 @@ func (s *qrService) ValidateToken(tokenStr string) (*models.QRToken, error) {
 }
 
 // AssignPatientToDevice assigns a patient to a device using a QR token
-func (s *qrService) AssignPatientToDevice(tokenStr string, macAddress string) error {
+func (s *qrService) AssignPatientToDevice(ctx context.Context, tokenStr string, macAddress string) error {
 	// Validate token
 	qrToken, err := s.ValidateToken(tokenStr)
 	if err != nil {
@@ -156,7 +157,7 @@ func (s *qrService) AssignPatientToDevice(tokenStr string, macAddress string) er
 
 	// Assign patient to device
 	device.PatientID = &qrToken.PatientID
-	if err := s.deviceRepo.Update(device); err != nil {
+	if err := s.deviceRepo.Update(ctx, device); err != nil {
 		return err
 	}
 
@@ -164,7 +165,7 @@ func (s *qrService) AssignPatientToDevice(tokenStr string, macAddress string) er
 	now := time.Now()
 	qrToken.IsUsed = true
 	qrToken.UsedAt = &now
-	if err := s.qrTokenRepo.Update(qrToken); err != nil {
+	if err := s.qrTokenRepo.Update(ctx, qrToken); err != nil {
 		return err
 	}
 

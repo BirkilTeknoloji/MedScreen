@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 	"time"
 
@@ -17,8 +18,8 @@ func NewPrescriptionRepository(db *gorm.DB) PrescriptionRepository {
 }
 
 // Create creates a new prescription in the database
-func (r *prescriptionRepository) Create(prescription *models.Prescription) error {
-	return r.db.Create(prescription).Error
+func (r *prescriptionRepository) Create(ctx context.Context, prescription *models.Prescription) error {
+	return r.db.WithContext(ctx).Create(prescription).Error
 }
 
 // FindByID retrieves a prescription by ID with preloaded relationships
@@ -55,13 +56,13 @@ func (r *prescriptionRepository) FindAll(page, limit int) ([]models.Prescription
 }
 
 // Update updates an existing prescription
-func (r *prescriptionRepository) Update(prescription *models.Prescription) error {
-	return r.db.Save(prescription).Error
+func (r *prescriptionRepository) Update(ctx context.Context, prescription *models.Prescription) error {
+	return r.db.WithContext(ctx).Save(prescription).Error
 }
 
 // Delete soft deletes a prescription by ID
-func (r *prescriptionRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Prescription{}, id).Error
+func (r *prescriptionRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.Prescription{}, id).Error
 }
 
 // FindByPatientID retrieves prescriptions by patient ID with pagination

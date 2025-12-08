@@ -29,7 +29,7 @@ func (h *AllergyHandler) CreateAllergy(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateAllergy(&allergy); err != nil {
+	if err := h.service.CreateAllergy(c.Request.Context(), &allergy); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_ALLERGY_CREATE_FAILED, "Failed to create allergy", err)
 		return
 	}
@@ -120,7 +120,7 @@ func (h *AllergyHandler) UpdateAllergy(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateAllergy(uint(id), &allergy); err != nil {
+	if err := h.service.UpdateAllergy(c.Request.Context(), uint(id), &allergy); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_ALLERGY_UPDATE_FAILED, "Failed to update allergy", err)
 		return
 	}
@@ -136,7 +136,7 @@ func (h *AllergyHandler) DeleteAllergy(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteAllergy(uint(id)); err != nil {
+	if err := h.service.DeleteAllergy(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_ALLERGY_DELETE_FAILED, "Failed to delete allergy", err)
 		return
 	}

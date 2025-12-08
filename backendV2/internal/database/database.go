@@ -65,6 +65,9 @@ func InitDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	// Set global DB instance
 	DB = db
 
+	// Register audit log callbacks
+	RegisterAuditCallbacks(db)
+
 	return db, nil
 }
 
@@ -88,6 +91,7 @@ func RunMigrations(db *gorm.DB) error {
 		&models.VitalSign{},
 		&models.NFCCard{},
 		&models.QRToken{},
+		&models.AuditLog{},
 	)
 
 	if err != nil {

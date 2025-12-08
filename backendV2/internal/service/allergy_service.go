@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"medscreen/internal/models"
 	"medscreen/internal/repository"
@@ -16,7 +17,7 @@ func NewAllergyService(repo repository.AllergyRepository) AllergyService {
 }
 
 // CreateAllergy creates a new allergy entry with validation
-func (s *allergyService) CreateAllergy(allergy *models.Allergy) error {
+func (s *allergyService) CreateAllergy(ctx context.Context, allergy *models.Allergy) error {
 	if allergy == nil {
 		return errors.New("allergy cannot be nil")
 	}
@@ -48,7 +49,7 @@ func (s *allergyService) CreateAllergy(allergy *models.Allergy) error {
 		return err
 	}
 
-	return s.repo.Create(allergy)
+	return s.repo.Create(ctx, allergy)
 }
 
 // GetAllergy retrieves an allergy entry by ID
@@ -81,7 +82,7 @@ func (s *allergyService) GetAllergies(page, limit int) ([]models.Allergy, int64,
 }
 
 // UpdateAllergy updates an existing allergy entry with validation
-func (s *allergyService) UpdateAllergy(id uint, allergy *models.Allergy) error {
+func (s *allergyService) UpdateAllergy(ctx context.Context, id uint, allergy *models.Allergy) error {
 	if id == 0 {
 		return errors.New("invalid allergy id")
 	}
@@ -119,11 +120,11 @@ func (s *allergyService) UpdateAllergy(id uint, allergy *models.Allergy) error {
 	allergy.AddedByDoctorID = existing.AddedByDoctorID
 	allergy.PatientID = existing.PatientID
 
-	return s.repo.Update(allergy)
+	return s.repo.Update(ctx, allergy)
 }
 
 // DeleteAllergy soft deletes an allergy entry
-func (s *allergyService) DeleteAllergy(id uint) error {
+func (s *allergyService) DeleteAllergy(ctx context.Context, id uint) error {
 	if id == 0 {
 		return errors.New("invalid allergy id")
 	}
@@ -137,7 +138,7 @@ func (s *allergyService) DeleteAllergy(id uint) error {
 		return errors.New("allergy not found")
 	}
 
-	return s.repo.Delete(id)
+	return s.repo.Delete(ctx, id)
 }
 
 // GetAllergiesByFilters retrieves allergy entries with filters

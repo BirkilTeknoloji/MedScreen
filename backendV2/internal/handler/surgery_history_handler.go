@@ -30,7 +30,7 @@ func (h *SurgeryHistoryHandler) CreateSurgeryHistory(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateSurgeryHistory(&surgery); err != nil {
+	if err := h.service.CreateSurgeryHistory(c.Request.Context(), &surgery); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_SURGERY_HISTORY_CREATE_FAILED, "Failed to create surgery history", err)
 		return
 	}
@@ -128,7 +128,7 @@ func (h *SurgeryHistoryHandler) UpdateSurgeryHistory(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateSurgeryHistory(uint(id), &surgery); err != nil {
+	if err := h.service.UpdateSurgeryHistory(c.Request.Context(), uint(id), &surgery); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_SURGERY_HISTORY_UPDATE_FAILED, "Failed to update surgery history", err)
 		return
 	}
@@ -144,7 +144,7 @@ func (h *SurgeryHistoryHandler) DeleteSurgeryHistory(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteSurgeryHistory(uint(id)); err != nil {
+	if err := h.service.DeleteSurgeryHistory(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_SURGERY_HISTORY_DELETE_FAILED, "Failed to delete surgery history", err)
 		return
 	}

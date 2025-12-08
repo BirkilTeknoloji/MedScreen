@@ -30,7 +30,7 @@ func (h *MedicalTestHandler) CreateMedicalTest(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateMedicalTest(&test); err != nil {
+	if err := h.service.CreateMedicalTest(c.Request.Context(), &test); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_MEDICAL_TEST_CREATE_FAILED, "Failed to create medical test", err)
 		return
 	}
@@ -147,7 +147,7 @@ func (h *MedicalTestHandler) UpdateMedicalTest(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateMedicalTest(uint(id), &test); err != nil {
+	if err := h.service.UpdateMedicalTest(c.Request.Context(), uint(id), &test); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_MEDICAL_TEST_UPDATE_FAILED, "Failed to update medical test", err)
 		return
 	}
@@ -163,7 +163,7 @@ func (h *MedicalTestHandler) DeleteMedicalTest(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteMedicalTest(uint(id)); err != nil {
+	if err := h.service.DeleteMedicalTest(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_MEDICAL_TEST_DELETE_FAILED, "Failed to delete medical test", err)
 		return
 	}

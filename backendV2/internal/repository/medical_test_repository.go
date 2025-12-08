@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"medscreen/internal/models"
 	"time"
 
@@ -17,8 +18,8 @@ func NewMedicalTestRepository(db *gorm.DB) MedicalTestRepository {
 }
 
 // Create creates a new medical test in the database
-func (r *medicalTestRepository) Create(test *models.MedicalTest) error {
-	return r.db.Create(test).Error
+func (r *medicalTestRepository) Create(ctx context.Context, test *models.MedicalTest) error {
+	return r.db.WithContext(ctx).Create(test).Error
 }
 
 // FindByID retrieves a medical test by ID with preloaded relationships
@@ -55,13 +56,13 @@ func (r *medicalTestRepository) FindAll(page, limit int) ([]models.MedicalTest, 
 }
 
 // Update updates an existing medical test
-func (r *medicalTestRepository) Update(test *models.MedicalTest) error {
-	return r.db.Save(test).Error
+func (r *medicalTestRepository) Update(ctx context.Context, test *models.MedicalTest) error {
+	return r.db.WithContext(ctx).Save(test).Error
 }
 
 // Delete soft deletes a medical test by ID
-func (r *medicalTestRepository) Delete(id uint) error {
-	return r.db.Delete(&models.MedicalTest{}, id).Error
+func (r *medicalTestRepository) Delete(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).Delete(&models.MedicalTest{}, id).Error
 }
 
 // FindByPatientID retrieves medical tests by patient ID with pagination

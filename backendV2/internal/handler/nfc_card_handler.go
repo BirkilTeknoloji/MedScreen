@@ -33,7 +33,7 @@ func (h *NFCCardHandler) CreateCard(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreateCard(&card); err != nil {
+	if err := h.service.CreateCard(c.Request.Context(), &card); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_NFC_CARD_CREATE_FAILED, "Failed to create NFC card", err)
 		return
 	}
@@ -94,7 +94,7 @@ func (h *NFCCardHandler) UpdateCard(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdateCard(uint(id), &card); err != nil {
+	if err := h.service.UpdateCard(c.Request.Context(), uint(id), &card); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_NFC_CARD_UPDATE_FAILED, "Failed to update NFC card", err)
 		return
 	}
@@ -110,7 +110,7 @@ func (h *NFCCardHandler) DeleteCard(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeleteCard(uint(id)); err != nil {
+	if err := h.service.DeleteCard(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_NFC_CARD_DELETE_FAILED, "Failed to delete NFC card", err)
 		return
 	}
@@ -135,7 +135,7 @@ func (h *NFCCardHandler) AssignCard(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.AssignCardToUser(uint(cardID), request.UserID); err != nil {
+	if err := h.service.AssignCardToUser(c.Request.Context(), uint(cardID), request.UserID); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_CARD_ASSIGN_FAILED, "Failed to assign card to user", err)
 		return
 	}
@@ -151,7 +151,7 @@ func (h *NFCCardHandler) DeactivateCard(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeactivateCard(uint(cardID)); err != nil {
+	if err := h.service.DeactivateCard(c.Request.Context(), uint(cardID)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_CARD_DEACTIVATE_FAILED, "Failed to deactivate card", err)
 		return
 	}

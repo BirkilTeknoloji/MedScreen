@@ -59,6 +59,7 @@ func main() {
 	vitalSignRepo := repository.NewVitalSignRepository(db)
 	deviceRepo := repository.NewDeviceRepository(db)
 	qrTokenRepo := repository.NewQRTokenRepository(db)
+	auditLogRepo := repository.NewAuditLogRepository(db)
 
 	// Initialize services with repository dependencies
 	userService := service.NewUserService(userRepo)
@@ -101,6 +102,7 @@ func main() {
 		Device:         handler.NewDeviceHandler(deviceService),
 		QR:             handler.NewQRHandler(qrService, deviceService),
 		Reset:          handler.NewResetHandler(db), //TODO: prodda sil
+		AuditLog:       handler.NewAuditLogHandler(auditLogRepo),
 	}
 
 	// Set up Gin router

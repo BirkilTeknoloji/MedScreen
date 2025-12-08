@@ -30,7 +30,7 @@ func (h *PrescriptionHandler) CreatePrescription(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.CreatePrescription(&prescription); err != nil {
+	if err := h.service.CreatePrescription(c.Request.Context(), &prescription); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_PRESCRIPTION_CREATE_FAILED, "Failed to create prescription", err)
 		return
 	}
@@ -141,7 +141,7 @@ func (h *PrescriptionHandler) UpdatePrescription(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.UpdatePrescription(uint(id), &prescription); err != nil {
+	if err := h.service.UpdatePrescription(c.Request.Context(), uint(id), &prescription); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_PRESCRIPTION_UPDATE_FAILED, "Failed to update prescription", err)
 		return
 	}
@@ -157,7 +157,7 @@ func (h *PrescriptionHandler) DeletePrescription(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.DeletePrescription(uint(id)); err != nil {
+	if err := h.service.DeletePrescription(c.Request.Context(), uint(id)); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_PRESCRIPTION_DELETE_FAILED, "Failed to delete prescription", err)
 		return
 	}
