@@ -264,6 +264,50 @@ Table devices {
   }
 }
 
+Table qr_tokens {
+  id integer [primary key, increment]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null]
+  token varchar(255) [unique, not null]
+  type varchar(50) [not null]
+  patient_id integer [not null]
+  device_id integer [null]
+  expires_at timestamp [not null]
+  is_used boolean [default: false]
+  used_at timestamp [null]
+
+  indexes {
+    token
+    type
+    patient_id
+    device_id
+    expires_at
+    is_used
+  }
+}
+
+Table audit_logs {
+  id integer [primary key, increment]
+  user_id integer [null]
+  action varchar(50) [not null]
+  entity_name varchar(100) [not null]
+  entity_id integer [not null]
+  old_values text [null]
+  new_values text [null]
+  ip_address varchar(50) [null]
+  user_agent varchar(255) [null]
+  created_at timestamp [default: `now()`]
+
+  indexes {
+    user_id
+    action
+    entity_name
+    entity_id
+    created_at
+  }
+}
+
 // fk relationship
 Ref: patients.primary_doctor_id > users.id
 
@@ -301,3 +345,8 @@ Ref: vital_signs.appointment_id > appointments.id [delete: set null]
 Ref: vital_signs.recorded_by_user_id > users.id
 
 Ref: devices.patient_id > patients.id [delete: set null]
+
+Ref: qr_tokens.patient_id > patients.id [delete: cascade]
+Ref: qr_tokens.device_id > devices.id [delete: set null]
+
+Ref: audit_logs.user_id > users.id [delete: set null]
