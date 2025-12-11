@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/PatientProfileStyle';
+import UserDataCom from './UserDataCom';
 
-export default function PatientProfile({ userData }) {
+export default function PatientProfile({ userData, actionButtons }) {
   const formatDate = dateString => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -14,18 +16,47 @@ export default function PatientProfile({ userData }) {
   };
   const userBd = formatDate(userData.birth_date);
   const created = formatDate(userData.CreatedAt);
+
+  // Yaşı hesapla
+  const calculateAge = birthDate => {
+    if (!birthDate) return 'N/A';
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+  const userAge = calculateAge(userData.birth_date);
+
+  // Cinsiyete göre icon seç
+  const isFemale =
+    userData.gender?.toLowerCase() === 'female' ||
+    userData.gender?.toLowerCase() === 'kadın';
+  const genderIcon = isFemale ? 'face-woman' : 'face-man';
+  const genderColor = isFemale ? '#E91E63' : '#2196F3';
+
   return (
     <View style={styles.profil}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', gap: 24 }}>
           <View style={styles.avatarInfo}>
-            <View>
-              <Image
-                source={{
-                  uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpd4mJRIUwqgE8D_Z2znANEbtiz4GhI4M8NQ&s',
-                }}
-                style={styles.profileImage}
-              />
+            <View
+              style={[
+                styles.profileImage,
+                {
+                  backgroundColor: genderColor + '20',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}
+            >
+              <Icon name={genderIcon} size={50} color={genderColor} />
             </View>
           </View>
           <View>
@@ -44,7 +75,7 @@ export default function PatientProfile({ userData }) {
               </View>
               <View>
                 <Text style={styles.infoText}>Yaş</Text>
-                <Text style={styles.infoText2}>23</Text>
+                <Text style={styles.infoText2}>{userAge}</Text>
               </View>
               <View>
                 <Text style={styles.infoText}>Cinsiyet</Text>
@@ -66,21 +97,25 @@ export default function PatientProfile({ userData }) {
           </View>
         </View>
         <View style={styles.row}>
-          {/* <UserDataCom
+          <UserDataCom
             title="Doktor İletişim Bilgileri"
-            name={userData.primary_doctor.first_name + ' ' + userData.primary_doctor.last_name}
-            phone={userData.primary_doctor.phone} 
+            name={
+              userData.primary_doctor.first_name +
+              ' ' +
+              userData.primary_doctor.last_name
+            }
+            phone={userData.primary_doctor.phone}
             color={'#1b8b05ff'}
-            bgColor={"#b0ffa0ff"}
+            bgColor={'#b0ffa0ff'}
           />
-          <UserDataCom 
-            title="Acil Durumda İletişime Geçilecek Kişi" 
-            name={userData.emergency_contact_name} 
-            phone={userData.emergency_contact_phone} 
+          <UserDataCom
+            title="Acil Durumda İletişime Geçilecek Kişi"
+            name={userData.emergency_contact_name}
+            phone={userData.emergency_contact_phone}
             color={'#dd612fff'}
-            bgColor={"#ffb3b0ff"}
-            />
-          */}
+            bgColor={'#ffb3b0ff'}
+          />
+          <View style={{ alignItems: 'flex-end' }}>{actionButtons}</View>
         </View>
       </View>
       <View style={styles.line}></View>

@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Animated } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  ScrollView,
+} from 'react-native';
 import ActionButtons from './components/ActionButtons';
 import PatientProfile from './components/PatientProfile';
 import {
@@ -164,7 +170,10 @@ export default function PatientScreen({ route, navigation }) {
             </Text>
           </View>
         )}
-        <PatientProfile userData={userData} />
+        <PatientProfile
+          userData={userData}
+          actionButtons={<ActionButtons navigation={navigation} />}
+        />
         <View style={styles.contentRow}>
           <AppointmentsContainer
             userData={userData}
@@ -177,7 +186,6 @@ export default function PatientScreen({ route, navigation }) {
             allergies={allergies}
           />
         </View>
-        <ActionButtons navigation={navigation} />
       </>
     );
   };

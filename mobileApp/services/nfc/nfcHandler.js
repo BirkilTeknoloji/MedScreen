@@ -42,20 +42,33 @@ export async function sendRfidToBackend(tagId) {
 
     if (token && user) {
       try {
-        console.log('✅ Token bulundu, hafızaya kaydediliyor:', token.substring(0, 10) + '...');
+        console.log(
+          '✅ Token bulundu, hafızaya kaydediliyor:',
+          token.substring(0, 10) + '...',
+        );
         await AsyncStorage.setItem('userToken', token);
         await AsyncStorage.setItem('userInfo', JSON.stringify(user));
 
         // Persist user roles separately for quick checks in the UI
         // Backend may provide roles as `roles` (array) or `role` (single string)
         try {
-          const roles = user.roles || (user.role ? [user.role] : []);
+          console.log(
+            '🔍 User object for role extraction:',
+            JSON.stringify(user, null, 2),
+          );
+          console.log('🔍 user.role value:', user.role);
+          console.log('🔍 user.roles value:', user.roles);
+          console.log('🔍 user.Role value:', user.Role);
+
+          const roles =
+            user.roles ||
+            (user.role ? [user.role] : user.Role ? [user.Role] : []);
           await AsyncStorage.setItem('userRoles', JSON.stringify(roles));
-          console.log('User roles saved:', roles);
+          console.log('✅ User roles saved:', roles);
         } catch (e) {
           console.warn('Could not persist user roles:', e);
         }
-        
+
         // Device MAC'i AsyncStorage'a kaydet (QR token atama için)
         if (user.id) {
           const deviceMac = await getDeviceMacFromBackend(user.id, token);
@@ -64,20 +77,19 @@ export async function sendRfidToBackend(tagId) {
             console.log('Device MAC kaydedildi:', deviceMac);
           }
         }
-        
-        return { 
-          success: true, 
-          token: token, 
-          user: user,
-          originalData: resJson 
-        };
 
+        return {
+          success: true,
+          token: token,
+          user: user,
+          originalData: resJson,
+        };
       } catch (e) {
         console.error('Token/User kaydetme hatası:', e);
         return null;
       }
     } else {
-      console.warn("⚠️ Yanıtta Token veya User bulunamadı!", resJson);
+      console.warn('⚠️ Yanıtta Token veya User bulunamadı!', resJson);
       return null;
     }
   } catch (error) {
@@ -107,7 +119,7 @@ async function getDeviceMacFromBackend(userId, token) {
 
     const resJson = await response.json();
     const devices = resJson.data || resJson;
-    
+
     if (Array.isArray(devices) && devices.length > 0) {
       return devices[0].mac_address;
     }

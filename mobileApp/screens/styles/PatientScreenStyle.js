@@ -22,12 +22,11 @@ export default StyleSheet.create({
     fontSize: 16,
     marginTop: 50,
   },
-  
+
   contentRow: {
+    flex: 1,
     flexDirection: 'row',
     gap: 10,
     marginTop: 20,
   },
-  
-  
 });

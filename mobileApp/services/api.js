@@ -28,13 +28,31 @@ export const getUserRoles = async () => {
   }
 };
 
-// hasRole: checks if current user has one of the required roles
-export const hasRole = async (requiredRoles) => {
+// hasRole: checks if current user has one of the required roles (case-insensitive)
+export const hasRole = async requiredRoles => {
   try {
     if (!requiredRoles) return false;
     const roles = await getUserRoles();
-    const required = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
-    return required.some(r => roles.includes(r));
+    const required = Array.isArray(requiredRoles)
+      ? requiredRoles
+      : [requiredRoles];
+
+    // Debug logging for role check
+    console.log('🔑 hasRole check - User roles:', roles);
+    console.log('🔑 hasRole check - Required roles:', required);
+
+    // Case-insensitive comparison
+    const normalizedRoles = roles.map(r =>
+      typeof r === 'string' ? r.toLowerCase() : '',
+    );
+    const normalizedRequired = required.map(r =>
+      typeof r === 'string' ? r.toLowerCase() : '',
+    );
+
+    const result = normalizedRequired.some(r => normalizedRoles.includes(r));
+    console.log('🔑 hasRole result:', result);
+
+    return result;
   } catch (e) {
     console.error('hasRole error:', e);
     return false;
@@ -97,7 +115,7 @@ export const getFirstPatient = async () => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`, 
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -109,7 +127,7 @@ export const getFirstPatient = async () => {
     const responseJson = await response.json();
 
     if (
-      responseJson.success && 
+      responseJson.success &&
       Array.isArray(responseJson.data) &&
       responseJson.data.length > 0
     ) {
@@ -157,10 +175,10 @@ export const getPatientByUserId = async userId => {
   }
 };
 
-export const getPatientById = async (patientId) => {
+export const getPatientById = async patientId => {
   try {
     const userToken = await AsyncStorage.getItem('userToken');
-    
+
     if (!userToken) {
       console.error('No user token for getPatientById');
       return null;
@@ -168,7 +186,7 @@ export const getPatientById = async (patientId) => {
 
     console.log('👤 Fetching patient by ID:', patientId);
     const url = `${BASE_API_URL}/patients`;
-    
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -184,9 +202,11 @@ export const getPatientById = async (patientId) => {
 
     const data = await response.json();
     const allPatients = data.data || data;
-    
+
     if (Array.isArray(allPatients)) {
-      const patient = allPatients.find(p => p.id === patientId || p.ID === patientId);
+      const patient = allPatients.find(
+        p => p.id === patientId || p.ID === patientId,
+      );
       if (patient) {
         console.log('👤 Patient found:', patient.first_name, patient.last_name);
         return patient;
@@ -253,7 +273,6 @@ export const getAppointmentsByPatientId = async patientId => {
 
     if (responseJson.success && Array.isArray(responseJson.data)) {
       const allAppointments = responseJson.data;
-
 
       const actualPatientId = patientId?.ID || patientId?.id || patientId;
       const filteredAppointments = allAppointments.filter(
@@ -487,7 +506,7 @@ export const getAllergiesByPatientId = async patientId => {
 export const parseQrCode = async qrValue => {
   try {
     const userToken = await AsyncStorage.getItem('userToken');
-    
+
     if (!userToken) {
       console.error('No user token available for QR validation');
       return null;
@@ -553,8 +572,12 @@ export const parseQrCode = async qrValue => {
     // Final sanity trim
     tokenStr = tokenStr.replace(/^\/+|\/+$/g, '');
 
-    console.log('Validating QR token (extracted):', tokenStr);
-    const validateUrl = `${BASE_API_URL}/qr-tokens/${encodeURIComponent(tokenStr)}/validate`;
+    console.log('📱 RAW QR scanned value:', qrValue);
+    console.log('📱 Extracted token string:', tokenStr);
+    const validateUrl = `${BASE_API_URL}/qr-tokens/${encodeURIComponent(
+      tokenStr,
+    )}/validate`;
+    console.log('📱 Validation URL:', validateUrl);
 
     const validateResponse = await fetch(validateUrl, {
       method: 'GET',
@@ -568,21 +591,37 @@ export const parseQrCode = async qrValue => {
       // Try to parse response body to surface structured error information
       let bodyText = '';
       let bodyJson = null;
-      try { bodyText = await validateResponse.text(); bodyJson = JSON.parse(bodyText); } catch (e) { /* ignore JSON parse errors */ }
+      try {
+        bodyText = await validateResponse.text();
+        bodyJson = JSON.parse(bodyText);
+      } catch (e) {
+        /* ignore JSON parse errors */
+      }
 
       // If token has already been used, return a structured result so UI can handle it
-      const msg = (bodyJson && (bodyJson.message || bodyJson.error)) || bodyText || '';
-      if (typeof msg === 'string' && msg.toLowerCase().includes('token has already been used')) {
+      const msg =
+        (bodyJson && (bodyJson.message || bodyJson.error)) || bodyText || '';
+      if (
+        typeof msg === 'string' &&
+        msg.toLowerCase().includes('token has already been used')
+      ) {
         console.warn('Token already used:', tokenStr);
         return {
           type: 'token_used',
           token: tokenStr,
-          tokenType: bodyJson && bodyJson.data && bodyJson.data.type ? bodyJson.data.type : null,
+          tokenType:
+            bodyJson && bodyJson.data && bodyJson.data.type
+              ? bodyJson.data.type
+              : null,
           data: bodyJson || { message: msg },
         };
       }
 
-      console.error('Token validation failed:', validateResponse.status, bodyText);
+      console.error(
+        'Token validation failed:',
+        validateResponse.status,
+        bodyText,
+      );
       return null;
     }
 
@@ -596,11 +635,11 @@ export const parseQrCode = async qrValue => {
     // If token type is patient_assignment and we have device MAC, try to assign
     if (qrTokenInfo.type === 'patient_assignment') {
       const deviceMac = await AsyncStorage.getItem('device_mac');
-      
+
       if (deviceMac) {
         console.log('Attempting to assign patient to device:', deviceMac);
         const scanUrl = `${BASE_API_URL}/devices/${deviceMac}/scan-patient-qr`;
-        
+
         try {
           const scanResponse = await fetch(scanUrl, {
             method: 'POST',
@@ -639,7 +678,9 @@ export const parseQrCode = async qrValue => {
           };
         }
       } else {
-        console.log('No device MAC stored, returning validated token info only');
+        console.log(
+          'No device MAC stored, returning validated token info only',
+        );
         return {
           type: 'token_validated',
           token: qrValue,
@@ -663,10 +704,10 @@ export const parseQrCode = async qrValue => {
 };
 
 // Get prescriptions for a specific patient
-export const getPrescriptionsByPatientId = async (patientId) => {
+export const getPrescriptionsByPatientId = async patientId => {
   try {
     const userToken = await AsyncStorage.getItem('userToken');
-    
+
     if (!userToken) {
       console.error('No user token available');
       return null;
@@ -674,7 +715,7 @@ export const getPrescriptionsByPatientId = async (patientId) => {
 
     console.log('📋 Getting prescriptions for patient ID:', patientId);
     const url = `${BASE_API_URL}/prescriptions`;
-    
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -695,9 +736,11 @@ export const getPrescriptionsByPatientId = async (patientId) => {
     const prescriptions = data.data || data;
     if (Array.isArray(prescriptions)) {
       const patientPrescriptions = prescriptions.filter(
-        p => p.patient_id === patientId || p.patient?.id === patientId
+        p => p.patient_id === patientId || p.patient?.id === patientId,
       );
-      console.log(`📋 Found ${patientPrescriptions.length} prescriptions for patient ${patientId}`);
+      console.log(
+        `📋 Found ${patientPrescriptions.length} prescriptions for patient ${patientId}`,
+      );
       return patientPrescriptions;
     }
 

@@ -441,7 +441,7 @@ INSERT INTO users (first_name, last_name, role, specialization, license_number, 
 
 -- NFC Cards
 INSERT INTO nfc_cards (card_uid, assigned_user_id, is_active, created_by_user_id, last_used_at) VALUES
-('NFC-CARD-001-UID', 1, true, 6, NOW() - INTERVAL '2 hours'),
+('031F8D0F', 1, true, 6, NOW() - INTERVAL '2 hours'),
 ('041C577A8A2190', 6, true, 6, NOW() - INTERVAL '1 day'),
 ('NFC-CARD-003-UID', 3, true, 6, NOW() - INTERVAL '3 hours'),
 ('NFC-CARD-004-UID', 5, true, 6, NOW() - INTERVAL '30 minutes'),

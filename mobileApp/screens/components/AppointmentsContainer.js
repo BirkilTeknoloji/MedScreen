@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomDropdown from './CustomDropdown';
 import styles from './styles/AppointmentsContainerStyle';
@@ -23,13 +23,7 @@ const AppointmentsContainer = ({
         gap: 10,
       }}
     >
-      <View
-        style={{
-          ...styles.appointmentContainer,
-          flex: 1,
-          width: undefined,
-        }}
-      >
+      <View style={styles.appointmentContainer}>
         <View
           style={{
             flexDirection: 'row',
@@ -45,30 +39,34 @@ const AppointmentsContainer = ({
         </View>
         <View style={styles.line}></View>
 
-        <CustomDropdown
-          data={appointments}
-          title={'Randevular'}
-          icon={'calendar-clock'}
-        />
-        <CustomDropdown
-          data={diagnoses}
-          title={'Tanılar'}
-          icon={'stethoscope'}
-        />
-        <CustomDropdown data={prescriptions} title={'İlaçlar'} icon={'pill'} />
-        <CustomDropdown
-          data={medicalTests}
-          title={'Tetkikler'}
-          icon={'test-tube'}
-        />
+        <ScrollView
+          style={{ flex: 1, marginTop: 10 }}
+          showsVerticalScrollIndicator={true}
+          nestedScrollEnabled={true}
+        >
+          <CustomDropdown
+            data={appointments}
+            title={'Randevular'}
+            icon={'calendar-clock'}
+          />
+          <CustomDropdown
+            data={diagnoses}
+            title={'Tanılar'}
+            icon={'stethoscope'}
+          />
+          <CustomDropdown
+            data={prescriptions}
+            title={'İlaçlar'}
+            icon={'pill'}
+          />
+          <CustomDropdown
+            data={medicalTests}
+            title={'Tetkikler'}
+            icon={'test-tube'}
+          />
+        </ScrollView>
       </View>
-      <View
-        style={{
-          ...styles.appointmentContainer,
-          flex: 1,
-          width: undefined,
-        }}
-      >
+      <View style={styles.appointmentContainer}>
         <View
           style={{
             flexDirection: 'row',
@@ -84,26 +82,32 @@ const AppointmentsContainer = ({
         </View>
         <View style={styles.line}></View>
 
-        <CustomDropdown
-          data={medicalHistory}
-          title={'Tıbbi Geçmiş'}
-          icon={'history'}
-        />
-        <CustomDropdown
-          data={surgeryHistory}
-          title={'Ameliyat Geçmişi'}
-          icon={'hospital-box'}
-        />
-        <CustomDropdown
-          data={allergies}
-          title={'Alerjiler'}
-          icon={'alert-circle-outline'}
-        />
-        <CustomDropdown
-          data={userData.Prescriptions}
-          title={'Reçeteler'}
-          icon={'prescription'}
-        />
+        <ScrollView
+          style={{ flex: 1, marginTop: 10 }}
+          showsVerticalScrollIndicator={true}
+          nestedScrollEnabled={true}
+        >
+          <CustomDropdown
+            data={medicalHistory}
+            title={'Tıbbi Geçmiş'}
+            icon={'history'}
+          />
+          <CustomDropdown
+            data={surgeryHistory}
+            title={'Ameliyat Geçmişi'}
+            icon={'hospital-box'}
+          />
+          <CustomDropdown
+            data={allergies}
+            title={'Alerjiler'}
+            icon={'alert-circle-outline'}
+          />
+          <CustomDropdown
+            data={userData.Prescriptions}
+            title={'Reçeteler'}
+            icon={'prescription'}
+          />
+        </ScrollView>
       </View>
     </View>
   );

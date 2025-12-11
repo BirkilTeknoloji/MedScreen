@@ -13,7 +13,7 @@ export default StyleSheet.create({
     backgroundColor: '#d2d9dfff',
   },
   appointmentContainer: {
-    minHeight: 200,
+    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 10,
     borderWidth: 0.5,
