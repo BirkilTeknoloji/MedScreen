@@ -3,215 +3,206 @@ package routes
 import (
 	"medscreen/internal/handler"
 	"medscreen/internal/middleware"
-	"medscreen/internal/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Handlers holds all HTTP handlers
+// Handlers holds all VEM 2.0 HTTP handlers (read-only)
 type Handlers struct {
-	User           *handler.UserHandler
-	Patient        *handler.PatientHandler
-	Appointment    *handler.AppointmentHandler
-	Diagnosis      *handler.DiagnosisHandler
-	Prescription   *handler.PrescriptionHandler
-	MedicalTest    *handler.MedicalTestHandler
-	MedicalHistory *handler.MedicalHistoryHandler
-	SurgeryHistory *handler.SurgeryHistoryHandler
-	Allergy        *handler.AllergyHandler
-	VitalSign      *handler.VitalSignHandler
-	NFCCard        *handler.NFCCardHandler
-	Device         *handler.DeviceHandler
-	QR             *handler.QRHandler
-	Reset          *handler.ResetHandler //TODO: prodda sil
-	AuditLog       *handler.AuditLogHandler
+	Personel              *handler.PersonelHandler
+	NFCKart               *handler.NFCKartHandler
+	Hasta                 *handler.HastaHandler
+	HastaBasvuru          *handler.HastaBasvuruHandler
+	Yatak                 *handler.YatakHandler
+	TabletCihaz           *handler.TabletCihazHandler
+	AnlikYatanHasta       *handler.AnlikYatanHastaHandler
+	HastaVitalFizikiBulgu *handler.HastaVitalFizikiBulguHandler
+	KlinikSeyir           *handler.KlinikSeyirHandler
+	TibbiOrder            *handler.TibbiOrderHandler
+	TetkikSonuc           *handler.TetkikSonucHandler
+	Recete                *handler.ReceteHandler
+	BasvuruTani           *handler.BasvuruTaniHandler
+	HastaTibbiBilgi       *handler.HastaTibbiBilgiHandler
+	HastaUyari            *handler.HastaUyariHandler
+	RiskSkorlama          *handler.RiskSkorlamaHandler
+	BasvuruYemek          *handler.BasvuruYemekHandler
 }
 
-// SetupRoutes registers all API endpoints
+// MethodNotAllowedMiddleware rejects write operations (POST, PUT, PATCH, DELETE)
+// This middleware ensures the API is read-only as per VEM 2.0 requirements
+func MethodNotAllowedMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		method := c.Request.Method
+		if method == http.MethodPost || method == http.MethodPut ||
+			method == http.MethodPatch || method == http.MethodDelete {
+			c.JSON(http.StatusMethodNotAllowed, gin.H{
+				"success": false,
+				"code":    "METHOD_NOT_ALLOWED",
+				"message": "This API is read-only. Write operations are not permitted.",
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
+// SetupRoutes registers all VEM 2.0 API endpoints (GET only)
 func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethods, corsHeaders []string) {
-	// Apply middleware
+	// Apply global middleware
 	router.Use(middleware.CORSMiddleware(corsOrigins, corsMethods, corsHeaders))
 	router.Use(middleware.LoggerMiddleware())
 	router.Use(middleware.RecoveryMiddleware())
+	router.Use(MethodNotAllowedMiddleware())
 
 	// API v1 group
 	api := router.Group("/api/v1")
-	api.POST("/nfc-cards/authenticate", handlers.NFCCard.AuthenticateByNFC)
+
+	// NFC Authentication endpoint (public, GET only for read-only system)
+	api.GET("/nfc-kart/authenticate/:kart_uid", handlers.NFCKart.GetByKartUID)
+
+	// Protected routes (require authentication)
 	protected := api.Group("/")
 	protected.Use(middleware.AuthMiddleware())
 
-	// User routes - Admin only
-	users := protected.Group("/users")
-	users.Use(middleware.RoleMiddleware(models.RoleAdmin))
+	// Personel routes (GET only)
+	personel := protected.Group("/personel")
 	{
-		users.POST("", handlers.User.CreateUser)
-		users.GET("", handlers.User.GetUsers)
-		users.GET("/:id", handlers.User.GetUser)
-		users.PUT("/:id", handlers.User.UpdateUser)
-		users.DELETE("/:id", handlers.User.DeleteUser)
+		personel.GET("", handlers.Personel.GetAll)
+		personel.GET("/:kodu", handlers.Personel.GetByKodu)
+		personel.GET("/gorev/:gorev_kodu", handlers.Personel.GetByGorev)
+		personel.GET("/authenticate/:kart_uid", handlers.Personel.Authenticate)
 	}
 
-	// Patient routes
-	// Read: Admin, Doctor, Nurse, Receptionist
-	// Create/Update: Admin, Receptionist
-	// Delete: Admin
-	patients := protected.Group("/patients")
+	// NFC Kart routes (GET only)
+	nfcKart := protected.Group("/nfc-kart")
 	{
-		patients.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleReceptionist), handlers.Patient.CreatePatient)
-		patients.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse, models.RoleReceptionist), handlers.Patient.GetPatients)
-		patients.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse, models.RoleReceptionist), handlers.Patient.GetPatient)
-		patients.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleReceptionist), handlers.Patient.UpdatePatient)
-		patients.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.Patient.DeletePatient)
-		patients.GET("/:id/medical-history", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Patient.GetPatientMedicalHistory)
-		patients.POST("/:id/generate-qr", middleware.RoleMiddleware(models.RoleAdmin, models.RoleReceptionist), handlers.QR.GeneratePatientQR)
+		nfcKart.GET("/:kodu", handlers.NFCKart.GetByKodu)
+		nfcKart.GET("/uid/:kart_uid", handlers.NFCKart.GetByKartUID)
+		nfcKart.GET("/personel/:personel_kodu", handlers.NFCKart.GetByPersonelKodu)
 	}
 
-	// Appointment routes
-	// Read: Admin, Doctor, Nurse, Receptionist
-	// Create/Update: Admin, Doctor, Receptionist
-	// Delete: Admin, Receptionist
-	appointments := protected.Group("/appointments")
+	// Hasta routes (GET only)
+	hasta := protected.Group("/hasta")
 	{
-		appointments.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleReceptionist), handlers.Appointment.CreateAppointment)
-		appointments.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse, models.RoleReceptionist), handlers.Appointment.GetAppointments)
-		appointments.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse, models.RoleReceptionist), handlers.Appointment.GetAppointment)
-		appointments.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleReceptionist), handlers.Appointment.UpdateAppointment)
-		appointments.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleReceptionist), handlers.Appointment.DeleteAppointment)
+		hasta.GET("", handlers.Hasta.GetAll)
+		hasta.GET("/search", handlers.Hasta.Search)
+		hasta.GET("/:kodu", handlers.Hasta.GetByKodu)
+		hasta.GET("/tc/:tc_kimlik", handlers.Hasta.GetByTCKimlik)
 	}
 
-	// Diagnosis routes
-	// Read: Admin, Doctor, Nurse
-	// Create/Update: Admin, Doctor
-	// Delete: Admin
-	diagnoses := protected.Group("/diagnoses")
+	// Hasta Basvuru routes (GET only)
+	hastaBasvuru := protected.Group("/hasta-basvuru")
 	{
-		diagnoses.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor), handlers.Diagnosis.CreateDiagnosis)
-		diagnoses.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Diagnosis.GetDiagnoses)
-		diagnoses.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Diagnosis.GetDiagnosis)
-		diagnoses.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor), handlers.Diagnosis.UpdateDiagnosis)
-		diagnoses.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.Diagnosis.DeleteDiagnosis)
+		hastaBasvuru.GET("/filter", handlers.HastaBasvuru.GetByFilters)
+		hastaBasvuru.GET("/:kodu", handlers.HastaBasvuru.GetByKodu)
+		hastaBasvuru.GET("/hasta/:hasta_kodu", handlers.HastaBasvuru.GetByHasta)
+		hastaBasvuru.GET("/hekim/:hekim_kodu", handlers.HastaBasvuru.GetByHekim)
 	}
 
-	// Prescription routes
-	// Read: Admin, Doctor, Nurse
-	// Create/Update: Admin, Doctor
-	// Delete: Admin
-	prescriptions := protected.Group("/prescriptions")
+	// Yatak routes (GET only)
+	yatak := protected.Group("/yatak")
 	{
-		prescriptions.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor), handlers.Prescription.CreatePrescription)
-		prescriptions.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Prescription.GetPrescriptions)
-		prescriptions.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Prescription.GetPrescription)
-		prescriptions.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor), handlers.Prescription.UpdatePrescription)
-		prescriptions.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.Prescription.DeletePrescription)
+		yatak.GET("", handlers.Yatak.GetAll)
+		yatak.GET("/:kodu", handlers.Yatak.GetByKodu)
+		yatak.GET("/birim/:birim_kodu/oda/:oda_kodu", handlers.Yatak.GetByBirimOda)
 	}
 
-	// Medical test routes
-	// Read: Admin, Doctor, Nurse
-	// Create/Update: Admin, Doctor, Nurse
-	// Delete: Admin
-	medicalTests := protected.Group("/medical-tests")
+	// Tablet Cihaz routes (GET only)
+	tabletCihaz := protected.Group("/tablet-cihaz")
 	{
-		medicalTests.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalTest.CreateMedicalTest)
-		medicalTests.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalTest.GetMedicalTests)
-		medicalTests.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalTest.GetMedicalTest)
-		medicalTests.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalTest.UpdateMedicalTest)
-		medicalTests.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.MedicalTest.DeleteMedicalTest)
+		tabletCihaz.GET("", handlers.TabletCihaz.GetAll)
+		tabletCihaz.GET("/:kodu", handlers.TabletCihaz.GetByKodu)
+		tabletCihaz.GET("/yatak/:yatak_kodu", handlers.TabletCihaz.GetByYatak)
 	}
 
-	// Medical history routes
-	// Read: Admin, Doctor, Nurse
-	// Create/Update: Admin, Doctor, Nurse
-	// Delete: Admin
-	medicalHistory := protected.Group("/medical-history")
+	// Anlik Yatan Hasta routes (GET only)
+	anlikYatanHasta := protected.Group("/anlik-yatan-hasta")
 	{
-		medicalHistory.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalHistory.CreateMedicalHistory)
-		medicalHistory.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalHistory.GetMedicalHistories)
-		medicalHistory.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalHistory.GetMedicalHistory)
-		medicalHistory.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.MedicalHistory.UpdateMedicalHistory)
-		medicalHistory.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.MedicalHistory.DeleteMedicalHistory)
+		anlikYatanHasta.GET("/:kodu", handlers.AnlikYatanHasta.GetByKodu)
+		anlikYatanHasta.GET("/yatak/:yatak_kodu", handlers.AnlikYatanHasta.GetByYatak)
+		anlikYatanHasta.GET("/hasta/:hasta_kodu", handlers.AnlikYatanHasta.GetByHasta)
+		anlikYatanHasta.GET("/birim/:birim_kodu", handlers.AnlikYatanHasta.GetByBirim)
 	}
 
-	// Surgery history routes
-	// Read: Admin, Doctor, Nurse
-	// Create/Update: Admin, Doctor, Nurse
-	// Delete: Admin
-	surgeryHistory := protected.Group("/surgery-history")
+	// Vital Bulgu routes (GET only)
+	vitalBulgu := protected.Group("/vital-bulgu")
 	{
-		surgeryHistory.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.SurgeryHistory.CreateSurgeryHistory)
-		surgeryHistory.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.SurgeryHistory.GetSurgeryHistories)
-		surgeryHistory.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.SurgeryHistory.GetSurgeryHistory)
-		surgeryHistory.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.SurgeryHistory.UpdateSurgeryHistory)
-		surgeryHistory.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.SurgeryHistory.DeleteSurgeryHistory)
+		vitalBulgu.GET("/date-range", handlers.HastaVitalFizikiBulgu.GetByDateRange)
+		vitalBulgu.GET("/:kodu", handlers.HastaVitalFizikiBulgu.GetByKodu)
+		vitalBulgu.GET("/basvuru/:basvuru_kodu", handlers.HastaVitalFizikiBulgu.GetByBasvuru)
 	}
 
-	// Allergy routes
-	// Read: Admin, Doctor, Nurse
-	// Create/Update: Admin, Doctor, Nurse
-	// Delete: Admin
-	allergies := protected.Group("/allergies")
+	// Klinik Seyir routes (GET only)
+	klinikSeyir := protected.Group("/klinik-seyir")
 	{
-		allergies.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Allergy.CreateAllergy)
-		allergies.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Allergy.GetAllergies)
-		allergies.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Allergy.GetAllergy)
-		allergies.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.Allergy.UpdateAllergy)
-		allergies.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.Allergy.DeleteAllergy)
+		klinikSeyir.GET("/filter", handlers.KlinikSeyir.GetByFilters)
+		klinikSeyir.GET("/:kodu", handlers.KlinikSeyir.GetByKodu)
+		klinikSeyir.GET("/basvuru/:basvuru_kodu", handlers.KlinikSeyir.GetByBasvuru)
 	}
 
-	// Vital sign routes
-	// Read: Admin, Doctor, Nurse
-	// Create/Update: Admin, Doctor, Nurse
-	// Delete: Admin
-	vitalSigns := protected.Group("/vital-signs")
+	// Tibbi Order routes (GET only)
+	tibbiOrder := protected.Group("/tibbi-order")
 	{
-		vitalSigns.POST("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.VitalSign.CreateVitalSign)
-		vitalSigns.GET("", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.VitalSign.GetVitalSigns)
-		vitalSigns.GET("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.VitalSign.GetVitalSign)
-		vitalSigns.PUT("/:id", middleware.RoleMiddleware(models.RoleAdmin, models.RoleDoctor, models.RoleNurse), handlers.VitalSign.UpdateVitalSign)
-		vitalSigns.DELETE("/:id", middleware.RoleMiddleware(models.RoleAdmin), handlers.VitalSign.DeleteVitalSign)
+		tibbiOrder.GET("/:kodu", handlers.TibbiOrder.GetByKodu)
+		tibbiOrder.GET("/:kodu/detay", handlers.TibbiOrder.GetDetay)
+		tibbiOrder.GET("/basvuru/:basvuru_kodu", handlers.TibbiOrder.GetByBasvuru)
 	}
 
-	// NFC card routes - Admin only
-	nfcCards := protected.Group("/nfc-cards")
-	nfcCards.Use(middleware.RoleMiddleware(models.RoleAdmin))
+	// Tetkik Sonuc routes (GET only)
+	tetkikSonuc := protected.Group("/tetkik-sonuc")
 	{
-		nfcCards.POST("", handlers.NFCCard.CreateCard)
-		nfcCards.GET("", handlers.NFCCard.GetCards)
-		nfcCards.GET("/:id", handlers.NFCCard.GetCard)
-		nfcCards.PUT("/:id", handlers.NFCCard.UpdateCard)
-		nfcCards.DELETE("/:id", handlers.NFCCard.DeleteCard)
-		nfcCards.POST("/:id/assign", handlers.NFCCard.AssignCard)
-		nfcCards.POST("/:id/deactivate", handlers.NFCCard.DeactivateCard)
+		tetkikSonuc.GET("/:kodu", handlers.TetkikSonuc.GetByKodu)
+		tetkikSonuc.GET("/basvuru/:basvuru_kodu", handlers.TetkikSonuc.GetByBasvuru)
 	}
 
-	// Device routes - Admin only
-	devices := protected.Group("/devices")
-	devices.Use(middleware.RoleMiddleware(models.RoleAdmin))
+	// Recete routes (GET only)
+	recete := protected.Group("/recete")
 	{
-		devices.POST("", handlers.Device.RegisterDevice)
-		devices.GET("", handlers.Device.GetDevices)
-		devices.GET("/id/:id", handlers.Device.GetDeviceByID)
-		devices.GET("/:mac_address", handlers.Device.GetDeviceByMAC)
-		devices.PUT("/:mac_address", handlers.Device.UpdateDevice)
-		devices.DELETE("/:mac_address", handlers.Device.DeleteDevice)
-		devices.POST("/:mac_address/assign", handlers.Device.AssignPatient)
-		devices.POST("/:mac_address/unassign", handlers.Device.UnassignPatient)
-		devices.POST("/:mac_address/scan-patient-qr", handlers.QR.ScanPatientQR)
-		devices.POST("/:mac_address/generate-prescription-qr/:patient_id", handlers.QR.GeneratePrescriptionQR)
+		recete.GET("/:kodu", handlers.Recete.GetByKodu)
+		recete.GET("/:kodu/ilaclar", handlers.Recete.GetIlaclar)
+		recete.GET("/basvuru/:basvuru_kodu", handlers.Recete.GetByBasvuru)
+		recete.GET("/hekim/:hekim_kodu", handlers.Recete.GetByHekim)
 	}
 
-	// QR Token routes
-	qrTokens := protected.Group("/qr-tokens")
+	// Basvuru Tani routes (GET only)
+	basvuruTani := protected.Group("/basvuru-tani")
 	{
-		qrTokens.GET("/:token/validate", handlers.QR.ValidateQRToken)
+		basvuruTani.GET("/:kodu", handlers.BasvuruTani.GetByKodu)
+		basvuruTani.GET("/hasta/:hasta_kodu", handlers.BasvuruTani.GetByHasta)
+		basvuruTani.GET("/basvuru/:basvuru_kodu", handlers.BasvuruTani.GetByBasvuru)
 	}
 
-	// Audit Log routes - Admin only
-	auditLogs := protected.Group("/audit-logs")
-	auditLogs.Use(middleware.RoleMiddleware(models.RoleAdmin))
+	// Hasta Tibbi Bilgi routes (GET only)
+	hastaTibbiBilgi := protected.Group("/hasta-tibbi-bilgi")
 	{
-		auditLogs.GET("", handlers.AuditLog.GetAuditLogs)
+		hastaTibbiBilgi.GET("/:kodu", handlers.HastaTibbiBilgi.GetByKodu)
+		hastaTibbiBilgi.GET("/hasta/:hasta_kodu", handlers.HastaTibbiBilgi.GetByHasta)
+		hastaTibbiBilgi.GET("/turu/:turu_kodu", handlers.HastaTibbiBilgi.GetByTuru)
 	}
 
-	// Reset route (prodda sil)
-	api.POST("/reset", handlers.Reset.ResetDatabase)
+	// Hasta Uyari routes (GET only)
+	hastaUyari := protected.Group("/hasta-uyari")
+	{
+		hastaUyari.GET("/filter", handlers.HastaUyari.GetByFilters)
+		hastaUyari.GET("/:kodu", handlers.HastaUyari.GetByKodu)
+		hastaUyari.GET("/basvuru/:basvuru_kodu", handlers.HastaUyari.GetByBasvuru)
+	}
+
+	// Risk Skorlama routes (GET only)
+	riskSkorlama := protected.Group("/risk-skorlama")
+	{
+		riskSkorlama.GET("/:kodu", handlers.RiskSkorlama.GetByKodu)
+		riskSkorlama.GET("/basvuru/:basvuru_kodu", handlers.RiskSkorlama.GetByBasvuru)
+		riskSkorlama.GET("/turu/:turu", handlers.RiskSkorlama.GetByTuru)
+	}
+
+	// Basvuru Yemek routes (GET only)
+	basvuruYemek := protected.Group("/basvuru-yemek")
+	{
+		basvuruYemek.GET("/:kodu", handlers.BasvuruYemek.GetByKodu)
+		basvuruYemek.GET("/basvuru/:basvuru_kodu", handlers.BasvuruYemek.GetByBasvuru)
+		basvuruYemek.GET("/turu/:yemek_turu", handlers.BasvuruYemek.GetByTuru)
+	}
 }

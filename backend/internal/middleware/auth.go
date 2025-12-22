@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"medscreen/internal/database"
 	"medscreen/internal/models"
 	"medscreen/internal/utils"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 )
 
 // AuthMiddleware is a Gin middleware for JWT authentication
+// For VEM 2.0 read-only system, this validates JWT tokens without audit logging
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get the Authorization header
@@ -29,16 +29,16 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Set("userID", userID)
 		c.Set("userRole", role)
 
-		// Add audit info to context
-		ctx := database.WithAuditContext(c.Request.Context(), &userID, c.ClientIP(), c.Request.UserAgent())
-		c.Request = c.Request.WithContext(ctx)
+		// Note: Audit context removed for read-only VEM 2.0 system
+		// No write operations are performed, so audit logging is not needed
 
 		c.Next()
 	}
 }
 
 // RoleMiddleware checks if the user has one of the allowed roles
-func RoleMiddleware(allowedRoles ...models.UserRole) gin.HandlerFunc {
+// Uses PersonelGorevKodu from VEM 2.0 schema
+func RoleMiddleware(allowedRoles ...models.PersonelGorevKodu) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		roleString, exists := c.Get("userRole")
 		if !exists {
@@ -46,7 +46,7 @@ func RoleMiddleware(allowedRoles ...models.UserRole) gin.HandlerFunc {
 			return
 		}
 
-		userRole := models.UserRole(roleString.(string))
+		userRole := models.PersonelGorevKodu(roleString.(string))
 		for _, allowed := range allowedRoles {
 			if userRole == allowed {
 				c.Next()

@@ -34,81 +34,78 @@ func main() {
 	// Set Gin mode
 	gin.SetMode(cfg.Server.GinMode)
 
-	// Initialize database connection
+	// Initialize database connection (read-only mode for VEM 2.0)
 	db, err := database.InitDatabase(&cfg.Database)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	// Run database migrations
-	if err := database.RunMigrations(db); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
+	// Note: No migrations run - VEM 2.0 tables already exist in the database
+	// The database.RunMigrations call has been removed for read-only mode
 
-	// Initialize repositories with dependency injection
-	userRepo := repository.NewUserRepository(db)
-	nfcCardRepo := repository.NewNFCCardRepository(db)
-	patientRepo := repository.NewPatientRepository(db)
-	appointmentRepo := repository.NewAppointmentRepository(db)
-	diagnosisRepo := repository.NewDiagnosisRepository(db)
-	prescriptionRepo := repository.NewPrescriptionRepository(db)
-	medicalTestRepo := repository.NewMedicalTestRepository(db)
-	medicalHistoryRepo := repository.NewMedicalHistoryRepository(db)
-	surgeryHistoryRepo := repository.NewSurgeryHistoryRepository(db)
-	allergyRepo := repository.NewAllergyRepository(db)
-	vitalSignRepo := repository.NewVitalSignRepository(db)
-	deviceRepo := repository.NewDeviceRepository(db)
-	qrTokenRepo := repository.NewQRTokenRepository(db)
-	auditLogRepo := repository.NewAuditLogRepository(db)
+	// Initialize VEM 2.0 repositories (read-only)
+	personelRepo := repository.NewPersonelRepository(db)
+	nfcKartRepo := repository.NewNFCKartRepository(db)
+	hastaRepo := repository.NewHastaRepository(db)
+	hastaBasvuruRepo := repository.NewHastaBasvuruRepository(db)
+	yatakRepo := repository.NewYatakRepository(db)
+	tabletCihazRepo := repository.NewTabletCihazRepository(db)
+	anlikYatanHastaRepo := repository.NewAnlikYatanHastaRepository(db)
+	hastaVitalFizikiBulguRepo := repository.NewHastaVitalFizikiBulguRepository(db)
+	klinikSeyirRepo := repository.NewKlinikSeyirRepository(db)
+	tibbiOrderRepo := repository.NewTibbiOrderRepository(db)
+	tetkikSonucRepo := repository.NewTetkikSonucRepository(db)
+	receteRepo := repository.NewReceteRepository(db)
+	basvuruTaniRepo := repository.NewBasvuruTaniRepository(db)
+	hastaTibbiBilgiRepo := repository.NewHastaTibbiBilgiRepository(db)
+	hastaUyariRepo := repository.NewHastaUyariRepository(db)
+	riskSkorlamaRepo := repository.NewRiskSkorlamaRepository(db)
+	basvuruYemekRepo := repository.NewBasvuruYemekRepository(db)
 
-	// Initialize services with repository dependencies
-	userService := service.NewUserService(userRepo)
-	nfcCardService := service.NewNFCCardService(nfcCardRepo)
-	patientService := service.NewPatientService(
-		patientRepo,
-		appointmentRepo,
-		diagnosisRepo,
-		prescriptionRepo,
-		medicalTestRepo,
-		medicalHistoryRepo,
-		surgeryHistoryRepo,
-		allergyRepo,
-		vitalSignRepo,
-	)
-	appointmentService := service.NewAppointmentService(appointmentRepo)
-	diagnosisService := service.NewDiagnosisService(diagnosisRepo)
-	prescriptionService := service.NewPrescriptionService(prescriptionRepo)
-	medicalTestService := service.NewMedicalTestService(medicalTestRepo)
-	medicalHistoryService := service.NewMedicalHistoryService(medicalHistoryRepo)
-	surgeryHistoryService := service.NewSurgeryHistoryService(surgeryHistoryRepo)
-	allergyService := service.NewAllergyService(allergyRepo)
-	vitalSignService := service.NewVitalSignService(vitalSignRepo)
-	deviceService := service.NewDeviceService(deviceRepo, patientRepo)
-	qrService := service.NewQRService(qrTokenRepo, patientRepo, deviceRepo)
+	// Initialize VEM 2.0 services (read-only)
+	personelService := service.NewPersonelService(personelRepo, nfcKartRepo)
+	nfcKartService := service.NewNFCKartService(nfcKartRepo)
+	hastaService := service.NewHastaService(hastaRepo)
+	hastaBasvuruService := service.NewHastaBasvuruService(hastaBasvuruRepo)
+	yatakService := service.NewYatakService(yatakRepo)
+	tabletCihazService := service.NewTabletCihazService(tabletCihazRepo)
+	anlikYatanHastaService := service.NewAnlikYatanHastaService(anlikYatanHastaRepo)
+	hastaVitalFizikiBulguService := service.NewHastaVitalFizikiBulguService(hastaVitalFizikiBulguRepo)
+	klinikSeyirService := service.NewKlinikSeyirService(klinikSeyirRepo)
+	tibbiOrderService := service.NewTibbiOrderService(tibbiOrderRepo)
+	tetkikSonucService := service.NewTetkikSonucService(tetkikSonucRepo)
+	receteService := service.NewReceteService(receteRepo)
+	basvuruTaniService := service.NewBasvuruTaniService(basvuruTaniRepo)
+	hastaTibbiBilgiService := service.NewHastaTibbiBilgiService(hastaTibbiBilgiRepo)
+	hastaUyariService := service.NewHastaUyariService(hastaUyariRepo)
+	riskSkorlamaService := service.NewRiskSkorlamaService(riskSkorlamaRepo)
+	basvuruYemekService := service.NewBasvuruYemekService(basvuruYemekRepo)
 
-	// Initialize handlers with service dependencies
+	// Initialize VEM 2.0 handlers (read-only, GET endpoints only)
 	handlers := &routes.Handlers{
-		User:           handler.NewUserHandler(userService),
-		Patient:        handler.NewPatientHandler(patientService),
-		Appointment:    handler.NewAppointmentHandler(appointmentService),
-		Diagnosis:      handler.NewDiagnosisHandler(diagnosisService),
-		Prescription:   handler.NewPrescriptionHandler(prescriptionService),
-		MedicalTest:    handler.NewMedicalTestHandler(medicalTestService),
-		MedicalHistory: handler.NewMedicalHistoryHandler(medicalHistoryService),
-		SurgeryHistory: handler.NewSurgeryHistoryHandler(surgeryHistoryService),
-		Allergy:        handler.NewAllergyHandler(allergyService),
-		VitalSign:      handler.NewVitalSignHandler(vitalSignService),
-		NFCCard:        handler.NewNFCCardHandler(nfcCardService, userService),
-		Device:         handler.NewDeviceHandler(deviceService),
-		QR:             handler.NewQRHandler(qrService, deviceService),
-		Reset:          handler.NewResetHandler(db), //TODO: prodda sil
-		AuditLog:       handler.NewAuditLogHandler(auditLogRepo),
+		Personel:              handler.NewPersonelHandler(personelService),
+		NFCKart:               handler.NewNFCKartHandler(nfcKartService),
+		Hasta:                 handler.NewHastaHandler(hastaService),
+		HastaBasvuru:          handler.NewHastaBasvuruHandler(hastaBasvuruService),
+		Yatak:                 handler.NewYatakHandler(yatakService),
+		TabletCihaz:           handler.NewTabletCihazHandler(tabletCihazService),
+		AnlikYatanHasta:       handler.NewAnlikYatanHastaHandler(anlikYatanHastaService),
+		HastaVitalFizikiBulgu: handler.NewHastaVitalFizikiBulguHandler(hastaVitalFizikiBulguService),
+		KlinikSeyir:           handler.NewKlinikSeyirHandler(klinikSeyirService),
+		TibbiOrder:            handler.NewTibbiOrderHandler(tibbiOrderService),
+		TetkikSonuc:           handler.NewTetkikSonucHandler(tetkikSonucService),
+		Recete:                handler.NewReceteHandler(receteService),
+		BasvuruTani:           handler.NewBasvuruTaniHandler(basvuruTaniService),
+		HastaTibbiBilgi:       handler.NewHastaTibbiBilgiHandler(hastaTibbiBilgiService),
+		HastaUyari:            handler.NewHastaUyariHandler(hastaUyariService),
+		RiskSkorlama:          handler.NewRiskSkorlamaHandler(riskSkorlamaService),
+		BasvuruYemek:          handler.NewBasvuruYemekHandler(basvuruYemekService),
 	}
 
 	// Set up Gin router
 	router := gin.Default()
 
-	// Register all routes with middleware
+	// Register all VEM 2.0 routes with middleware (GET only)
 	routes.SetupRoutes(router, handlers, cfg.CORS.AllowedOrigins, cfg.CORS.AllowedMethods, cfg.CORS.AllowedHeaders)
 
 	// Create HTTP server
@@ -120,7 +117,7 @@ func main() {
 
 	// Start server in a goroutine
 	go func() {
-		log.Printf("Starting MedScreen server on %s", serverAddr)
+		log.Printf("Starting MedScreen VEM 2.0 server on %s (read-only mode)", serverAddr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Failed to start server: %v", err)
 		}

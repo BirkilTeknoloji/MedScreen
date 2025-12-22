@@ -1,0 +1,316 @@
+Project MEDSCREEN_YATAK_BASI_TABLET_FINAL {
+  database_type: "PostgreSQL"
+  Note: "VEM 2.0 Tam Uyumlu"
+}
+
+// ---------------------------------------------------------
+// 1. PERSONEL VE GÜVENLİK
+// ---------------------------------------------------------
+
+Table PERSONEL {
+  personel_kodu varchar [pk, not null]
+  ad varchar [not null]
+  soyadi varchar [not null]
+  personel_gorev_kodu varchar [not null]
+  medula_brans_kodu varchar
+  tescil_numarasi varchar
+  tc_kimlik_numarasi varchar
+  aktiflik_bilgisi int [default: 1]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+
+  Indexes {
+    (ad, soyadi)
+  }
+}
+
+Table NFC_KART {
+  nfc_kart_kodu varchar [pk, not null]
+  personel_kodu varchar [ref: > PERSONEL.personel_kodu, not null]
+  kart_uid varchar [unique, not null]
+  son_kullanim_tarihi datetime
+  aktiflik_bilgisi int [default: 1]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+// ---------------------------------------------------------
+// 2. HASTA VE KABUL İŞLEMLERİ
+// ---------------------------------------------------------
+
+Table HASTA {
+  hasta_kodu varchar [pk, not null]
+  tc_kimlik_numarasi varchar [unique]
+  ad varchar [not null]
+  soyadi varchar [not null]
+  anne_hasta_kodu varchar [ref: > HASTA.hasta_kodu]
+  baba_hasta_kodu varchar [ref: > HASTA.hasta_kodu]
+  dogum_tarihi date [not null]
+  cinsiyet varchar
+  kan_grubu varchar
+  uyruk varchar
+  hasta_tipi varchar
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+
+  Indexes {
+    tc_kimlik_numarasi
+    (ad, soyadi)
+  }
+}
+
+Table HASTA_BASVURU {
+  hasta_basvuru_kodu varchar [pk, not null]
+  hasta_kodu varchar [ref: > HASTA.hasta_kodu, not null]
+  basvuru_protokol_numarasi varchar [unique, not null]
+  hasta_kabul_zamani datetime [not null]
+  cikis_zamani datetime
+  hekim_kodu varchar [ref: > PERSONEL.personel_kodu]
+  basvuru_durumu varchar
+  hayati_tehlike_durumu varchar
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+Table HASTA_TIBBI_BILGI {
+  hasta_tibbi_bilgi_kodu varchar [pk, not null]
+  hasta_kodu varchar [ref: > HASTA.hasta_kodu, not null]
+  tibbi_bilgi_turu_kodu varchar [not null]
+  tibbi_bilgi_alt_turu_kodu varchar
+  aciklama text
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+// ---------------------------------------------------------
+// 3. KONUM VE TABLET DONANIMI
+// ---------------------------------------------------------
+
+Table YATAK {
+  yatak_kodu varchar [pk, not null]
+  birim_kodu varchar [not null]
+  oda_kodu varchar [not null]
+  yatak_adi varchar
+  yatak_turu_kodu varchar
+  yogun_bakim_yatak_seviyesi varchar
+  ventilator_cihaz_kodu varchar
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+Table TABLET_CIHAZ {
+  tablet_cihaz_kodu varchar [pk, not null]
+  yatak_kodu varchar [ref: - YATAK.yatak_kodu]
+  ip_adresi varchar
+  seri_numarasi varchar [unique]
+  son_gorulme_zamani datetime
+  aktiflik_bilgisi boolean [default: true]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+
+  Indexes {
+    yatak_kodu
+  }
+}
+
+Table ANLIK_YATAN_HASTA {
+  anlik_yatan_hasta_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  hasta_kodu varchar [ref: > HASTA.hasta_kodu, not null]
+  yatak_kodu varchar [ref: > YATAK.yatak_kodu, not null]
+  birim_kodu varchar
+  yatis_zamani datetime [not null]
+  hekim_kodu varchar [ref: > PERSONEL.personel_kodu]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+
+  Indexes {
+    yatak_kodu
+    hasta_basvuru_kodu
+  }
+}
+
+// ---------------------------------------------------------
+// 4. KLİNİK VERİLER (VİTAL, SEYİR VE TETKİK)
+// ---------------------------------------------------------
+
+Table HASTA_VITAL_FIZIKI_BULGU {
+  hasta_vital_fiziki_bulgu_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  islem_zamani datetime [not null]
+  ates varchar
+  nabiz varchar
+  sistolik_kan_basinci_degeri varchar
+  diastolik_kan_basinci_degeri varchar
+  solunum varchar
+  saturasyon varchar
+  boy varchar
+  agirlik varchar
+  hemsire_kodu varchar [ref: > PERSONEL.personel_kodu]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+
+  Indexes {
+    islem_zamani
+  }
+}
+
+Table KLINIK_SEYIR {
+  klinik_seyir_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  seyir_tipi varchar [not null]
+  seyir_zamani datetime [not null]
+  seyir_bilgisi text [not null]
+  septik_sok int [default: 0]
+  sepsis_durumu int [default: 0]
+  hekim_kodu varchar [ref: > PERSONEL.personel_kodu]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+
+  Indexes {
+    seyir_zamani
+  }
+}
+
+Table TIBBI_ORDER {
+  tibbi_order_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  order_turu_kodu varchar [not null]
+  aciklama text
+  order_zamani datetime [not null]
+  hekim_kodu varchar [ref: > PERSONEL.personel_kodu, not null]
+  iptal_durumu int [default: 0]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+Table TIBBI_ORDER_DETAY {
+  tibbi_order_detay_kodu varchar [pk, not null]
+  tibbi_order_kodu varchar [ref: > TIBBI_ORDER.tibbi_order_kodu, not null]
+  planlanan_uygulama_zamani datetime [not null]
+  uygulama_zamani datetime
+  uygulanma_durumu int [default: 0]
+  uygulayan_personel_kodu varchar [ref: > PERSONEL.personel_kodu]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+}
+
+Table TETKIK_SONUC {
+  tetkik_sonuc_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  tetkik_adi varchar [not null]
+  sonuc_degeri varchar
+  kritik_deger_araligi varchar
+  onay_zamani datetime
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+}
+
+// ---------------------------------------------------------
+// 5. REÇETE VE İLAÇ YÖNETİMİ
+// ---------------------------------------------------------
+
+Table RECETE {
+  recete_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  medula_e_recete_numarasi varchar
+  recete_turu_kodu varchar [not null]
+  hekim_kodu varchar [ref: > PERSONEL.personel_kodu, not null]
+  recete_zamani datetime [not null]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+  aktiflik_bilgisi int [default: 1]
+}
+
+Table RECETE_ILAC {
+  recete_ilac_kodu varchar [pk, not null]
+  recete_kodu varchar [ref: > RECETE.recete_kodu, not null]
+  barkod varchar [not null]
+  ilac_adi varchar
+  ilac_kullanim_dozu varchar [not null]
+  doz_birim varchar [not null]
+  ilac_kullanim_periyodu int
+  ilac_kullanim_periyodu_birimi varchar [not null]
+  ilac_kullanim_sekli varchar
+  kutu_adeti int
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+// ---------------------------------------------------------
+// 6. DİYET, RİSK VE UYARILAR
+// ---------------------------------------------------------
+
+Table BASVURU_YEMEK {
+  basvuru_yemek_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  yemek_zamani_turu varchar [not null]
+  yemek_turu varchar [not null]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+Table RISK_SKORLAMA {
+  risk_skorlama_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  risk_skorlama_turu varchar [not null]
+  risk_skorlama_toplam_puani varchar [not null]
+  islem_zamani datetime [not null]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+Table HASTA_UYARI {
+  hasta_uyari_kodu varchar [pk, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  uyari_turu varchar [not null]
+  uyari_aciklama text
+  aktiflik_bilgisi int [default: 1]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}
+
+Table BASVURU_TANI {
+  basvuru_tani_kodu varchar [pk, not null]
+  hasta_kodu varchar [ref: > HASTA.hasta_kodu, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu, not null]
+  tani_kodu varchar [not null]
+  tani_turu varchar
+  birincil_tani int [default: 0]
+  tani_zamani datetime [not null]
+  hekim_kodu varchar [ref: > PERSONEL.personel_kodu]
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime
+  guncelleyen_kullanici_kodu varchar
+}

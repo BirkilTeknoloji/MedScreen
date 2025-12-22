@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"medscreen/internal/config"
-	"medscreen/internal/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,6 +16,9 @@ import (
 var DB *gorm.DB
 
 // InitDatabase initializes the database connection with GORM
+// This is a read-only connection to the VEM 2.0 database.
+// No migrations or audit callbacks are registered since this system
+// only reads data from the existing VEM 2.0 compliant database.
 func InitDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	// Build PostgreSQL connection string
 	dsn := fmt.Sprintf(
@@ -60,46 +62,15 @@ func InitDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	log.Println("Database connection established successfully")
+	log.Println("Database connection established successfully (read-only mode)")
 
 	// Set global DB instance
 	DB = db
 
-	// Register audit log callbacks
-	RegisterAuditCallbacks(db)
+	// Note: No audit callbacks registered - this is a read-only system
+	// Note: No migrations run - VEM 2.0 tables already exist in the database
 
 	return db, nil
-}
-
-// RunMigrations runs GORM AutoMigrate for all models
-func RunMigrations(db *gorm.DB) error {
-	log.Println("Running database migrations...")
-
-	// Note: Since the database already exists with tables, AutoMigrate will
-	// only add missing columns and indexes, not recreate existing tables
-	err := db.AutoMigrate(
-		&models.User{},
-		&models.Patient{},
-		&models.Device{},
-		&models.Appointment{},
-		&models.Diagnosis{},
-		&models.Prescription{},
-		&models.MedicalTest{},
-		&models.MedicalHistory{},
-		&models.SurgeryHistory{},
-		&models.Allergy{},
-		&models.VitalSign{},
-		&models.NFCCard{},
-		&models.QRToken{},
-		&models.AuditLog{},
-	)
-
-	if err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-
-	log.Println("Database migrations completed successfully")
-	return nil
 }
 
 // CloseDatabase closes the database connection gracefully

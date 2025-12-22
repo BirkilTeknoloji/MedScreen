@@ -1,134 +1,129 @@
 package service
 
 import (
-	"context"
 	"medscreen/internal/models"
 	"time"
 )
 
-// UserService defines the interface for user business logic operations
-type UserService interface {
-	CreateUser(ctx context.Context, user *models.User) error
-	GetUser(id uint) (*models.User, error)
-	GetUsers(page, limit int, role *models.UserRole) ([]models.User, int64, error)
-	UpdateUser(ctx context.Context, id uint, user *models.User) error
-	DeleteUser(ctx context.Context, id uint) error
-	AuthenticateByNFC(nfcCardID string) (*models.User, error)
+// PersonelService defines the read-only interface for personnel business logic operations
+type PersonelService interface {
+	GetByKodu(kodu string) (*models.Personel, error)
+	GetAll(page, limit int) ([]models.Personel, int64, error)
+	GetByGorevKodu(gorevKodu string, page, limit int) ([]models.Personel, int64, error)
+	AuthenticateByNFC(kartUID string) (*models.Personel, error)
 }
 
-// NFCCardService defines the interface for NFC card business logic operations
-type NFCCardService interface {
-	CreateCard(ctx context.Context, card *models.NFCCard) error
-	GetCard(id uint) (*models.NFCCard, error)
-	GetCards(page, limit int) ([]models.NFCCard, int64, error)
-	UpdateCard(ctx context.Context, id uint, card *models.NFCCard) error
-	DeleteCard(ctx context.Context, id uint) error
-	AssignCardToUser(ctx context.Context, cardID, userID uint) error
-	DeactivateCard(ctx context.Context, cardID uint) error
-	GetCardByUID(cardUID string) (*models.NFCCard, error)
+// NFCKartService defines the read-only interface for NFC card business logic operations
+type NFCKartService interface {
+	GetByKodu(kodu string) (*models.NFCKart, error)
+	GetByKartUID(kartUID string) (*models.NFCKart, error)
+	GetByPersonelKodu(personelKodu string, page, limit int) ([]models.NFCKart, int64, error)
 }
 
-// PatientService defines the interface for patient business logic operations
-type PatientService interface {
-	CreatePatient(ctx context.Context, patient *models.Patient) error
-	GetPatient(id uint) (*models.Patient, error)
-	GetPatients(page, limit int) ([]models.Patient, int64, error)
-	UpdatePatient(ctx context.Context, id uint, patient *models.Patient) error
-	DeletePatient(ctx context.Context, id uint) error
-	GetPatientByTCNumber(tcNumber string) (*models.Patient, error)
-	SearchPatientsByName(name string, page, limit int) ([]models.Patient, int64, error)
-	GetPatientMedicalHistory(patientID uint) (map[string]interface{}, error)
+// HastaService defines the read-only interface for patient business logic operations
+type HastaService interface {
+	GetByKodu(kodu string) (*models.Hasta, error)
+	GetByTCKimlik(tcKimlik string) (*models.Hasta, error)
+	GetAll(page, limit int) ([]models.Hasta, int64, error)
+	SearchByName(name string, page, limit int) ([]models.Hasta, int64, error)
 }
 
-// AppointmentService defines the interface for appointment business logic operations
-type AppointmentService interface {
-	CreateAppointment(ctx context.Context, appointment *models.Appointment) error
-	GetAppointment(id uint) (*models.Appointment, error)
-	GetAppointments(page, limit int) ([]models.Appointment, int64, error)
-	UpdateAppointment(ctx context.Context, id uint, appointment *models.Appointment) error
-	DeleteAppointment(ctx context.Context, id uint) error
-	GetAppointmentsByFilters(doctorID, patientID *uint, status *models.AppointmentStatus, startDate, endDate *time.Time, page, limit int) ([]models.Appointment, int64, error)
+// HastaBasvuruService defines the read-only interface for patient visit business logic operations
+type HastaBasvuruService interface {
+	GetByKodu(kodu string) (*models.HastaBasvuru, error)
+	GetByHastaKodu(hastaKodu string, page, limit int) ([]models.HastaBasvuru, int64, error)
+	GetByHekimKodu(hekimKodu string, page, limit int) ([]models.HastaBasvuru, int64, error)
+	GetByFilters(durum *string, startDate, endDate *time.Time, page, limit int) ([]models.HastaBasvuru, int64, error)
 }
 
-// DiagnosisService defines the interface for diagnosis business logic operations
-type DiagnosisService interface {
-	CreateDiagnosis(ctx context.Context, diagnosis *models.Diagnosis) error
-	GetDiagnosis(id uint) (*models.Diagnosis, error)
-	GetDiagnoses(page, limit int) ([]models.Diagnosis, int64, error)
-	UpdateDiagnosis(ctx context.Context, id uint, diagnosis *models.Diagnosis) error
-	DeleteDiagnosis(ctx context.Context, id uint) error
-	GetDiagnosesByFilters(patientID, doctorID, appointmentID *uint, startDate, endDate *time.Time, page, limit int) ([]models.Diagnosis, int64, error)
+// YatakService defines the read-only interface for bed business logic operations
+type YatakService interface {
+	GetByKodu(kodu string) (*models.Yatak, error)
+	GetByBirimAndOda(birimKodu, odaKodu string, page, limit int) ([]models.Yatak, int64, error)
+	GetAll(page, limit int) ([]models.Yatak, int64, error)
 }
 
-// PrescriptionService defines the interface for prescription business logic operations
-type PrescriptionService interface {
-	CreatePrescription(ctx context.Context, prescription *models.Prescription) error
-	GetPrescription(id uint) (*models.Prescription, error)
-	GetPrescriptions(page, limit int) ([]models.Prescription, int64, error)
-	UpdatePrescription(ctx context.Context, id uint, prescription *models.Prescription) error
-	DeletePrescription(ctx context.Context, id uint) error
-	GetPrescriptionsByFilters(patientID, doctorID *uint, status *models.PrescriptionStatus, startDate, endDate *time.Time, page, limit int) ([]models.Prescription, int64, error)
+// TabletCihazService defines the read-only interface for tablet device business logic operations
+type TabletCihazService interface {
+	GetByKodu(kodu string) (*models.TabletCihaz, error)
+	GetByYatakKodu(yatakKodu string, page, limit int) ([]models.TabletCihaz, int64, error)
+	GetAll(page, limit int) ([]models.TabletCihaz, int64, error)
 }
 
-// MedicalTestService defines the interface for medical test business logic operations
-type MedicalTestService interface {
-	CreateMedicalTest(ctx context.Context, test *models.MedicalTest) error
-	GetMedicalTest(id uint) (*models.MedicalTest, error)
-	GetMedicalTests(page, limit int) ([]models.MedicalTest, int64, error)
-	UpdateMedicalTest(ctx context.Context, id uint, test *models.MedicalTest) error
-	DeleteMedicalTest(ctx context.Context, id uint) error
-	GetMedicalTestsByFilters(patientID, doctorID *uint, testType *models.TestType, status *models.TestStatus, startDate, endDate *time.Time, page, limit int) ([]models.MedicalTest, int64, error)
+// AnlikYatanHastaService defines the read-only interface for current inpatient business logic operations
+type AnlikYatanHastaService interface {
+	GetByKodu(kodu string) (*models.AnlikYatanHasta, error)
+	GetByYatakKodu(yatakKodu string, page, limit int) ([]models.AnlikYatanHasta, int64, error)
+	GetByHastaKodu(hastaKodu string, page, limit int) ([]models.AnlikYatanHasta, int64, error)
+	GetByBirimKodu(birimKodu string, page, limit int) ([]models.AnlikYatanHasta, int64, error)
 }
 
-// MedicalHistoryService defines the interface for medical history business logic operations
-type MedicalHistoryService interface {
-	CreateMedicalHistory(ctx context.Context, history *models.MedicalHistory) error
-	GetMedicalHistory(id uint) (*models.MedicalHistory, error)
-	GetMedicalHistories(page, limit int) ([]models.MedicalHistory, int64, error)
-	UpdateMedicalHistory(ctx context.Context, id uint, history *models.MedicalHistory) error
-	DeleteMedicalHistory(ctx context.Context, id uint) error
-	GetMedicalHistoriesByFilters(patientID *uint, status *models.MedicalHistoryStatus, page, limit int) ([]models.MedicalHistory, int64, error)
+// HastaVitalFizikiBulguService defines the read-only interface for vital signs business logic operations
+type HastaVitalFizikiBulguService interface {
+	GetByKodu(kodu string) (*models.HastaVitalFizikiBulgu, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.HastaVitalFizikiBulgu, int64, error)
+	GetByDateRange(startDate, endDate time.Time, page, limit int) ([]models.HastaVitalFizikiBulgu, int64, error)
 }
 
-// SurgeryHistoryService defines the interface for surgery history business logic operations
-type SurgeryHistoryService interface {
-	CreateSurgeryHistory(ctx context.Context, surgery *models.SurgeryHistory) error
-	GetSurgeryHistory(id uint) (*models.SurgeryHistory, error)
-	GetSurgeryHistories(page, limit int) ([]models.SurgeryHistory, int64, error)
-	UpdateSurgeryHistory(ctx context.Context, id uint, surgery *models.SurgeryHistory) error
-	DeleteSurgeryHistory(ctx context.Context, id uint) error
-	GetSurgeryHistoriesByFilters(patientID *uint, startDate, endDate *time.Time, page, limit int) ([]models.SurgeryHistory, int64, error)
+// KlinikSeyirService defines the read-only interface for clinical progress notes business logic operations
+type KlinikSeyirService interface {
+	GetByKodu(kodu string) (*models.KlinikSeyir, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.KlinikSeyir, int64, error)
+	GetByFilters(seyirTipi *string, startDate, endDate *time.Time, page, limit int) ([]models.KlinikSeyir, int64, error)
 }
 
-// AllergyService defines the interface for allergy business logic operations
-type AllergyService interface {
-	CreateAllergy(ctx context.Context, allergy *models.Allergy) error
-	GetAllergy(id uint) (*models.Allergy, error)
-	GetAllergies(page, limit int) ([]models.Allergy, int64, error)
-	UpdateAllergy(ctx context.Context, id uint, allergy *models.Allergy) error
-	DeleteAllergy(ctx context.Context, id uint) error
-	GetAllergiesByFilters(patientID *uint, severity *models.AllergySeverity, page, limit int) ([]models.Allergy, int64, error)
+// TibbiOrderService defines the read-only interface for medical orders business logic operations
+type TibbiOrderService interface {
+	GetByKodu(kodu string) (*models.TibbiOrder, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.TibbiOrder, int64, error)
+	GetDetayByOrderKodu(orderKodu string, page, limit int) ([]models.TibbiOrderDetay, int64, error)
 }
 
-// VitalSignService defines the interface for vital sign business logic operations
-type VitalSignService interface {
-	CreateVitalSign(ctx context.Context, vitalSign *models.VitalSign) error
-	GetVitalSign(id uint) (*models.VitalSign, error)
-	GetVitalSigns(page, limit int) ([]models.VitalSign, int64, error)
-	UpdateVitalSign(ctx context.Context, id uint, vitalSign *models.VitalSign) error
-	DeleteVitalSign(ctx context.Context, id uint) error
-	GetVitalSignsByFilters(patientID, appointmentID *uint, startDate, endDate *time.Time, page, limit int) ([]models.VitalSign, int64, error)
+// TetkikSonucService defines the read-only interface for test results business logic operations
+type TetkikSonucService interface {
+	GetByKodu(kodu string) (*models.TetkikSonuc, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.TetkikSonuc, int64, error)
 }
 
-// DeviceService defines the interface for device business logic operations
-type DeviceService interface {
-	RegisterDevice(ctx context.Context, device *models.Device) error
-	GetDeviceByMAC(mac string) (*models.Device, error)
-	GetDeviceByID(id uint) (*models.Device, error)
-	GetAllDevices(page, limit int) ([]models.Device, int64, error)
-	AssignPatient(ctx context.Context, mac string, patientID uint) error
-	UnassignPatient(ctx context.Context, mac string) error
-	UpdateDevice(ctx context.Context, mac string, updates *DeviceUpdateRequest) (*models.Device, error)
-	DeleteDevice(ctx context.Context, mac string) error
-	GetDevicesByFilters(roomNumber *string, patientID *uint, page, limit int) ([]models.Device, int64, error)
+// ReceteService defines the read-only interface for prescription business logic operations
+type ReceteService interface {
+	GetByKodu(kodu string) (*models.Recete, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.Recete, int64, error)
+	GetByHekimKodu(hekimKodu string, page, limit int) ([]models.Recete, int64, error)
+	GetIlaclar(receteKodu string, page, limit int) ([]models.ReceteIlac, int64, error)
+}
+
+// BasvuruTaniService defines the read-only interface for diagnosis business logic operations
+type BasvuruTaniService interface {
+	GetByKodu(kodu string) (*models.BasvuruTani, error)
+	GetByHastaKodu(hastaKodu string, page, limit int) ([]models.BasvuruTani, int64, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.BasvuruTani, int64, error)
+}
+
+// HastaTibbiBilgiService defines the read-only interface for patient medical information business logic operations
+type HastaTibbiBilgiService interface {
+	GetByKodu(kodu string) (*models.HastaTibbiBilgi, error)
+	GetByHastaKodu(hastaKodu string, page, limit int) ([]models.HastaTibbiBilgi, int64, error)
+	GetByTuru(turuKodu string, page, limit int) ([]models.HastaTibbiBilgi, int64, error)
+}
+
+// HastaUyariService defines the read-only interface for patient warnings business logic operations
+type HastaUyariService interface {
+	GetByKodu(kodu string) (*models.HastaUyari, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.HastaUyari, int64, error)
+	GetByFilters(uyariTuru *string, aktiflik *int, page, limit int) ([]models.HastaUyari, int64, error)
+}
+
+// RiskSkorlamaService defines the read-only interface for risk scoring business logic operations
+type RiskSkorlamaService interface {
+	GetByKodu(kodu string) (*models.RiskSkorlama, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.RiskSkorlama, int64, error)
+	GetByTuru(turu string, page, limit int) ([]models.RiskSkorlama, int64, error)
+}
+
+// BasvuruYemekService defines the read-only interface for diet/meal business logic operations
+type BasvuruYemekService interface {
+	GetByKodu(kodu string) (*models.BasvuruYemek, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.BasvuruYemek, int64, error)
+	GetByTuru(yemekTuru string, page, limit int) ([]models.BasvuruYemek, int64, error)
 }

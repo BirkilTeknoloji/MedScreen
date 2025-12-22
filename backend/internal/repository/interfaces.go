@@ -1,160 +1,133 @@
 package repository
 
 import (
-	"context"
 	"medscreen/internal/models"
 	"time"
 )
 
-// UserRepository defines the interface for user data access operations
-type UserRepository interface {
-	Create(ctx context.Context, user *models.User) error
-	FindByID(id uint) (*models.User, error)
-	FindAll(page, limit int) ([]models.User, int64, error)
-	Update(ctx context.Context, user *models.User) error
-	Delete(ctx context.Context, id uint) error
-	FindByRole(role models.UserRole, page, limit int) ([]models.User, int64, error)
-	FindByNFCCardID(nfcCardID uint) (*models.User, error)
-	FindByNFCCardUID(cardUID string) (*models.User, error)
+// PersonelRepository defines the read-only interface for personnel data access
+type PersonelRepository interface {
+	FindByKodu(kodu string) (*models.Personel, error)
+	FindAll(page, limit int) ([]models.Personel, int64, error)
+	FindByGorevKodu(gorevKodu string, page, limit int) ([]models.Personel, int64, error)
 }
 
-// NFCCardRepository defines the interface for NFC card data access operations
-type NFCCardRepository interface {
-	Create(ctx context.Context, card *models.NFCCard) error
-	FindByID(id uint) (*models.NFCCard, error)
-	FindAll(page, limit int) ([]models.NFCCard, int64, error)
-	Update(ctx context.Context, card *models.NFCCard) error
-	Delete(ctx context.Context, id uint) error
-	FindByCardUID(cardUID string) (*models.NFCCard, error)
-	FindByAssignedUserID(userID uint, page, limit int) ([]models.NFCCard, int64, error)
-	FindByActiveStatus(isActive bool, page, limit int) ([]models.NFCCard, int64, error)
+// NFCKartRepository defines the read-only interface for NFC card data access
+type NFCKartRepository interface {
+	FindByKodu(kodu string) (*models.NFCKart, error)
+	FindByKartUID(kartUID string) (*models.NFCKart, error)
+	FindByPersonelKodu(personelKodu string, page, limit int) ([]models.NFCKart, int64, error)
+	FindAll(page, limit int) ([]models.NFCKart, int64, error)
 }
 
-// PatientRepository defines the interface for patient data access operations
-type PatientRepository interface {
-	Create(ctx context.Context, patient *models.Patient) error
-	FindByID(id uint) (*models.Patient, error)
-	FindAll(page, limit int) ([]models.Patient, int64, error)
-	Update(ctx context.Context, patient *models.Patient) error
-	Delete(ctx context.Context, id uint) error
-	FindByTCNumber(tcNumber string) (*models.Patient, error)
-	SearchByName(name string, page, limit int) ([]models.Patient, int64, error)
+// HastaRepository defines the read-only interface for patient data access
+type HastaRepository interface {
+	FindByKodu(kodu string) (*models.Hasta, error)
+	FindByTCKimlik(tcKimlik string) (*models.Hasta, error)
+	FindAll(page, limit int) ([]models.Hasta, int64, error)
+	SearchByName(name string, page, limit int) ([]models.Hasta, int64, error)
 }
 
-// AppointmentRepository defines the interface for appointment data access operations
-type AppointmentRepository interface {
-	Create(ctx context.Context, appointment *models.Appointment) error
-	FindByID(id uint) (*models.Appointment, error)
-	FindAll(page, limit int) ([]models.Appointment, int64, error)
-	Update(ctx context.Context, appointment *models.Appointment) error
-	Delete(ctx context.Context, id uint) error
-	FindByDoctorID(doctorID uint, page, limit int) ([]models.Appointment, int64, error)
-	FindByPatientID(patientID uint, page, limit int) ([]models.Appointment, int64, error)
-	FindByStatus(status models.AppointmentStatus, page, limit int) ([]models.Appointment, int64, error)
-	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.Appointment, int64, error)
-	FindByFilters(doctorID, patientID *uint, status *models.AppointmentStatus, startDate, endDate *time.Time, page, limit int) ([]models.Appointment, int64, error)
+// HastaBasvuruRepository defines the read-only interface for patient visit/admission data access
+type HastaBasvuruRepository interface {
+	FindByKodu(kodu string) (*models.HastaBasvuru, error)
+	FindByHastaKodu(hastaKodu string, page, limit int) ([]models.HastaBasvuru, int64, error)
+	FindByHekimKodu(hekimKodu string, page, limit int) ([]models.HastaBasvuru, int64, error)
+	FindByDurum(durum string, page, limit int) ([]models.HastaBasvuru, int64, error)
+	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.HastaBasvuru, int64, error)
 }
 
-// DiagnosisRepository defines the interface for diagnosis data access operations
-type DiagnosisRepository interface {
-	Create(ctx context.Context, diagnosis *models.Diagnosis) error
-	FindByID(id uint) (*models.Diagnosis, error)
-	FindAll(page, limit int) ([]models.Diagnosis, int64, error)
-	Update(ctx context.Context, diagnosis *models.Diagnosis) error
-	Delete(ctx context.Context, id uint) error
-	FindByPatientID(patientID uint, page, limit int) ([]models.Diagnosis, int64, error)
-	FindByDoctorID(doctorID uint, page, limit int) ([]models.Diagnosis, int64, error)
-	FindByAppointmentID(appointmentID uint, page, limit int) ([]models.Diagnosis, int64, error)
-	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.Diagnosis, int64, error)
-	FindByFilters(patientID, doctorID, appointmentID *uint, startDate, endDate *time.Time, page, limit int) ([]models.Diagnosis, int64, error)
+// YatakRepository defines the read-only interface for bed data access
+type YatakRepository interface {
+	FindByKodu(kodu string) (*models.Yatak, error)
+	FindByBirimAndOda(birimKodu, odaKodu string, page, limit int) ([]models.Yatak, int64, error)
+	FindAll(page, limit int) ([]models.Yatak, int64, error)
 }
 
-// PrescriptionRepository defines the interface for prescription data access operations
-type PrescriptionRepository interface {
-	Create(ctx context.Context, prescription *models.Prescription) error
-	FindByID(id uint) (*models.Prescription, error)
-	FindAll(page, limit int) ([]models.Prescription, int64, error)
-	Update(ctx context.Context, prescription *models.Prescription) error
-	Delete(ctx context.Context, id uint) error
-	FindByPatientID(patientID uint, page, limit int) ([]models.Prescription, int64, error)
-	FindByDoctorID(doctorID uint, page, limit int) ([]models.Prescription, int64, error)
-	FindByStatus(status models.PrescriptionStatus, page, limit int) ([]models.Prescription, int64, error)
-	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.Prescription, int64, error)
-	FindByFilters(patientID, doctorID *uint, status *models.PrescriptionStatus, startDate, endDate *time.Time, page, limit int) ([]models.Prescription, int64, error)
+// TabletCihazRepository defines the read-only interface for tablet device data access
+type TabletCihazRepository interface {
+	FindByKodu(kodu string) (*models.TabletCihaz, error)
+	FindByYatakKodu(yatakKodu string, page, limit int) ([]models.TabletCihaz, int64, error)
+	FindAll(page, limit int) ([]models.TabletCihaz, int64, error)
 }
 
-// MedicalTestRepository defines the interface for medical test data access operations
-type MedicalTestRepository interface {
-	Create(ctx context.Context, test *models.MedicalTest) error
-	FindByID(id uint) (*models.MedicalTest, error)
-	FindAll(page, limit int) ([]models.MedicalTest, int64, error)
-	Update(ctx context.Context, test *models.MedicalTest) error
-	Delete(ctx context.Context, id uint) error
-	FindByPatientID(patientID uint, page, limit int) ([]models.MedicalTest, int64, error)
-	FindByDoctorID(doctorID uint, page, limit int) ([]models.MedicalTest, int64, error)
-	FindByTestType(testType models.TestType, page, limit int) ([]models.MedicalTest, int64, error)
-	FindByStatus(status models.TestStatus, page, limit int) ([]models.MedicalTest, int64, error)
-	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.MedicalTest, int64, error)
-	FindByFilters(patientID, doctorID *uint, testType *models.TestType, status *models.TestStatus, startDate, endDate *time.Time, page, limit int) ([]models.MedicalTest, int64, error)
+// AnlikYatanHastaRepository defines the read-only interface for current inpatient data access
+type AnlikYatanHastaRepository interface {
+	FindByKodu(kodu string) (*models.AnlikYatanHasta, error)
+	FindByYatakKodu(yatakKodu string, page, limit int) ([]models.AnlikYatanHasta, int64, error)
+	FindByHastaKodu(hastaKodu string, page, limit int) ([]models.AnlikYatanHasta, int64, error)
+	FindByBirimKodu(birimKodu string, page, limit int) ([]models.AnlikYatanHasta, int64, error)
 }
 
-// MedicalHistoryRepository defines the interface for medical history data access operations
-type MedicalHistoryRepository interface {
-	Create(ctx context.Context, history *models.MedicalHistory) error
-	FindByID(id uint) (*models.MedicalHistory, error)
-	FindAll(page, limit int) ([]models.MedicalHistory, int64, error)
-	Update(ctx context.Context, history *models.MedicalHistory) error
-	Delete(ctx context.Context, id uint) error
-	FindByPatientID(patientID uint, page, limit int) ([]models.MedicalHistory, int64, error)
-	FindByStatus(status models.MedicalHistoryStatus, page, limit int) ([]models.MedicalHistory, int64, error)
-	FindByFilters(patientID *uint, status *models.MedicalHistoryStatus, page, limit int) ([]models.MedicalHistory, int64, error)
+// HastaVitalFizikiBulguRepository defines the read-only interface for vital signs data access
+type HastaVitalFizikiBulguRepository interface {
+	FindByKodu(kodu string) (*models.HastaVitalFizikiBulgu, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.HastaVitalFizikiBulgu, int64, error)
+	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.HastaVitalFizikiBulgu, int64, error)
 }
 
-// SurgeryHistoryRepository defines the interface for surgery history data access operations
-type SurgeryHistoryRepository interface {
-	Create(ctx context.Context, surgery *models.SurgeryHistory) error
-	FindByID(id uint) (*models.SurgeryHistory, error)
-	FindAll(page, limit int) ([]models.SurgeryHistory, int64, error)
-	Update(ctx context.Context, surgery *models.SurgeryHistory) error
-	Delete(ctx context.Context, id uint) error
-	FindByPatientID(patientID uint, page, limit int) ([]models.SurgeryHistory, int64, error)
-	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.SurgeryHistory, int64, error)
-	FindByFilters(patientID *uint, startDate, endDate *time.Time, page, limit int) ([]models.SurgeryHistory, int64, error)
+// KlinikSeyirRepository defines the read-only interface for clinical progress notes data access
+type KlinikSeyirRepository interface {
+	FindByKodu(kodu string) (*models.KlinikSeyir, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.KlinikSeyir, int64, error)
+	FindBySeyirTipi(seyirTipi string, page, limit int) ([]models.KlinikSeyir, int64, error)
+	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.KlinikSeyir, int64, error)
 }
 
-// AllergyRepository defines the interface for allergy data access operations
-type AllergyRepository interface {
-	Create(ctx context.Context, allergy *models.Allergy) error
-	FindByID(id uint) (*models.Allergy, error)
-	FindAll(page, limit int) ([]models.Allergy, int64, error)
-	Update(ctx context.Context, allergy *models.Allergy) error
-	Delete(ctx context.Context, id uint) error
-	FindByPatientID(patientID uint, page, limit int) ([]models.Allergy, int64, error)
-	FindBySeverity(severity models.AllergySeverity, page, limit int) ([]models.Allergy, int64, error)
-	FindByFilters(patientID *uint, severity *models.AllergySeverity, page, limit int) ([]models.Allergy, int64, error)
+// TibbiOrderRepository defines the read-only interface for medical orders data access
+type TibbiOrderRepository interface {
+	FindByKodu(kodu string) (*models.TibbiOrder, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.TibbiOrder, int64, error)
+	FindDetayByOrderKodu(orderKodu string, page, limit int) ([]models.TibbiOrderDetay, int64, error)
 }
 
-// VitalSignRepository defines the interface for vital sign data access operations
-type VitalSignRepository interface {
-	Create(ctx context.Context, vitalSign *models.VitalSign) error
-	FindByID(id uint) (*models.VitalSign, error)
-	FindAll(page, limit int) ([]models.VitalSign, int64, error)
-	Update(ctx context.Context, vitalSign *models.VitalSign) error
-	Delete(ctx context.Context, id uint) error
-	FindByPatientID(patientID uint, page, limit int) ([]models.VitalSign, int64, error)
-	FindByAppointmentID(appointmentID uint, page, limit int) ([]models.VitalSign, int64, error)
-	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.VitalSign, int64, error)
-	FindByFilters(patientID, appointmentID *uint, startDate, endDate *time.Time, page, limit int) ([]models.VitalSign, int64, error)
+// TetkikSonucRepository defines the read-only interface for test results data access
+type TetkikSonucRepository interface {
+	FindByKodu(kodu string) (*models.TetkikSonuc, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.TetkikSonuc, int64, error)
 }
 
-// DeviceRepository defines the interface for device data access operations
-type DeviceRepository interface {
-	Create(ctx context.Context, device *models.Device) error
-	GetByMAC(mac string) (*models.Device, error)
-	GetByID(id uint) (*models.Device, error)
-	Update(ctx context.Context, device *models.Device) error
-	Delete(ctx context.Context, id uint) error
-	FindAll(page, limit int) ([]models.Device, int64, error)
-	DeleteByMAC(ctx context.Context, mac string) error
-	FindByFilters(roomNumber *string, patientID *uint, page, limit int) ([]models.Device, int64, error)
+// ReceteRepository defines the read-only interface for prescription data access
+type ReceteRepository interface {
+	FindByKodu(kodu string) (*models.Recete, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.Recete, int64, error)
+	FindByHekimKodu(hekimKodu string, page, limit int) ([]models.Recete, int64, error)
+	FindIlacByReceteKodu(receteKodu string, page, limit int) ([]models.ReceteIlac, int64, error)
+}
+
+// BasvuruTaniRepository defines the read-only interface for diagnosis data access
+type BasvuruTaniRepository interface {
+	FindByKodu(kodu string) (*models.BasvuruTani, error)
+	FindByHastaKodu(hastaKodu string, page, limit int) ([]models.BasvuruTani, int64, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.BasvuruTani, int64, error)
+	FindByTaniKodu(taniKodu string, page, limit int) ([]models.BasvuruTani, int64, error)
+}
+
+// HastaTibbiBilgiRepository defines the read-only interface for patient medical information data access
+type HastaTibbiBilgiRepository interface {
+	FindByKodu(kodu string) (*models.HastaTibbiBilgi, error)
+	FindByHastaKodu(hastaKodu string, page, limit int) ([]models.HastaTibbiBilgi, int64, error)
+	FindByTuru(turuKodu string, page, limit int) ([]models.HastaTibbiBilgi, int64, error)
+}
+
+// HastaUyariRepository defines the read-only interface for patient warnings data access
+type HastaUyariRepository interface {
+	FindByKodu(kodu string) (*models.HastaUyari, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.HastaUyari, int64, error)
+	FindByTuru(uyariTuru string, page, limit int) ([]models.HastaUyari, int64, error)
+	FindByAktiflik(aktiflik int, page, limit int) ([]models.HastaUyari, int64, error)
+}
+
+// RiskSkorlamaRepository defines the read-only interface for risk scoring data access
+type RiskSkorlamaRepository interface {
+	FindByKodu(kodu string) (*models.RiskSkorlama, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.RiskSkorlama, int64, error)
+	FindByTuru(turu string, page, limit int) ([]models.RiskSkorlama, int64, error)
+}
+
+// BasvuruYemekRepository defines the read-only interface for diet/meal data access
+type BasvuruYemekRepository interface {
+	FindByKodu(kodu string) (*models.BasvuruYemek, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.BasvuruYemek, int64, error)
+	FindByTuru(yemekTuru string, page, limit int) ([]models.BasvuruYemek, int64, error)
 }
