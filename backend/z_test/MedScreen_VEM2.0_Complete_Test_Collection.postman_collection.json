@@ -1,32 +1,11 @@
 {
 	"info": {
-		"_postman_id": "medscreen-vem2-collection",
-		"name": "MedScreen VEM 2.0 - Complete API Test Collection",
+		"_postman_id": "0fc97b42-2693-4537-ab15-137fa7299619",
+		"name": "MedScreen VEM 2.0 API Test",
 		"description": "Comprehensive test collection for MedScreen VEM 2.0 read-only API endpoints using test database data",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41185553"
 	},
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{auth_token}}",
-				"type": "string"
-			}
-		]
-	},
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "http://localhost:8080/api/v1",
-			"type": "string"
-		},
-		{
-			"key": "auth_token",
-			"value": "",
-			"type": "string"
-		}
-	],
 	"item": [
 		{
 			"name": "Authentication",
@@ -56,8 +35,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/nfc-kart/authenticate/04AABBCCDD01",
-							"host": ["{{base_url}}"],
-							"path": ["nfc-kart", "authenticate", "04AABBCCDD01"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfc-kart",
+								"authenticate",
+								"04AABBCCDD01"
+							]
 						}
 					},
 					"response": []
@@ -87,8 +72,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/nfc-kart/authenticate/04AABBCCDD02",
-							"host": ["{{base_url}}"],
-							"path": ["nfc-kart", "authenticate", "04AABBCCDD02"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfc-kart",
+								"authenticate",
+								"04AABBCCDD02"
+							]
 						}
 					},
 					"response": []
@@ -118,8 +109,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/nfc-kart/authenticate/04AABBCCDD03",
-							"host": ["{{base_url}}"],
-							"path": ["nfc-kart", "authenticate", "04AABBCCDD03"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfc-kart",
+								"authenticate",
+								"04AABBCCDD03"
+							]
 						}
 					},
 					"response": []
@@ -136,8 +133,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/personel",
-							"host": ["{{base_url}}"],
-							"path": ["personel"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel"
+							]
 						}
 					},
 					"response": []
@@ -149,8 +150,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/personel/P0001",
-							"host": ["{{base_url}}"],
-							"path": ["personel", "P0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel",
+								"P0001"
+							]
 						}
 					},
 					"response": []
@@ -162,8 +168,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/personel/P0002",
-							"host": ["{{base_url}}"],
-							"path": ["personel", "P0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel",
+								"P0002"
+							]
 						}
 					},
 					"response": []
@@ -175,8 +186,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/personel/gorev/HEKIM",
-							"host": ["{{base_url}}"],
-							"path": ["personel", "gorev", "HEKIM"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel",
+								"gorev",
+								"HEKIM"
+							]
 						}
 					},
 					"response": []
@@ -188,8 +205,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/personel/gorev/HEMSIRE",
-							"host": ["{{base_url}}"],
-							"path": ["personel", "gorev", "HEMSIRE"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel",
+								"gorev",
+								"HEMSIRE"
+							]
 						}
 					},
 					"response": []
@@ -201,8 +224,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/personel/authenticate/04AABBCCDD01",
-							"host": ["{{base_url}}"],
-							"path": ["personel", "authenticate", "04AABBCCDD01"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel",
+								"authenticate",
+								"04AABBCCDD01"
+							]
 						}
 					},
 					"response": []
@@ -219,8 +248,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/nfc-kart/NFK0001",
-							"host": ["{{base_url}}"],
-							"path": ["nfc-kart", "NFK0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfc-kart",
+								"NFK0001"
+							]
 						}
 					},
 					"response": []
@@ -232,8 +266,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/nfc-kart/uid/04AABBCCDD01",
-							"host": ["{{base_url}}"],
-							"path": ["nfc-kart", "uid", "04AABBCCDD01"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfc-kart",
+								"uid",
+								"04AABBCCDD01"
+							]
 						}
 					},
 					"response": []
@@ -245,8 +285,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/nfc-kart/personel/P0001",
-							"host": ["{{base_url}}"],
-							"path": ["nfc-kart", "personel", "P0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"nfc-kart",
+								"personel",
+								"P0001"
+							]
 						}
 					},
 					"response": []
@@ -263,8 +309,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta",
-							"host": ["{{base_url}}"],
-							"path": ["hasta"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta"
+							]
 						}
 					},
 					"response": []
@@ -276,8 +326,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta/search?ad=Fatma&soyadi=Acar",
-							"host": ["{{base_url}}"],
-							"path": ["hasta", "search"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta",
+								"search"
+							],
 							"query": [
 								{
 									"key": "ad",
@@ -299,8 +354,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta/H0001",
-							"host": ["{{base_url}}"],
-							"path": ["hasta", "H0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta",
+								"H0001"
+							]
 						}
 					},
 					"response": []
@@ -312,8 +372,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta/H0003",
-							"host": ["{{base_url}}"],
-							"path": ["hasta", "H0003"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta",
+								"H0003"
+							]
 						}
 					},
 					"response": []
@@ -325,8 +390,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta/tc/55555555555",
-							"host": ["{{base_url}}"],
-							"path": ["hasta", "tc", "55555555555"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta",
+								"tc",
+								"55555555555"
+							]
 						}
 					},
 					"response": []
@@ -343,8 +414,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-basvuru/filter?basvuru_durumu=YATIS",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-basvuru", "filter"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-basvuru",
+								"filter"
+							],
 							"query": [
 								{
 									"key": "basvuru_durumu",
@@ -362,8 +438,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-basvuru/B0001",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-basvuru", "B0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-basvuru",
+								"B0001"
+							]
 						}
 					},
 					"response": []
@@ -375,8 +456,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -388,8 +474,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-basvuru/hasta/H0001",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-basvuru", "hasta", "H0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-basvuru",
+								"hasta",
+								"H0001"
+							]
 						}
 					},
 					"response": []
@@ -401,8 +493,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-basvuru/hekim/P0001",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-basvuru", "hekim", "P0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-basvuru",
+								"hekim",
+								"P0001"
+							]
 						}
 					},
 					"response": []
@@ -419,8 +517,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/yatak",
-							"host": ["{{base_url}}"],
-							"path": ["yatak"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"yatak"
+							]
 						}
 					},
 					"response": []
@@ -432,8 +534,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/yatak/Y001",
-							"host": ["{{base_url}}"],
-							"path": ["yatak", "Y001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"yatak",
+								"Y001"
+							]
 						}
 					},
 					"response": []
@@ -445,8 +552,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/yatak/Y002",
-							"host": ["{{base_url}}"],
-							"path": ["yatak", "Y002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"yatak",
+								"Y002"
+							]
 						}
 					},
 					"response": []
@@ -458,8 +570,16 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/yatak/birim/ICU/oda/ICU-01",
-							"host": ["{{base_url}}"],
-							"path": ["yatak", "birim", "ICU", "oda", "ICU-01"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"yatak",
+								"birim",
+								"ICU",
+								"oda",
+								"ICU-01"
+							]
 						}
 					},
 					"response": []
@@ -476,8 +596,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tablet-cihaz",
-							"host": ["{{base_url}}"],
-							"path": ["tablet-cihaz"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tablet-cihaz"
+							]
 						}
 					},
 					"response": []
@@ -489,8 +613,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tablet-cihaz/TBL001",
-							"host": ["{{base_url}}"],
-							"path": ["tablet-cihaz", "TBL001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tablet-cihaz",
+								"TBL001"
+							]
 						}
 					},
 					"response": []
@@ -502,8 +631,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tablet-cihaz/yatak/Y001",
-							"host": ["{{base_url}}"],
-							"path": ["tablet-cihaz", "yatak", "Y001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tablet-cihaz",
+								"yatak",
+								"Y001"
+							]
 						}
 					},
 					"response": []
@@ -520,8 +655,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/anlik-yatan-hasta/AYH001",
-							"host": ["{{base_url}}"],
-							"path": ["anlik-yatan-hasta", "AYH001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"anlik-yatan-hasta",
+								"AYH001"
+							]
 						}
 					},
 					"response": []
@@ -533,8 +673,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/anlik-yatan-hasta/yatak/Y001",
-							"host": ["{{base_url}}"],
-							"path": ["anlik-yatan-hasta", "yatak", "Y001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"anlik-yatan-hasta",
+								"yatak",
+								"Y001"
+							]
 						}
 					},
 					"response": []
@@ -546,8 +692,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/anlik-yatan-hasta/hasta/H0003",
-							"host": ["{{base_url}}"],
-							"path": ["anlik-yatan-hasta", "hasta", "H0003"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"anlik-yatan-hasta",
+								"hasta",
+								"H0003"
+							]
 						}
 					},
 					"response": []
@@ -559,8 +711,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/anlik-yatan-hasta/birim/ICU",
-							"host": ["{{base_url}}"],
-							"path": ["anlik-yatan-hasta", "birim", "ICU"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"anlik-yatan-hasta",
+								"birim",
+								"ICU"
+							]
 						}
 					},
 					"response": []
@@ -577,8 +735,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/vital-bulgu/date-range?start_date=2025-12-21&end_date=2025-12-22",
-							"host": ["{{base_url}}"],
-							"path": ["vital-bulgu", "date-range"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vital-bulgu",
+								"date-range"
+							],
 							"query": [
 								{
 									"key": "start_date",
@@ -600,8 +763,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/vital-bulgu/VTL001",
-							"host": ["{{base_url}}"],
-							"path": ["vital-bulgu", "VTL001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vital-bulgu",
+								"VTL001"
+							]
 						}
 					},
 					"response": []
@@ -613,8 +781,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/vital-bulgu/basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["vital-bulgu", "basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vital-bulgu",
+								"basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -631,8 +805,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/klinik-seyir/filter?seyir_tipi=HEKIM_NOTU&sepsis_durumu=1",
-							"host": ["{{base_url}}"],
-							"path": ["klinik-seyir", "filter"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"klinik-seyir",
+								"filter"
+							],
 							"query": [
 								{
 									"key": "seyir_tipi",
@@ -654,8 +833,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/klinik-seyir/KS001",
-							"host": ["{{base_url}}"],
-							"path": ["klinik-seyir", "KS001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"klinik-seyir",
+								"KS001"
+							]
 						}
 					},
 					"response": []
@@ -667,8 +851,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/klinik-seyir/basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["klinik-seyir", "basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"klinik-seyir",
+								"basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -685,8 +875,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tibbi-order/ORD001",
-							"host": ["{{base_url}}"],
-							"path": ["tibbi-order", "ORD001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tibbi-order",
+								"ORD001"
+							]
 						}
 					},
 					"response": []
@@ -698,8 +893,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tibbi-order/ORD001/detay",
-							"host": ["{{base_url}}"],
-							"path": ["tibbi-order", "ORD001", "detay"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tibbi-order",
+								"ORD001",
+								"detay"
+							]
 						}
 					},
 					"response": []
@@ -711,8 +912,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tibbi-order/basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["tibbi-order", "basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tibbi-order",
+								"basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -729,8 +936,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tetkik-sonuc/TS001",
-							"host": ["{{base_url}}"],
-							"path": ["tetkik-sonuc", "TS001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tetkik-sonuc",
+								"TS001"
+							]
 						}
 					},
 					"response": []
@@ -742,8 +954,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tetkik-sonuc/TS002",
-							"host": ["{{base_url}}"],
-							"path": ["tetkik-sonuc", "TS002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tetkik-sonuc",
+								"TS002"
+							]
 						}
 					},
 					"response": []
@@ -755,8 +972,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/tetkik-sonuc/basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["tetkik-sonuc", "basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tetkik-sonuc",
+								"basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -773,8 +996,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/recete/RCP001",
-							"host": ["{{base_url}}"],
-							"path": ["recete", "RCP001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"recete",
+								"RCP001"
+							]
 						}
 					},
 					"response": []
@@ -786,8 +1014,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/recete/RCP001/ilaclar",
-							"host": ["{{base_url}}"],
-							"path": ["recete", "RCP001", "ilaclar"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"recete",
+								"RCP001",
+								"ilaclar"
+							]
 						}
 					},
 					"response": []
@@ -799,8 +1033,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/recete/basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["recete", "basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"recete",
+								"basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -812,8 +1052,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/recete/hekim/P0001",
-							"host": ["{{base_url}}"],
-							"path": ["recete", "hekim", "P0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"recete",
+								"hekim",
+								"P0001"
+							]
 						}
 					},
 					"response": []
@@ -830,8 +1076,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/basvuru-tani/TN001",
-							"host": ["{{base_url}}"],
-							"path": ["basvuru-tani", "TN001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"basvuru-tani",
+								"TN001"
+							]
 						}
 					},
 					"response": []
@@ -843,8 +1094,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/basvuru-tani/hasta/H0003",
-							"host": ["{{base_url}}"],
-							"path": ["basvuru-tani", "hasta", "H0003"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"basvuru-tani",
+								"hasta",
+								"H0003"
+							]
 						}
 					},
 					"response": []
@@ -856,8 +1113,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/basvuru-tani/basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["basvuru-tani", "basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"basvuru-tani",
+								"basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -874,8 +1137,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-tibbi-bilgi/TB0001",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-tibbi-bilgi", "TB0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-tibbi-bilgi",
+								"TB0001"
+							]
 						}
 					},
 					"response": []
@@ -887,8 +1155,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-tibbi-bilgi/hasta/H0001",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-tibbi-bilgi", "hasta", "H0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-tibbi-bilgi",
+								"hasta",
+								"H0001"
+							]
 						}
 					},
 					"response": []
@@ -900,8 +1174,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-tibbi-bilgi/turu/ALERJI",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-tibbi-bilgi", "turu", "ALERJI"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-tibbi-bilgi",
+								"turu",
+								"ALERJI"
+							]
 						}
 					},
 					"response": []
@@ -918,8 +1198,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-uyari/filter?uyari_turu=KRITIK&aktiflik_bilgisi=1",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-uyari", "filter"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-uyari",
+								"filter"
+							],
 							"query": [
 								{
 									"key": "uyari_turu",
@@ -941,8 +1226,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-uyari/UY001",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-uyari", "UY001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-uyari",
+								"UY001"
+							]
 						}
 					},
 					"response": []
@@ -954,8 +1244,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-uyari/UY002",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-uyari", "UY002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-uyari",
+								"UY002"
+							]
 						}
 					},
 					"response": []
@@ -967,8 +1262,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta-uyari/basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["hasta-uyari", "basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta-uyari",
+								"basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -985,8 +1286,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/risk-skorlama/RSK001",
-							"host": ["{{base_url}}"],
-							"path": ["risk-skorlama", "RSK001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"risk-skorlama",
+								"RSK001"
+							]
 						}
 					},
 					"response": []
@@ -998,8 +1304,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/risk-skorlama/basvuru/B0002",
-							"host": ["{{base_url}}"],
-							"path": ["risk-skorlama", "basvuru", "B0002"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"risk-skorlama",
+								"basvuru",
+								"B0002"
+							]
 						}
 					},
 					"response": []
@@ -1011,8 +1323,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/risk-skorlama/turu/NEWS2",
-							"host": ["{{base_url}}"],
-							"path": ["risk-skorlama", "turu", "NEWS2"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"risk-skorlama",
+								"turu",
+								"NEWS2"
+							]
 						}
 					},
 					"response": []
@@ -1024,8 +1342,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/risk-skorlama/turu/FALL_RISK",
-							"host": ["{{base_url}}"],
-							"path": ["risk-skorlama", "turu", "FALL_RISK"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"risk-skorlama",
+								"turu",
+								"FALL_RISK"
+							]
 						}
 					},
 					"response": []
@@ -1042,8 +1366,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/basvuru-yemek/BY001",
-							"host": ["{{base_url}}"],
-							"path": ["basvuru-yemek", "BY001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"basvuru-yemek",
+								"BY001"
+							]
 						}
 					},
 					"response": []
@@ -1055,8 +1384,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/basvuru-yemek/basvuru/B0001",
-							"host": ["{{base_url}}"],
-							"path": ["basvuru-yemek", "basvuru", "B0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"basvuru-yemek",
+								"basvuru",
+								"B0001"
+							]
 						}
 					},
 					"response": []
@@ -1068,8 +1403,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/basvuru-yemek/turu/DIYET-STD",
-							"host": ["{{base_url}}"],
-							"path": ["basvuru-yemek", "turu", "DIYET-STD"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"basvuru-yemek",
+								"turu",
+								"DIYET-STD"
+							]
 						}
 					},
 					"response": []
@@ -1095,8 +1436,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/personel",
-							"host": ["{{base_url}}"],
-							"path": ["personel"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel"
+							]
 						}
 					},
 					"response": []
@@ -1117,8 +1462,13 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/personel/P0001",
-							"host": ["{{base_url}}"],
-							"path": ["personel", "P0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel",
+								"P0001"
+							]
 						}
 					},
 					"response": []
@@ -1130,8 +1480,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/personel/P0001",
-							"host": ["{{base_url}}"],
-							"path": ["personel", "P0001"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel",
+								"P0001"
+							]
 						}
 					},
 					"response": []
@@ -1143,8 +1498,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/personel/INVALID_CODE",
-							"host": ["{{base_url}}"],
-							"path": ["personel", "INVALID_CODE"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"personel",
+								"INVALID_CODE"
+							]
 						}
 					},
 					"response": []
@@ -1156,13 +1516,40 @@
 						"header": [],
 						"url": {
 							"raw": "{{base_url}}/hasta/INVALID_CODE",
-							"host": ["{{base_url}}"],
-							"path": ["hasta", "INVALID_CODE"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hasta",
+								"INVALID_CODE"
+							]
 						}
 					},
 					"response": []
 				}
 			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
