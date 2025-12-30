@@ -22,7 +22,7 @@ var DB *gorm.DB
 func InitDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	// Build PostgreSQL connection string
 	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s client_encoding=UTF8",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s client_encoding=SQL_ASCII",
 		cfg.Host,
 		cfg.Port,
 		cfg.User,

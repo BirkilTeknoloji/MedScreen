@@ -83,6 +83,16 @@ func (h *KlinikSeyirHandler) GetByFilters(c *gin.Context) {
 		seyirTipi = &tipi
 	}
 
+	var sepsisDurumu *int
+	if sepsis := c.Query("sepsis_durumu"); sepsis != "" {
+		parsed, err := strconv.Atoi(sepsis)
+		if err != nil {
+			utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Invalid sepsis_durumu (use 0 or 1)", err)
+			return
+		}
+		sepsisDurumu = &parsed
+	}
+
 	var startDate, endDate *time.Time
 	if start := c.Query("start_date"); start != "" {
 		t, err := time.Parse("2006-01-02", start)
@@ -102,7 +112,12 @@ func (h *KlinikSeyirHandler) GetByFilters(c *gin.Context) {
 		endDate = &t
 	}
 
-	seyirler, total, err := h.service.GetByFilters(seyirTipi, startDate, endDate, page, limit)
+	if seyirTipi == nil && sepsisDurumu == nil && (startDate == nil || endDate == nil) {
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "At least one filter (seyir_tipi, sepsis_durumu, or start_date+end_date) is required", nil)
+		return
+	}
+
+	seyirler, total, err := h.service.GetByFilters(seyirTipi, sepsisDurumu, startDate, endDate, page, limit)
 	if err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to retrieve clinical notes", err)
 		return

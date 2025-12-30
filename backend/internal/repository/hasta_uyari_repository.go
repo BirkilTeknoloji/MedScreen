@@ -2,6 +2,7 @@ package repository
 
 import (
 	"medscreen/internal/models"
+	"medscreen/internal/utils"
 
 	"gorm.io/gorm"
 )
@@ -23,6 +24,7 @@ func (r *hastaUyariRepository) FindByKodu(kodu string) (*models.HastaUyari, erro
 		Where("hasta_uyari_kodu = ?", kodu).First(&uyari).Error; err != nil {
 		return nil, err
 	}
+	sanitizeHastaUyari(&uyari)
 	return &uyari, nil
 }
 
@@ -43,6 +45,9 @@ func (r *hastaUyariRepository) FindByBasvuruKodu(basvuruKodu string, page, limit
 		return nil, 0, err
 	}
 
+	for i := range uyarilar {
+		sanitizeHastaUyari(&uyarilar[i])
+	}
 	return uyarilar, total, nil
 }
 
@@ -63,6 +68,9 @@ func (r *hastaUyariRepository) FindByTuru(uyariTuru string, page, limit int) ([]
 		return nil, 0, err
 	}
 
+	for i := range uyarilar {
+		sanitizeHastaUyari(&uyarilar[i])
+	}
 	return uyarilar, total, nil
 }
 
@@ -83,5 +91,12 @@ func (r *hastaUyariRepository) FindByAktiflik(aktiflik int, page, limit int) ([]
 		return nil, 0, err
 	}
 
+	for i := range uyarilar {
+		sanitizeHastaUyari(&uyarilar[i])
+	}
 	return uyarilar, total, nil
+}
+
+func sanitizeHastaUyari(uyari *models.HastaUyari) {
+	uyari.UyariAciklama = utils.NormalizeUTF8Ptr(uyari.UyariAciklama)
 }

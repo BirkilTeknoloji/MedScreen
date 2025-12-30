@@ -90,6 +90,18 @@ func (h *HastaUyariHandler) GetByFilters(c *gin.Context) {
 			return
 		}
 		aktiflik = &aktifVal
+	} else if aktifStr := c.Query("aktiflik_bilgisi"); aktifStr != "" {
+		aktifVal, err := strconv.Atoi(aktifStr)
+		if err != nil {
+			utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Invalid aktiflik_bilgisi value", err)
+			return
+		}
+		aktiflik = &aktifVal
+	}
+
+	if uyariTuru == nil && aktiflik == nil {
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "At least one filter (uyari_turu or aktiflik/aktiflik_bilgisi) is required", nil)
+		return
 	}
 
 	uyarilar, total, err := h.service.GetByFilters(uyariTuru, aktiflik, page, limit)

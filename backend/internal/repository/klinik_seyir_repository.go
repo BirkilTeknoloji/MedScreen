@@ -2,6 +2,7 @@ package repository
 
 import (
 	"medscreen/internal/models"
+	"medscreen/internal/utils"
 	"time"
 
 	"gorm.io/gorm"
@@ -24,6 +25,7 @@ func (r *klinikSeyirRepository) FindByKodu(kodu string) (*models.KlinikSeyir, er
 		Where("klinik_seyir_kodu = ?", kodu).First(&seyir).Error; err != nil {
 		return nil, err
 	}
+	sanitizeKlinikSeyir(&seyir)
 	return &seyir, nil
 }
 
@@ -44,6 +46,9 @@ func (r *klinikSeyirRepository) FindByBasvuruKodu(basvuruKodu string, page, limi
 		return nil, 0, err
 	}
 
+	for i := range seyirler {
+		sanitizeKlinikSeyir(&seyirler[i])
+	}
 	return seyirler, total, nil
 }
 
@@ -64,6 +69,57 @@ func (r *klinikSeyirRepository) FindBySeyirTipi(seyirTipi string, page, limit in
 		return nil, 0, err
 	}
 
+	for i := range seyirler {
+		sanitizeKlinikSeyir(&seyirler[i])
+	}
+	return seyirler, total, nil
+}
+
+// FindBySepsisDurumu retrieves clinical notes by sepsis status with pagination
+func (r *klinikSeyirRepository) FindBySepsisDurumu(sepsisDurumu int, page, limit int) ([]models.KlinikSeyir, int64, error) {
+	var seyirler []models.KlinikSeyir
+	var total int64
+
+	if err := r.db.Model(&models.KlinikSeyir{}).Where("sepsis_durumu = ?", sepsisDurumu).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	if err := r.db.Preload("HastaBasvuru").Preload("Hekim").
+		Where("sepsis_durumu = ?", sepsisDurumu).
+		Order("seyir_zamani DESC").
+		Offset(offset).Limit(limit).Find(&seyirler).Error; err != nil {
+		return nil, 0, err
+	}
+
+	for i := range seyirler {
+		sanitizeKlinikSeyir(&seyirler[i])
+	}
+	return seyirler, total, nil
+}
+
+// FindBySeyirTipiAndSepsisDurumu retrieves clinical notes by type and sepsis status with pagination
+func (r *klinikSeyirRepository) FindBySeyirTipiAndSepsisDurumu(seyirTipi string, sepsisDurumu int, page, limit int) ([]models.KlinikSeyir, int64, error) {
+	var seyirler []models.KlinikSeyir
+	var total int64
+
+	if err := r.db.Model(&models.KlinikSeyir{}).
+		Where("seyir_tipi = ? AND sepsis_durumu = ?", seyirTipi, sepsisDurumu).
+		Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	if err := r.db.Preload("HastaBasvuru").Preload("Hekim").
+		Where("seyir_tipi = ? AND sepsis_durumu = ?", seyirTipi, sepsisDurumu).
+		Order("seyir_zamani DESC").
+		Offset(offset).Limit(limit).Find(&seyirler).Error; err != nil {
+		return nil, 0, err
+	}
+
+	for i := range seyirler {
+		sanitizeKlinikSeyir(&seyirler[i])
+	}
 	return seyirler, total, nil
 }
 
@@ -86,5 +142,12 @@ func (r *klinikSeyirRepository) FindByDateRange(startDate, endDate time.Time, pa
 		return nil, 0, err
 	}
 
+	for i := range seyirler {
+		sanitizeKlinikSeyir(&seyirler[i])
+	}
 	return seyirler, total, nil
+}
+
+func sanitizeKlinikSeyir(seyir *models.KlinikSeyir) {
+	seyir.SeyirBilgisi = utils.NormalizeUTF8(seyir.SeyirBilgisi)
 }

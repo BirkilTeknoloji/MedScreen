@@ -69,7 +69,7 @@ type HastaVitalFizikiBulguService interface {
 type KlinikSeyirService interface {
 	GetByKodu(kodu string) (*models.KlinikSeyir, error)
 	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.KlinikSeyir, int64, error)
-	GetByFilters(seyirTipi *string, startDate, endDate *time.Time, page, limit int) ([]models.KlinikSeyir, int64, error)
+	GetByFilters(seyirTipi *string, sepsisDurumu *int, startDate, endDate *time.Time, page, limit int) ([]models.KlinikSeyir, int64, error)
 }
 
 // TibbiOrderService defines the read-only interface for medical orders business logic operations

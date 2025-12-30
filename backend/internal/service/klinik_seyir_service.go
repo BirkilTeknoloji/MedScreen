@@ -50,7 +50,7 @@ func (s *klinikSeyirService) GetByBasvuruKodu(basvuruKodu string, page, limit in
 }
 
 // GetByFilters retrieves clinical progress notes by various filters
-func (s *klinikSeyirService) GetByFilters(seyirTipi *string, startDate, endDate *time.Time, page, limit int) ([]models.KlinikSeyir, int64, error) {
+func (s *klinikSeyirService) GetByFilters(seyirTipi *string, sepsisDurumu *int, startDate, endDate *time.Time, page, limit int) ([]models.KlinikSeyir, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -60,7 +60,15 @@ func (s *klinikSeyirService) GetByFilters(seyirTipi *string, startDate, endDate 
 
 	// If note type filter is provided
 	if seyirTipi != nil && *seyirTipi != "" {
+		if sepsisDurumu != nil {
+			return s.repo.FindBySeyirTipiAndSepsisDurumu(*seyirTipi, *sepsisDurumu, page, limit)
+		}
 		return s.repo.FindBySeyirTipi(*seyirTipi, page, limit)
+	}
+
+	// If sepsis status filter is provided
+	if sepsisDurumu != nil {
+		return s.repo.FindBySepsisDurumu(*sepsisDurumu, page, limit)
 	}
 
 	// If date range filter is provided

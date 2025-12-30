@@ -109,6 +109,8 @@ func (h *HastaBasvuruHandler) GetByFilters(c *gin.Context) {
 	var durum *string
 	if d := c.Query("durum"); d != "" {
 		durum = &d
+	} else if d := c.Query("basvuru_durumu"); d != "" {
+		durum = &d
 	}
 
 	var startDate, endDate *time.Time
@@ -128,6 +130,11 @@ func (h *HastaBasvuruHandler) GetByFilters(c *gin.Context) {
 			return
 		}
 		endDate = &t
+	}
+
+	if durum == nil && (startDate == nil || endDate == nil) {
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "At least one filter (durum/basvuru_durumu or start_date+end_date) is required", nil)
+		return
 	}
 
 	basvurular, total, err := h.service.GetByFilters(durum, startDate, endDate, page, limit)

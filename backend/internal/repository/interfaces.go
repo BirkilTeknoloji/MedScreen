@@ -71,6 +71,8 @@ type KlinikSeyirRepository interface {
 	FindByKodu(kodu string) (*models.KlinikSeyir, error)
 	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.KlinikSeyir, int64, error)
 	FindBySeyirTipi(seyirTipi string, page, limit int) ([]models.KlinikSeyir, int64, error)
+	FindBySepsisDurumu(sepsisDurumu int, page, limit int) ([]models.KlinikSeyir, int64, error)
+	FindBySeyirTipiAndSepsisDurumu(seyirTipi string, sepsisDurumu int, page, limit int) ([]models.KlinikSeyir, int64, error)
 	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.KlinikSeyir, int64, error)
 }
 
