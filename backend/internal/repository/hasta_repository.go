@@ -55,18 +55,21 @@ func (r *hastaRepository) FindAll(page, limit int) ([]models.Hasta, int64, error
 	return hastalar, total, nil
 }
 
-// SearchByName searches patients by name using ILIKE for case-insensitive search
-func (r *hastaRepository) SearchByName(name string, page, limit int) ([]models.Hasta, int64, error) {
+// SearchByAdSoyadi searches patients by first name and/or last name using ILIKE for case-insensitive search
+func (r *hastaRepository) SearchByAdSoyadi(ad, soyadi string, page, limit int) ([]models.Hasta, int64, error) {
 	var hastalar []models.Hasta
 	var total int64
 
-	// Use ILIKE for case-insensitive search on both ad and soyadi
-	searchPattern := "%" + name + "%"
+	query := r.db.Model(&models.Hasta{})
+	if ad != "" {
+		query = query.Where("ad ILIKE ?", "%"+ad+"%")
+	}
+	if soyadi != "" {
+		query = query.Where("soyadi ILIKE ?", "%"+soyadi+"%")
+	}
 
 	// Count total records matching the search
-	if err := r.db.Model(&models.Hasta{}).
-		Where("ad ILIKE ? OR soyadi ILIKE ?", searchPattern, searchPattern).
-		Count(&total).Error; err != nil {
+	if err := query.Session(&gorm.Session{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -74,8 +77,7 @@ func (r *hastaRepository) SearchByName(name string, page, limit int) ([]models.H
 	offset := (page - 1) * limit
 
 	// Fetch paginated results
-	if err := r.db.Where("ad ILIKE ? OR soyadi ILIKE ?", searchPattern, searchPattern).
-		Offset(offset).Limit(limit).Find(&hastalar).Error; err != nil {
+	if err := query.Session(&gorm.Session{}).Offset(offset).Limit(limit).Find(&hastalar).Error; err != nil {
 		return nil, 0, err
 	}
 

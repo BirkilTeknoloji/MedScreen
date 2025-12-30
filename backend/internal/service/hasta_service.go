@@ -66,10 +66,10 @@ func (s *hastaService) GetAll(page, limit int) ([]models.Hasta, int64, error) {
 	return s.repo.FindAll(page, limit)
 }
 
-// SearchByName searches for patients by name
-func (s *hastaService) SearchByName(name string, page, limit int) ([]models.Hasta, int64, error) {
-	if name == "" {
-		return nil, 0, errors.New("name is required for search")
+// SearchByAdSoyadi searches for patients by first name and/or last name
+func (s *hastaService) SearchByAdSoyadi(ad, soyadi string, page, limit int) ([]models.Hasta, int64, error) {
+	if ad == "" && soyadi == "" {
+		return nil, 0, errors.New("ad or soyadi is required for search")
 	}
 
 	if page < 1 {
@@ -79,7 +79,7 @@ func (s *hastaService) SearchByName(name string, page, limit int) ([]models.Hast
 		limit = 10
 	}
 
-	return s.repo.SearchByName(name, page, limit)
+	return s.repo.SearchByAdSoyadi(ad, soyadi, page, limit)
 }
 
 // validateTCKimlik validates that the TC number is exactly 11 digits

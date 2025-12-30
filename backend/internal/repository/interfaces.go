@@ -25,7 +25,7 @@ type HastaRepository interface {
 	FindByKodu(kodu string) (*models.Hasta, error)
 	FindByTCKimlik(tcKimlik string) (*models.Hasta, error)
 	FindAll(page, limit int) ([]models.Hasta, int64, error)
-	SearchByName(name string, page, limit int) ([]models.Hasta, int64, error)
+	SearchByAdSoyadi(ad, soyadi string, page, limit int) ([]models.Hasta, int64, error)
 }
 
 // HastaBasvuruRepository defines the read-only interface for patient visit/admission data access

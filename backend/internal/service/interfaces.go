@@ -25,7 +25,7 @@ type HastaService interface {
 	GetByKodu(kodu string) (*models.Hasta, error)
 	GetByTCKimlik(tcKimlik string) (*models.Hasta, error)
 	GetAll(page, limit int) ([]models.Hasta, int64, error)
-	SearchByName(name string, page, limit int) ([]models.Hasta, int64, error)
+	SearchByAdSoyadi(ad, soyadi string, page, limit int) ([]models.Hasta, int64, error)
 }
 
 // HastaBasvuruService defines the read-only interface for patient visit business logic operations
@@ -126,4 +126,14 @@ type BasvuruYemekService interface {
 	GetByKodu(kodu string) (*models.BasvuruYemek, error)
 	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.BasvuruYemek, int64, error)
 	GetByTuru(yemekTuru string, page, limit int) ([]models.BasvuruYemek, int64, error)
+}
+
+// RandevuService defines the read-only interface for appointment business logic operations
+type RandevuService interface {
+	GetByKodu(kodu string) (*models.Randevu, error)
+	GetByHastaKodu(hastaKodu string, page, limit int) ([]models.Randevu, int64, error)
+	GetByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.Randevu, int64, error)
+	GetByHekimKodu(hekimKodu string, page, limit int) ([]models.Randevu, int64, error)
+	GetByTuru(randevuTuru string, page, limit int) ([]models.Randevu, int64, error)
+	GetByDateRange(startDate, endDate time.Time, page, limit int) ([]models.Randevu, int64, error)
 }

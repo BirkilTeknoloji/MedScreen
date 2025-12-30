@@ -78,9 +78,10 @@ func (h *HastaHandler) GetAll(c *gin.Context) {
 
 // Search handles GET /api/v1/hasta/search
 func (h *HastaHandler) Search(c *gin.Context) {
-	name := c.Query("name")
-	if name == "" {
-		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Search name is required", nil)
+	ad := c.Query("ad")
+	soyadi := c.Query("soyadi")
+	if ad == "" && soyadi == "" {
+		utils.SendErrorResponse(c, http.StatusBadRequest, constants.ERROR_INVALID_REQUEST, "Search ad or soyadi is required", nil)
 		return
 	}
 
@@ -94,7 +95,7 @@ func (h *HastaHandler) Search(c *gin.Context) {
 		limit = 10
 	}
 
-	hastalar, total, err := h.service.SearchByName(name, page, limit)
+	hastalar, total, err := h.service.SearchByAdSoyadi(ad, soyadi, page, limit)
 	if err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, constants.ERROR_INTERNAL_SERVER, "Failed to search patients", err)
 		return
