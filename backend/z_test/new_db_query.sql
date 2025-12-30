@@ -9,6 +9,7 @@ SET TIME ZONE 'Europe/Istanbul';
 -- DROP (FK bağımlılık sırasına göre)
 -- ---------------------------------------------------------
 DROP TABLE IF EXISTS basvuru_tani CASCADE;
+DROP TABLE IF EXISTS randevu CASCADE;
 DROP TABLE IF EXISTS hasta_uyari CASCADE;
 DROP TABLE IF EXISTS risk_skorlama CASCADE;
 DROP TABLE IF EXISTS basvuru_yemek CASCADE;
@@ -328,6 +329,30 @@ CREATE TABLE basvuru_tani (
 );
 
 -- ---------------------------------------------------------
+-- 7. RANDEVU YÖNETİMİ
+-- ---------------------------------------------------------
+CREATE TABLE randevu (
+  randevu_kodu               varchar PRIMARY KEY,
+  hasta_kodu                 varchar NOT NULL REFERENCES hasta(hasta_kodu),
+  hasta_basvuru_kodu         varchar REFERENCES hasta_basvuru(hasta_basvuru_kodu),
+  hekim_kodu                 varchar REFERENCES personel(personel_kodu),
+  birim_kodu                 varchar,
+  randevu_turu               varchar NOT NULL,
+  randevu_zamani             timestamp NOT NULL,
+  randevu_gelme_durumu       varchar,
+  aciklama                   text,
+  iptal_durumu               int NOT NULL DEFAULT 0,
+  kayit_zamani               timestamp NOT NULL,
+  ekleyen_kullanici_kodu     varchar NOT NULL,
+  guncelleme_zamani          timestamp,
+  guncelleyen_kullanici_kodu varchar
+);
+
+CREATE INDEX idx_randevu_hasta_kodu ON randevu (hasta_kodu);
+CREATE INDEX idx_randevu_zamani ON randevu (randevu_zamani);
+CREATE INDEX idx_randevu_hekim_zamani ON randevu (hekim_kodu, randevu_zamani);
+
+-- ---------------------------------------------------------
 -- SEED DATA (her tablo 3 kayıt)
 -- ---------------------------------------------------------
 
@@ -507,5 +532,14 @@ INSERT INTO basvuru_tani (
   ('TN001','H0002','B0003','I10','KESIN',1,'2025-12-21 09:45:00','P0001','2025-12-21 09:46:00','P0001',NULL,NULL),
   ('TN002','H0003','B0002','A41.9','ON_TANI',1,'2025-12-21 08:50:00','P0003','2025-12-21 08:51:00','P0003',NULL,NULL),
   ('TN003','H0001','B0001','R50.9','ON_TANI',1,'2025-12-21 09:05:00','P0001','2025-12-21 09:06:00','P0001',NULL,NULL);
+
+-- RANDEVU (3 kayŽñt)
+INSERT INTO randevu (
+  randevu_kodu, hasta_kodu, hasta_basvuru_kodu, hekim_kodu, birim_kodu, randevu_turu, randevu_zamani,
+  randevu_gelme_durumu, aciklama, iptal_durumu, kayit_zamani, ekleyen_kullanici_kodu, guncelleme_zamani, guncelleyen_kullanici_kodu
+) VALUES
+  ('RAN001','H0001','B0001','P0001','SERVIS','KONTROL','2025-12-22 09:00:00','GELDI','Kontrol randevusu',0,'2025-12-21 12:00:00','SYS',NULL,NULL),
+  ('RAN002','H0002',NULL,'P0003','POLIKLINIK','MUAYENE','2025-12-23 14:30:00','GELMEDI',NULL,0,'2025-12-21 12:05:00','SYS',NULL,NULL),
+  ('RAN003','H0003','B0002',NULL,'DIS','DIS_TEDAVI','2025-12-24 10:15:00',NULL,'Dis poliklinigi randevusu',1,'2025-12-21 12:10:00','SYS','2025-12-22 08:00:00','P0004');
 
 COMMIT;

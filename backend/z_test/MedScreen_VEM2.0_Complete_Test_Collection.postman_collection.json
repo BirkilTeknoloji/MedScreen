@@ -1418,6 +1418,133 @@
 			]
 		},
 		{
+			"name": "Appointment Management",
+			"item": [
+				{
+					"name": "Get Appointment by Code - RAN001",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/randevu/RAN001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"randevu",
+								"RAN001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments by Patient - H0001",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/randevu/hasta/H0001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"randevu",
+								"hasta",
+								"H0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments by Visit - B0001",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/randevu/basvuru/B0001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"randevu",
+								"basvuru",
+								"B0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments by Physician - P0001",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/randevu/hekim/P0001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"randevu",
+								"hekim",
+								"P0001"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments by Type - KONTROL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/randevu/turu/KONTROL",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"randevu",
+								"turu",
+								"KONTROL"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Appointments by Date Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/randevu/date-range?start_date=2025-12-22&end_date=2025-12-24",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"randevu",
+								"date-range"
+							],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2025-12-22"
+								},
+								{
+									"key": "end_date",
+									"value": "2025-12-24"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Error Testing",
 			"item": [
 				{

@@ -27,6 +27,7 @@ type Handlers struct {
 	HastaUyari            *handler.HastaUyariHandler
 	RiskSkorlama          *handler.RiskSkorlamaHandler
 	BasvuruYemek          *handler.BasvuruYemekHandler
+	Randevu               *handler.RandevuHandler
 }
 
 // MethodNotAllowedMiddleware rejects write operations (POST, PUT, PATCH, DELETE)
@@ -204,5 +205,16 @@ func SetupRoutes(router *gin.Engine, handlers *Handlers, corsOrigins, corsMethod
 		basvuruYemek.GET("/:kodu", handlers.BasvuruYemek.GetByKodu)
 		basvuruYemek.GET("/basvuru/:basvuru_kodu", handlers.BasvuruYemek.GetByBasvuru)
 		basvuruYemek.GET("/turu/:yemek_turu", handlers.BasvuruYemek.GetByTuru)
+	}
+
+	// Randevu routes (GET only)
+	randevu := protected.Group("/randevu")
+	{
+		randevu.GET("/:kodu", handlers.Randevu.GetByKodu)
+		randevu.GET("/hasta/:hasta_kodu", handlers.Randevu.GetByHasta)
+		randevu.GET("/basvuru/:basvuru_kodu", handlers.Randevu.GetByBasvuru)
+		randevu.GET("/hekim/:hekim_kodu", handlers.Randevu.GetByHekim)
+		randevu.GET("/turu/:randevu_turu", handlers.Randevu.GetByTuru)
+		randevu.GET("/date-range", handlers.Randevu.GetByDateRange)
 	}
 }

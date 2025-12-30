@@ -314,3 +314,30 @@ Table BASVURU_TANI {
   guncelleme_zamani datetime
   guncelleyen_kullanici_kodu varchar
 }
+
+// ---------------------------------------------------------
+// 7. RANDEVU YÖNETİMİ
+// ---------------------------------------------------------
+
+Table RANDEVU {
+  randevu_kodu varchar [pk, not null]
+  hasta_kodu varchar [ref: > HASTA.hasta_kodu, not null]
+  hasta_basvuru_kodu varchar [ref: > HASTA_BASVURU.hasta_basvuru_kodu]
+  hekim_kodu varchar [ref: > PERSONEL.personel_kodu]
+  birim_kodu varchar
+  randevu_turu varchar [not null]
+  randevu_zamani datetime [not null]
+  randevu_gelme_durumu varchar
+  aciklama text
+  iptal_durumu int [default: 0] // Sadece iptal mi değil mi bilgisini tutarız.
+  kayit_zamani datetime [not null]
+  ekleyen_kullanici_kodu varchar [not null]
+  guncelleme_zamani datetime // İptal zamanı buradan okunabilir.
+  guncelleyen_kullanici_kodu varchar // İptal eden kişi buradan okunabilir.
+
+  Indexes {
+    hasta_kodu
+    randevu_zamani
+    (hekim_kodu, randevu_zamani)
+  }
+}

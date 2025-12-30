@@ -133,3 +133,13 @@ type BasvuruYemekRepository interface {
 	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.BasvuruYemek, int64, error)
 	FindByTuru(yemekTuru string, page, limit int) ([]models.BasvuruYemek, int64, error)
 }
+
+// RandevuRepository defines the read-only interface for appointment data access
+type RandevuRepository interface {
+	FindByKodu(kodu string) (*models.Randevu, error)
+	FindByHastaKodu(hastaKodu string, page, limit int) ([]models.Randevu, int64, error)
+	FindByBasvuruKodu(basvuruKodu string, page, limit int) ([]models.Randevu, int64, error)
+	FindByHekimKodu(hekimKodu string, page, limit int) ([]models.Randevu, int64, error)
+	FindByTuru(randevuTuru string, page, limit int) ([]models.Randevu, int64, error)
+	FindByDateRange(startDate, endDate time.Time, page, limit int) ([]models.Randevu, int64, error)
+}

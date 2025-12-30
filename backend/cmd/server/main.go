@@ -61,6 +61,7 @@ func main() {
 	hastaUyariRepo := repository.NewHastaUyariRepository(db)
 	riskSkorlamaRepo := repository.NewRiskSkorlamaRepository(db)
 	basvuruYemekRepo := repository.NewBasvuruYemekRepository(db)
+	randevuRepo := repository.NewRandevuRepository(db)
 
 	// Initialize VEM 2.0 services (read-only)
 	personelService := service.NewPersonelService(personelRepo, nfcKartRepo)
@@ -80,6 +81,7 @@ func main() {
 	hastaUyariService := service.NewHastaUyariService(hastaUyariRepo)
 	riskSkorlamaService := service.NewRiskSkorlamaService(riskSkorlamaRepo)
 	basvuruYemekService := service.NewBasvuruYemekService(basvuruYemekRepo)
+	randevuService := service.NewRandevuService(randevuRepo)
 
 	// Initialize VEM 2.0 handlers (read-only, GET endpoints only)
 	handlers := &routes.Handlers{
@@ -100,6 +102,7 @@ func main() {
 		HastaUyari:            handler.NewHastaUyariHandler(hastaUyariService),
 		RiskSkorlama:          handler.NewRiskSkorlamaHandler(riskSkorlamaService),
 		BasvuruYemek:          handler.NewBasvuruYemekHandler(basvuruYemekService),
+		Randevu:               handler.NewRandevuHandler(randevuService),
 	}
 
 	// Set up Gin router
