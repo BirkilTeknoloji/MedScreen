@@ -1,34 +1,19 @@
-import { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-  ScrollView,
-} from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { View, Text, ActivityIndicator, ScrollView } from 'react-native';
 import ActionButtons from './components/ActionButtons';
 import PatientProfile from './components/PatientProfile';
-import {
-  getAppointmentsByPatientId,
-  getDiagnosesByPatientId,
-  getFirstPatient,
-  getPatientById,
-  getPatientByDeviceId,
-  getPrescriptionsByPatientId,
-  getMedicalTestsByPatientId,
-  getMedicalHistoryByPatientId,
-  getSurgeryHistoryByPatientId,
-  getAllergiesByPatientId,
-} from '../services/api';
-import styles from './styles/PatientScreenStyle';
-
 import AppointmentsContainer from './components/AppointmentsContainer';
+import * as Api from '../services/apiService';
+import styles from './styles/PatientScreenStyle';
 
 export default function PatientScreen({ route, navigation }) {
   const [userData, setUserData] = useState(null);
+  const [patientId, setPatientId] = useState('H0001');
+
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [firstData, setFirstData] = useState(null);
+
+  // Veri State'leri
   const [appointments, setAppointments] = useState([]);
   const [diagnoses, setDiagnoses] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
@@ -36,159 +21,181 @@ export default function PatientScreen({ route, navigation }) {
   const [medicalHistory, setMedicalHistory] = useState([]);
   const [surgeryHistory, setSurgeryHistory] = useState([]);
   const [allergies, setAllergies] = useState([]);
-  const {
-    patientData,
-    doctorData,
-    isPatientLogin,
-    qrTokenData,
-    qrTokenType,
-    isQrNavigation,
-  } = route.params || {};
-  const [activeTab, setActiveTab] = useState('randevularTetkikler');
 
+  const { isQrNavigation, qrTokenData } = route.params || {};
+
+  const resetDetails = () => {
+    setAppointments([]);
+    setDiagnoses([]);
+    setPrescriptions([]);
+    setMedicalTests([]);
+    setMedicalHistory([]);
+    setSurgeryHistory([]);
+    setAllergies([]);
+  };
+
+  // Normalize helper
+  const norm = v =>
+    (v ?? '').toString().trim().toLocaleUpperCase('tr-TR').replaceAll('İ', 'I');
+
+  // 1) Base data
   useEffect(() => {
-    if (!route.params?.patientData) {
-      // Check if coming from QR navigation with patient_id
-      if (isQrNavigation && qrTokenData?.patient_id) {
-        console.log(
-          'Fetching patient data from QR token:',
-          qrTokenData.patient_id,
+    const fetchBaseData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        resetDetails();
+
+        const pid =
+          isQrNavigation && qrTokenData?.patient_id
+            ? qrTokenData.patient_id
+            : 'H0001';
+
+        setPatientId(pid);
+
+        console.log('Hasta yükleniyor:', pid);
+        const data = await Api.getPatientById(pid);
+
+        if (data) {
+          setUserData(data);
+          console.log('Hasta yüklendi:', data);
+        } else {
+          setUserData(null);
+          setError('Hasta verisi boş döndü.');
+        }
+      } catch (err) {
+        setUserData(null);
+        setError('Sunucu bağlantı hatası.');
+        console.error('Hasta yükleme hatası:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBaseData();
+  }, [isQrNavigation, qrTokenData]);
+
+  // 2) Details
+  const fetchAllDetails = useCallback(async () => {
+    if (!userData || !patientId) return;
+
+    try {
+      const [appts, diags, pres, tests, historyRes] = await Promise.all([
+        Api.getAppointmentsByPatientId(patientId),
+        Api.getDiagnosesByPatientId(patientId),
+        Api.getPrescriptionsByPatientId(patientId),
+        Api.getMedicalTestsByPatientId(patientId),
+        Api.getMedicalHistoryByPatientId(patientId),
+      ]);
+
+      const history = Array.isArray(historyRes)
+        ? historyRes
+        : historyRes?.data ?? [];
+
+      // Debug
+      console.log('history raw:', history);
+      console.log(
+        'history types:',
+        (history || []).map(x => x.turu || x.TURU),
+      );
+
+      // PatientScreen.js içindeki filtreleme mantığı
+      if (history && Array.isArray(history)) {
+        // 1. Alerjiler
+        const allergyData = history.filter(
+          i => i.tibbi_bilgi_turu_kodu === 'ALERJI',
         );
-        fetchPatientDataById(qrTokenData.patient_id);
-      } else {
-        fetchPatientFirstData();
+        setAllergies(allergyData);
+
+        // 2. Ameliyatlar
+        const surgeryData = history.filter(
+          i => i.tibbi_bilgi_turu_kodu === 'AMELIYAT',
+        );
+        setSurgeryHistory(surgeryData);
+
+        // 3. Kronik Hastalıklar (Tıbbi Geçmiş)
+        const chronicData = history.filter(
+          i =>
+            i.tibbi_bilgi_turu_kodu === 'KRONIK' ||
+            i.aciklama?.toLowerCase().includes('kronik'),
+        );
+        setMedicalHistory(chronicData);
       }
+
+      setAppointments(appts || []);
+      setDiagnoses(diags || []);
+      setPrescriptions(pres || []);
+      setMedicalTests(tests || []);
+    } catch (err) {
+      console.error('Detay veri çekme/ayrıştırma hatası:', err);
     }
-  }, []);
+  }, [userData, patientId]);
 
   useEffect(() => {
-    if (userData) {
-      fetchAppointmentsOnly();
-    }
-  }, [userData]);
+    fetchAllDetails();
+  }, [fetchAllDetails]);
 
-  const fetchPatientFirstData = async () => {
-    try {
-      setIsLoading(true);
+  useEffect(() => {
+    console.log("Dropdown'a gelen alerjiler:", allergies);
+  }, [allergies]);
 
-      const data = await getFirstPatient();
-
-      if (data) {
-        setUserData(data);
-      } else {
-        setError('Görüntülenecek hasta bulunamadı.');
-      }
-    } catch (err) {
-      console.error('Hata:', err);
-      setError('Veri alınamadı.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchPatientDataById = async patientId => {
-    try {
-      setIsLoading(true);
-      // Fetch specific patient by ID from QR token
-      const patient = await getPatientById(patientId);
-
-      if (patient) {
-        setUserData(patient);
-      } else {
-        console.warn('Patient not found for ID:', patientId);
-        setError('Hasta verisi alınamadı.');
-      }
-    } catch (err) {
-      console.error('Patient fetch error:', err);
-      setError('Veri alınamadı.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const fetchAppointmentsOnly = async () => {
-    if (!userData?.ID) return;
-
-    try {
-      // Randevuları çek
-      const appts = await getAppointmentsByPatientId(userData.ID);
-      setAppointments(appts);
-
-      // 3. TANILARI VE İLAÇLARI ÇEK
-      console.log('Tanılar isteniyor...');
-      const diags = await getDiagnosesByPatientId(userData.ID);
-      console.log('İlaçlar isteniyor...');
-      const pres = await getPrescriptionsByPatientId(userData.ID);
-      console.log('Tetkikler isteniyor...');
-      const tests = await getMedicalTestsByPatientId(userData.ID);
-      console.log('Tıbbi geçmiş isteniyor...');
-      const history = await getMedicalHistoryByPatientId(userData.ID);
-      console.log('Ameliyat geçmişi isteniyor...');
-      const surgery = await getSurgeryHistoryByPatientId(userData.ID);
-      console.log('Alerjiler isteniyor...');
-      const allergiesData = await getAllergiesByPatientId(userData.ID);
-      setDiagnoses(diags);
-      setPrescriptions(pres);
-      setMedicalTests(tests);
-      setMedicalHistory(history);
-      setSurgeryHistory(surgery);
-      setAllergies(allergiesData);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const tabs = [
-    { key: 'randevularTetkikler', label: 'Randevular & Tetkikler' },
-    { key: 'saglikGecmisi', label: 'Sağlık Geçmişi' },
-  ];
-
-  const renderContent = () => {
-    if (isLoading) {
-      return <Text style={styles.loadingText}>Yükleniyor...</Text>;
-    }
-    if (error) {
-      return <Text style={styles.errorText}>{error}</Text>;
-    }
-    if (!userData) {
-      return <Text style={styles.noDataText}>Hasta verisi bulunamadı.</Text>;
-    }
+  // --- Render ---
+  if (isLoading) {
     return (
-      <>
-        {isQrNavigation && (
-          <View
-            style={{
-              backgroundColor: '#e3f2fd',
-              padding: 12,
-              marginBottom: 8,
-              borderRadius: 4,
-            }}
-          >
-            <Text
-              style={{ fontSize: 12, color: '#1976d2', fontWeight: 'bold' }}
-            >
-              ✅ QR Token ile Yüklendi ({qrTokenType})
-            </Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#4A90E2" />
+        <Text style={{ marginTop: 10, color: '#666' }}>
+          Hasta bilgileri yükleniyor...
+        </Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 20,
+        }}
+      >
+        <Text style={{ color: 'red', fontSize: 16, textAlign: 'center' }}>
+          {error}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={{ flex: 1 }}>
+        {userData ? (
+          <>
+            <PatientProfile
+              userData={userData}
+              actionButtons={<ActionButtons navigation={navigation} />}
+            />
+            <View style={styles.contentRow}>
+              <AppointmentsContainer
+                userData={userData}
+                appointments={appointments}
+                diagnoses={diagnoses}
+                prescriptions={prescriptions}
+                medicalTests={medicalTests}
+                medicalHistory={medicalHistory}
+                surgeryHistory={surgeryHistory}
+                allergies={allergies}
+              />
+            </View>
+          </>
+        ) : (
+          <View style={{ padding: 20 }}>
+            <Text>Hasta bilgisi bulunamadı.</Text>
           </View>
         )}
-        <PatientProfile
-          userData={userData}
-          actionButtons={<ActionButtons navigation={navigation} />}
-        />
-        <View style={styles.contentRow}>
-          <AppointmentsContainer
-            userData={userData}
-            appointments={appointments}
-            diagnoses={diagnoses}
-            prescriptions={prescriptions}
-            medicalTests={medicalTests}
-            medicalHistory={medicalHistory}
-            surgeryHistory={surgeryHistory}
-            allergies={allergies}
-          />
-        </View>
-      </>
-    );
-  };
-
-  return <View style={styles.container}>{renderContent()}</View>;
+      </View>
+    </View>
+  );
 }
