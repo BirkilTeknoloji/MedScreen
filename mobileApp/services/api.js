@@ -99,7 +99,7 @@ export const getPatientData = async id => {
     return null;
   }
 };
-export const getFirstPatient = async () => {
+export const getFirstPatient = async hastaId => {
   const token = await AsyncStorage.getItem('userToken');
 
   if (!token) {
@@ -108,9 +108,7 @@ export const getFirstPatient = async () => {
   }
 
   try {
-    const url = `${BASE_API_URL}/patients`;
-    console.log('İlk hasta isteniyor:', url);
-
+    const url = `${BASE_API_URL}/hasta/${hastaId}`;
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -126,16 +124,20 @@ export const getFirstPatient = async () => {
 
     const responseJson = await response.json();
 
-    if (
-      responseJson.success &&
-      Array.isArray(responseJson.data) &&
-      responseJson.data.length > 0
-    ) {
-      const firstPatient = responseJson.data[0];
-      console.log('İlk hasta başarıyla çekildi:', firstPatient.first_name);
-      return firstPatient;
+    // Düzeltilen kontrol mantığı:
+    if (responseJson.success && responseJson.data) {
+      const patient = responseJson.data;
+
+      // JSON örneğinize göre ad alanı "ad", soyadı "soyadi" olarak görünüyor.
+      // Log kısmını da buna göre güncelledik.
+      console.log('Hasta başarıyla çekildi:', patient.ad, patient.soyadi);
+
+      return patient;
     } else {
-      console.warn('Liste boş veya beklenen formatta değil.', responseJson);
+      console.warn(
+        'Veri beklenen formatta değil veya bulunamadı.',
+        responseJson,
+      );
       return null;
     }
   } catch (error) {

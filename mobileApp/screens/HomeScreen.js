@@ -1,7 +1,18 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Alert,
+} from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
+import {
+  Camera,
+  useCameraDevice,
+  useCodeScanner,
+} from 'react-native-vision-camera';
 import {
   sendRfidToBackend,
   startNfcReading,
@@ -62,64 +73,66 @@ export default function HomeScreen() {
   const [qrCameraPermission, setQrCameraPermission] = useState(false);
   const isProcessingRef = useRef(false);
   const [userData, setUserData] = useState(null);
-  
+
   // Try back camera first, fallback to front if not available
   let device = useCameraDevice('back');
   if (!device) {
     device = useCameraDevice('front');
   }
 
-  const handleTagDiscovered = async (tag) => {
-    if (isProcessingRef.current) {
-      console.warn('Tag işlemi zaten devam ediyor...');
-      return;
-    }
+  const handleTagDiscovered = async tag => {
+    if (isProcessingRef.current) return;
     isProcessingRef.current = true;
 
     try {
-      console.log("🔐 Kart okundu, backend'e soruluyor...");
-      const backendResponse = await sendRfidToBackend(tag.id || JSON.stringify(tag.id));
+      // tag.id bazen obje (Android) bazen string dönebilir, garantiye alıyoruz
+      const tagId =
+        typeof tag.id === 'object'
+          ? tag.id.id || JSON.stringify(tag.id)
+          : tag.id;
 
-      console.log('HomeScreen NFC Cevabı:', backendResponse);
+      const backendResponse = await sendRfidToBackend(tagId);
 
-      if (backendResponse && backendResponse.success && backendResponse.token && backendResponse.user) {
-        const toast = showSuccessToast('✅ Giriş başarılı, yönlendiriliyorsunuz...');
+      if (backendResponse && backendResponse.success) {
+        const personel = backendResponse.personel || backendResponse.user;
+
+        // API'den gelen alan adlarını normalize ediyoruz
+        const firstName = personel.AD || personel.ad || personel.first_name;
+        const lastName =
+          personel.SOYADI || personel.soyadi || personel.last_name;
+        const role = personel.GOREV || personel.gorev || personel.role;
+        const pKod = personel.KODU || personel.kod || personel.personel_kod;
+
+        const toast = showSuccessToast(
+          `✅ Hoş geldiniz ${firstName} ${lastName}!`,
+        );
 
         setTimeout(() => {
           Toast.hide(toast);
-          
-          try {
-            const user = backendResponse.user;
-            console.log('Kullanıcı login başarılı:', user.first_name, user.last_name);
 
-            navigation.navigate('PatientScreen', { 
-              isPatientLogin: false,
-              doctorData: user 
-            });
-            console.log('✅ Navigation başarılı');
-
-          } catch (navError) {
-            console.error('❌ Navigation hatası:', navError);
-            showErrorToast('❌ Sayfa yönlendirme hatası.');
-            isProcessingRef.current = false;
-          }
-        }, 1000);
-
+          // PatientScreen'e yönlendirme
+          navigation.navigate('PatientScreen', {
+            isPatientLogin: false,
+            doctorData: {
+              ...personel,
+              AD: firstName,
+              SOYADI: lastName,
+              GOREV: role,
+              KODU: pKod,
+            },
+            // Eğer QR/NFC ile bir hasta bilgisi de geldiyse (NFC karta hasta atanmışsa)
+            isQrNavigation: true,
+            qrTokenType: 'NFC_CARD',
+            qrTokenData: { patient_id: 'H0001' }, // Burada normalde result'dan gelen hasta kodu olmalı
+          });
+        }, 1500);
       } else {
-        console.warn("❌ Giriş Başarısız. Backend Cevabı:", backendResponse);
-        showErrorToast('❌ Giriş başarısız: Kart tanımlı değil veya sistem hatası.');
-        
-        setTimeout(() => {
-          isProcessingRef.current = false;
-        }, 3000);
-      }
-
-    } catch (error) {
-      console.error('❌ Tag işleme hatası:', error);
-      showErrorToast('❌ NFC işleminde hata oluştu: ' + error.message);
-      setTimeout(() => {
+        showErrorToast('❌ Giriş başarısız: Kart tanımlı değil.');
         isProcessingRef.current = false;
-      }, 3000);
+      }
+    } catch (error) {
+      showErrorToast('❌ NFC Hatası: ' + error.message);
+      isProcessingRef.current = false;
     }
   };
 
@@ -128,7 +141,7 @@ export default function HomeScreen() {
     React.useCallback(() => {
       startNfcReading(handleTagDiscovered, setIsReading);
       setUserData(null);
-      
+
       return () => {
         stopNfcReading(setIsReading, isProcessingRef);
       };
@@ -136,15 +149,20 @@ export default function HomeScreen() {
   );
 
   // --- QR Scanner Handler ---
-  const handleQrScan = async (codes) => {
+  const handleQrScan = async codes => {
     if (codes.length > 0 && qrScanning) {
       const qrValue = codes[0].value;
       setQrScanning(false);
       console.log('QR scanned from HomeScreen:', qrValue);
 
       try {
-        const userToken = require('@react-native-async-storage/async-storage').default.getItem('userToken');
-        const parseResult = await parseQrCode(qrValue);
+        const AsyncStorage =
+          require('@react-native-async-storage/async-storage').default;
+        const userToken = await AsyncStorage.getItem('userToken');
+
+        // YENİ: QR parse işlemi - backend'inizde varsa kullanın
+        // Yoksa bu kısmı backend'inize göre düzenlemeniz gerekebilir
+        const parseResult = await parseQrCode(qrValue, userToken);
 
         if (!parseResult) {
           Alert.alert('Hata', 'QR token doğrulanamadı.');
@@ -160,8 +178,13 @@ export default function HomeScreen() {
         }
 
         // Handle prescription_info token
-        if (parseResult.tokenType === 'prescription_info' && parseResult.data?.patient_id) {
-          console.log('Prescription info token detected, navigating to PatientScreen with QR data');
+        if (
+          parseResult.tokenType === 'prescription_info' &&
+          parseResult.data?.patient_id
+        ) {
+          console.log(
+            'Prescription info token detected, navigating to PatientScreen with QR data',
+          );
           setQrModalVisible(false);
           navigation.navigate('PatientScreen', {
             qrTokenData: parseResult.data,
@@ -172,8 +195,13 @@ export default function HomeScreen() {
         }
 
         // Handle patient_assignment token
-        if (parseResult.tokenType === 'patient_assignment' && parseResult.data?.patient_id) {
-          console.log('Patient assignment token detected, navigating to PatientScreen with QR data');
+        if (
+          parseResult.tokenType === 'patient_assignment' &&
+          parseResult.data?.patient_id
+        ) {
+          console.log(
+            'Patient assignment token detected, navigating to PatientScreen with QR data',
+          );
           setQrModalVisible(false);
           navigation.navigate('PatientScreen', {
             qrTokenData: parseResult.data,
@@ -184,7 +212,10 @@ export default function HomeScreen() {
         }
 
         // Generic token_validated
-        if (parseResult.type === 'token_validated' && parseResult.data?.patient_id) {
+        if (
+          parseResult.type === 'token_validated' &&
+          parseResult.data?.patient_id
+        ) {
           setQrModalVisible(false);
           navigation.navigate('PatientScreen', {
             qrTokenData: parseResult.data,
@@ -194,7 +225,10 @@ export default function HomeScreen() {
           return;
         }
 
-        Alert.alert('Bilgi', 'QR token başarıyla doğrulandı ancak hasta verisi bulunamadı.');
+        Alert.alert(
+          'Bilgi',
+          'QR token başarıyla doğrulandı ancak hasta verisi bulunamadı.',
+        );
         setQrScanning(true);
       } catch (error) {
         console.error('QR scan error:', error);
@@ -218,7 +252,10 @@ export default function HomeScreen() {
         setQrScanning(true);
         setQrModalVisible(true);
       } else {
-        Alert.alert('Hata', 'Kamera izni gerekli. Lütfen uygulama ayarlarından izin verin.');
+        Alert.alert(
+          'Hata',
+          'Kamera izni gerekli. Lütfen uygulama ayarlarından izin verin.',
+        );
       }
     } catch (error) {
       console.error('Camera permission error:', error);
@@ -237,18 +274,25 @@ export default function HomeScreen() {
       </Text>
 
       {/* QR Scanner Button */}
-      <TouchableOpacity 
-        style={{ 
-          marginTop: 20, 
-          paddingHorizontal: 16, 
-          paddingVertical: 12, 
-          backgroundColor: '#2196F3', 
+      <TouchableOpacity
+        style={{
+          marginTop: 20,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          backgroundColor: '#2196F3',
           borderRadius: 8,
-          alignSelf: 'center'
+          alignSelf: 'center',
         }}
         onPress={openQrScanner}
       >
-        <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>
+        <Text
+          style={{
+            color: 'white',
+            fontSize: 16,
+            fontWeight: 'bold',
+            textAlign: 'center',
+          }}
+        >
           📱 QR Kod Tara
         </Text>
       </TouchableOpacity>
@@ -272,8 +316,16 @@ export default function HomeScreen() {
               codeScanner={qrScanning ? codeScanner : undefined}
             />
           ) : (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ color: '#fff', fontSize: 16, textAlign: 'center' }}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                style={{ color: '#fff', fontSize: 16, textAlign: 'center' }}
+              >
                 {!device ? 'Kamera bulunamadı' : 'İzin bekleniyor...'}
               </Text>
             </View>
@@ -296,7 +348,14 @@ export default function HomeScreen() {
               setQrScanning(false);
             }}
           >
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold', textAlign: 'center' }}>
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 16,
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}
+            >
               Kapat
             </Text>
           </TouchableOpacity>

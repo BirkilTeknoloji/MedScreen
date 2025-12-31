@@ -50,84 +50,63 @@ const AppointmentsDetail = ({ visible, appointment, onClose }) => {
               <Icon name="close" size={24} color="#6B7280" />
             </TouchableOpacity>
           </View>
-
+          // AppointmentsDetail.js içindeki InfoRow ve UserCard kısımlarını
+          güncelleyin:
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            <Text style={styles.sectionTitle}>Randevu Bilgileri</Text>
+            <Text style={styles.sectionTitle}>Başvuru Bilgileri</Text>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-              }}
-            >
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
               <InfoRow
                 style={{ width: '48%' }}
                 icon="calendar-blank-outline"
-                label="Tarih"
-                value={formatDate(appointment.appointment_date)}
+                label="Kabul Tarihi"
+                // API: hasta_kabul_zamani
+                value={formatDate(appointment.hasta_kabul_zamani)}
               />
 
               <InfoRow
                 style={{ width: '48%' }}
                 icon="clock-time-four-outline"
-                label="Saat"
-                value={formatTime(appointment.appointment_date)}
+                label="Kabul Saati"
+                // API: hasta_kabul_zamani
+                value={formatTime(appointment.hasta_kabul_zamani)}
               />
 
-              {appointment.duration_minutes && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="timer-outline"
-                  label="Süre"
-                  value={`${appointment.duration_minutes} dakika`}
-                />
-              )}
-
-              {appointment.appointment_type && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="medical-bag"
-                  label="Randevu Türü"
-                  value={appointment.appointment_type}
-                />
-              )}
+              <InfoRow
+                style={{ width: '48%' }}
+                icon="identifier"
+                label="Protokol No"
+                // API: basvuru_protokol_numarasi
+                value={appointment.basvuru_protokol_numarasi}
+              />
 
               <InfoRow
-                style={{ width: '100%' }}
-                icon="text-subject"
-                label="Sebep"
-                value={appointment.reason || 'Belirtilmemiş'}
+                style={{ width: '48%' }}
+                icon="alert-circle-outline"
+                label="Hayati Tehlike"
+                // API: hayati_tehlike_durumu
+                value={appointment.hayati_tehlike_durumu}
               />
             </View>
 
-            {appointment.notes && (
-              <View style={styles.notesSection}>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Notlar</Text>
-                <View style={styles.notesContainer}>
-                  <Icon
-                    name="note-text"
-                    size={20}
-                    color="#2563EB"
-                    style={styles.notesIcon}
-                  />
-                  <Text style={styles.notesText}>{appointment.notes}</Text>
-                </View>
-              </View>
-            )}
-
-            {appointment.doctor && (
+            {/* Hekim Bilgisi Bölümü */}
+            {appointment.hekim && (
               <View>
                 <View style={styles.divider} />
                 <UserCard
                   icon="doctor"
-                  name={`Dr. ${appointment.doctor.first_name} ${appointment.doctor.last_name}`}
-                  role={appointment.doctor.specialization}
+                  name={`Dr. ${appointment.hekim.ad} ${appointment.hekim.soyadi}`}
+                  // API: personel_gorev_kodu (Örn: HEKIM)
+                  role={appointment.hekim.personel_gorev_kodu}
                 />
+                <Text
+                  style={{ fontSize: 12, color: '#6B7280', marginLeft: 65 }}
+                >
+                  Branş Kodu: {appointment.hekim.medula_brans_kodu}
+                </Text>
               </View>
             )}
           </ScrollView>
-
           <View style={styles.footer}>
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
               <Text style={styles.cancelButtonText}>Kapat</Text>

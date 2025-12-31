@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/DetailModalStyle';
 import InfoRow from '../InfoRow';
@@ -17,41 +10,20 @@ const AllergiesDetail = ({ visible, allergy, onClose }) => {
 
   const formatDate = dateString => {
     if (!dateString) return 'Tarih belirtilmemiş';
-    return new Date(dateString).toLocaleDateString('tr-TR');
+    return new Date(dateString).toLocaleDateString('tr-TR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
   };
 
-  // Şiddete göre renk ve metin ayarları
-  const getSeverityConfig = severity => {
-    switch (severity) {
-      case 'severe':
-        return { color: '#DC2626', bg: '#FEE2E2', text: 'Şiddetli' }; // Kırmızı
-      case 'moderate':
-        return { color: '#D97706', bg: '#FEF3C7', text: 'Orta' }; // Turuncu
-      case 'mild':
-        return { color: '#059669', bg: '#D1FAE5', text: 'Hafif' }; // Yeşil
-      default:
-        return {
-          color: '#4B5563',
-          bg: '#F3F4F6',
-          text: severity || 'Belirtilmemiş',
-        }; // Gri
-    }
+  // API'den gelen veriye göre şiddet tespiti (Varsayılan olarak 'moderate' aldık)
+  const getSeverityConfig = () => {
+    // Eğer API'den şiddet bilgisi gelmiyorsa alerji her zaman kritiktir
+    return { color: '#DC2626', bg: '#FEE2E2' };
   };
 
-  const getAllergyTypeText = type => {
-    switch (type) {
-      case 'medication':
-        return 'İlaç Alerjisi';
-      case 'food':
-        return 'Gıda Alerjisi';
-      case 'environmental':
-        return 'Çevresel Alerji';
-      default:
-        return type;
-    }
-  };
-
-  const severityInfo = getSeverityConfig(allergy.severity);
+  const severityInfo = getSeverityConfig();
 
   return (
     <Modal
@@ -65,19 +37,10 @@ const AllergiesDetail = ({ visible, allergy, onClose }) => {
           {/* --- HEADER --- */}
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.title}>{allergy.allergen}</Text>
-              <View
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: severityInfo.bg },
-                ]}
-              >
-                <Text
-                  style={[styles.statusText, { color: severityInfo.color }]}
-                >
-                  {severityInfo.text}
-                </Text>
-              </View>
+              {/* API: tibbi_bilgi_alt_turu_kodu (Örn: PENISILIN) */}
+              <Text style={styles.title}>
+                {allergy.tibbi_bilgi_alt_turu_kodu || 'Bilinmeyen Alerjen'}
+              </Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Icon name="close" size={24} color="#6B7280" />
@@ -97,24 +60,30 @@ const AllergiesDetail = ({ visible, allergy, onClose }) => {
               <InfoRow
                 style={{ width: '48%' }}
                 icon="tag-outline"
-                label="Alerji Türü"
-                value={getAllergyTypeText(allergy.allergy_type)}
+                label="Kategori"
+                // API: tibbi_bilgi_turu_kodu (Örn: ALERJI)
+                value={
+                  allergy.tibbi_bilgi_turu_kodu === 'ALERJI'
+                    ? 'Tıbbi Alerji'
+                    : 'Diğer'
+                }
               />
 
               <InfoRow
                 style={{ width: '48%' }}
                 icon="calendar-blank-outline"
-                label="Tanı Tarihi"
-                value={formatDate(allergy.diagnosed_date)}
+                label="Kayıt Tarihi"
+                // API: kayit_zamani
+                value={formatDate(allergy.kayit_zamani)}
               />
             </View>
 
-            {/* --- REAKSİYON (Önemli - Kırmızı Kutu) --- */}
-            {allergy.reaction && (
+            {/* --- AÇIKLAMA VE REAKSİYON (Önemli - Kırmızı Kutu) --- */}
+            {allergy.aciklama && (
               <View style={styles.notesSection}>
                 <View style={styles.divider} />
                 <Text style={[styles.sectionTitle, { color: '#DC2626' }]}>
-                  Reaksiyon
+                  Açıklama ve Reaksiyon
                 </Text>
                 <View
                   style={[
@@ -129,41 +98,31 @@ const AllergiesDetail = ({ visible, allergy, onClose }) => {
                     style={styles.notesIcon}
                   />
                   <Text style={[styles.notesText, { color: '#7F1D1D' }]}>
-                    {allergy.reaction}
+                    {allergy.aciklama}
                   </Text>
                 </View>
               </View>
             )}
 
-            {/* --- NOTLAR (Mavi Kutu) --- */}
-            {allergy.notes && (
-              <View style={styles.notesSection}>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Notlar</Text>
-                <View style={styles.notesContainer}>
-                  <Icon
-                    name="note-text-outline"
-                    size={20}
-                    color="#2563EB"
-                    style={styles.notesIcon}
-                  />
-                  <Text style={styles.notesText}>{allergy.notes}</Text>
-                </View>
-              </View>
-            )}
-
-            {/* --- DOKTOR KARTI --- */}
-            {allergy.added_by_doctor && (
+            {/* --- EKLEYEN HEKİM --- */}
+            {allergy.hekim && (
               <View>
                 <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Ekleyen Doktor</Text>
+                <Text style={styles.sectionTitle}>Ekleyen Hekim</Text>
                 <UserCard
                   icon="doctor"
-                  name={`Dr. ${allergy.added_by_doctor.first_name} ${allergy.added_by_doctor.last_name}`}
-                  role="Doktor"
+                  name={`Dr. ${allergy.hekim.ad} ${allergy.hekim.soyadi}`}
+                  role={allergy.hekim.personel_gorev_kodu || 'Hekim'}
                 />
               </View>
             )}
+
+            {/* --- HASTA BİLGİSİ (Alt Bilgi) --- */}
+            <View style={{ marginTop: 20, opacity: 0.6 }}>
+              <Text style={{ fontSize: 12 }}>
+                Bilgi Kodu: {allergy.hasta_tibbi_bilgi_kodu}
+              </Text>
+            </View>
           </ScrollView>
 
           {/* --- FOOTER --- */}

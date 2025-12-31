@@ -14,8 +14,8 @@ export default function PatientProfile({ userData, actionButtons }) {
 
     return `${day}.${month}.${year}`;
   };
-  const userBd = formatDate(userData.birth_date);
-  const created = formatDate(userData.CreatedAt);
+  const userBd = formatDate(userData.dogum_tarihi);
+  const created = formatDate(userData.kayit_zamani);
 
   // Yaşı hesapla
   const calculateAge = birthDate => {
@@ -36,8 +36,8 @@ export default function PatientProfile({ userData, actionButtons }) {
 
   // Cinsiyete göre icon seç
   const isFemale =
-    userData.gender?.toLowerCase() === 'female' ||
-    userData.gender?.toLowerCase() === 'kadın';
+    userData.cinsiyet?.toLowerCase() === 'K' ||
+    userData.gender?.toLowerCase() === 'Kadın';
   const genderIcon = isFemale ? 'face-woman' : 'face-man';
   const genderColor = isFemale ? '#E91E63' : '#2196F3';
 
@@ -63,9 +63,9 @@ export default function PatientProfile({ userData, actionButtons }) {
             <View style={styles.container}>
               <View>
                 <Text style={styles.textName}>
-                  {userData.first_name} {userData.last_name}
+                  {userData.ad} {userData.soyadi}
                 </Text>
-                <Text>Hasta TC: {userData.tc_number}</Text>
+                <Text>Hasta TC: {userData.tc_kimlik_numarasi}</Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -79,24 +79,24 @@ export default function PatientProfile({ userData, actionButtons }) {
               </View>
               <View>
                 <Text style={styles.infoText}>Cinsiyet</Text>
-                <Text style={styles.infoText2}>{userData.gender}</Text>
+                <Text style={styles.infoText2}>{userData.cinsiyet}</Text>
               </View>
               <View>
                 <Text style={styles.infoText}>Kan Grubu</Text>
-                <Text style={styles.infoText2}>{userData.blood_type}</Text>
+                <Text style={styles.infoText2}>{userData.kan_grubu}</Text>
               </View>
               <View>
                 <Text style={styles.infoText}>Boy(cm)</Text>
-                <Text style={styles.infoText2}>{userData.height}</Text>
+                <Text style={styles.infoText2}>170</Text>
               </View>
               <View>
                 <Text style={styles.infoText}>Kilo(kg)</Text>
-                <Text style={styles.infoText2}>{userData.weight}</Text>
+                <Text style={styles.infoText2}>70</Text>
               </View>
             </View>
           </View>
         </View>
-        <View style={styles.row}>
+        {/* <View style={styles.row}>
           <UserDataCom
             title="Doktor İletişim Bilgileri"
             name={
@@ -116,21 +116,21 @@ export default function PatientProfile({ userData, actionButtons }) {
             bgColor={'#ffb3b0ff'}
           />
           <View style={{ alignItems: 'flex-end' }}>{actionButtons}</View>
-        </View>
+        </View> */}
       </View>
       <View style={styles.line}></View>
       <View style={styles.profilePerson}>
         <View>
           <Text style={styles.infoText}>Telefon Numarası</Text>
-          <Text style={styles.infoText2}>{userData.phone}</Text>
+          <Text style={styles.infoText2}>"5555555555"</Text>
         </View>
         <View>
           <Text style={styles.infoText}>Email Adresi</Text>
-          <Text style={styles.infoText2}>{userData.email}</Text>
+          <Text style={styles.infoText2}>deneme@mail.com</Text>
         </View>
         <View>
           <Text style={styles.infoText}>Adres</Text>
-          <Text style={styles.infoText2}>{userData.address}</Text>
+          <Text style={styles.infoText2}>adres</Text>
         </View>
       </View>
     </View>

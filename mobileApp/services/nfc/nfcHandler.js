@@ -1,157 +1,102 @@
 import NfcManager, { NfcEvents } from 'react-native-nfc-manager';
-import { BASE_API_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// nfcHandler.js (veya ilgili dosya)
-
 export async function sendRfidToBackend(tagId) {
-  const url = `${BASE_API_URL}/nfc-cards/authenticate`;
+  // IP adresini apiService.js ile aynı tutmaya özen göster
+  const url = `http://192.168.1.101:8080/api/v1/nfc-kart/authenticate/${tagId}`;
 
   try {
-    console.log('🔍 NFC tag ID received:', tagId);
-    console.log('🔍 Tag type:', typeof tagId);
-    if (typeof tagId === 'object') {
-      console.log('🔍 Tag object:', JSON.stringify(tagId, null, 2));
-    }
-    console.log('📡 NFC authenticate isteği gönderiliyor:', url);
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({ card_uid: tagId }),
-    });
+    console.log('📡 NFC authenticate isteği:', url);
 
-    console.log('NFC response status:', response.status);
-
-    if (!response.ok) {
-      console.error('NFC Backend error:', response.status);
-      const errorText = await response.text();
-      console.error('Error response:', errorText);
-      return null;
-    }
-
-    const resJson = await response.json();
-    console.log('NFC response data:', resJson);
-
-    // backendV2 response format: { success: true, code: "SUCCESS_NFC_AUTHENTICATION", message: "...", data: { user: {...}, token: "..." } }
-    const data = resJson.data || resJson;
-    const token = data.token || resJson.token;
-    const user = data.user || resJson.user;
-
-    if (token && user) {
-      try {
-        console.log(
-          '✅ Token bulundu, hafızaya kaydediliyor:',
-          token.substring(0, 10) + '...',
-        );
-        await AsyncStorage.setItem('userToken', token);
-        await AsyncStorage.setItem('userInfo', JSON.stringify(user));
-
-        // Persist user roles separately for quick checks in the UI
-        // Backend may provide roles as `roles` (array) or `role` (single string)
-        try {
-          console.log(
-            '🔍 User object for role extraction:',
-            JSON.stringify(user, null, 2),
-          );
-          console.log('🔍 user.role value:', user.role);
-          console.log('🔍 user.roles value:', user.roles);
-          console.log('🔍 user.Role value:', user.Role);
-
-          const roles =
-            user.roles ||
-            (user.role ? [user.role] : user.Role ? [user.Role] : []);
-          await AsyncStorage.setItem('userRoles', JSON.stringify(roles));
-          console.log('✅ User roles saved:', roles);
-        } catch (e) {
-          console.warn('Could not persist user roles:', e);
-        }
-
-        // Device MAC'i AsyncStorage'a kaydet (QR token atama için)
-        if (user.id) {
-          const deviceMac = await getDeviceMacFromBackend(user.id, token);
-          if (deviceMac) {
-            await AsyncStorage.setItem('device_mac', deviceMac);
-            console.log('Device MAC kaydedildi:', deviceMac);
-          }
-        }
-
-        return {
-          success: true,
-          token: token,
-          user: user,
-          originalData: resJson,
-        };
-      } catch (e) {
-        console.error('Token/User kaydetme hatası:', e);
-        return null;
-      }
-    } else {
-      console.warn('⚠️ Yanıtta Token veya User bulunamadı!', resJson);
-      return null;
-    }
-  } catch (error) {
-    console.error('NFC Network request failed:', error.message);
-    return null;
-  }
-}
-
-// Helper: Device MAC'i backend'den al
-async function getDeviceMacFromBackend(userId, token) {
-  try {
-    // Bu endpoint'i backend'e eklemek gerekebilir
-    // Şu an için cihazların genel listesinden ilkini al
-    const url = `${BASE_API_URL}/devices`;
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
       },
     });
 
-    if (!response.ok) {
-      console.warn('Device listesi alınamadı');
-      return null;
-    }
+    if (!response.ok) return null;
 
     const resJson = await response.json();
-    const devices = resJson.data || resJson;
+    const data = resJson.data;
+    const token = data?.token;
+    const personel = data?.personel;
 
-    if (Array.isArray(devices) && devices.length > 0) {
-      return devices[0].mac_address;
+    if (token && personel) {
+      // ÖNEMLİ: apiService.js 'auth_token' beklediği için burayı güncelledik
+      await AsyncStorage.setItem('auth_token', token);
+      await AsyncStorage.setItem('userInfo', JSON.stringify(personel));
+
+      if (personel.kod) {
+        await AsyncStorage.setItem('personel_kod', personel.kod);
+      }
+
+      console.log('✅ Giriş başarılı, token kaydedildi.');
+
+      return {
+        success: true,
+        token: token,
+        personel: personel,
+      };
     }
-
     return null;
   } catch (error) {
-    console.error('Device MAC alınamadı:', error);
+    console.error('NFC Network hatası:', error.message);
     return null;
   }
 }
 
-// Aşağıdaki fonksiyonlarda bir değişiklik gerekmiyor, standart NFC yönetimi
+// BAŞLATMA FONKSİYONU - DÜZELTİLMİŞ
+// nfcHandler.js
+
 export async function startNfcReading(handleTagDiscovered, setIsReading) {
   try {
+    // 1. Durumu güncelle
     setIsReading(true);
 
-    await NfcManager.start();
+    // 2. Önce donanımı başlatmayı dene (Eğer App.js'de başarısız olduysa burada tekrar dener)
+    try {
+      await NfcManager.start();
+    } catch (e) {
+      // "Already started" veya "Activity" hatası gelirse burada yutuyoruz çünkü
+      // bazen donanım arka planda hazır olsa da hata dönebilir.
+      console.log('NFC Start bypass:', e.message);
+    }
+
+    // 3. Mevcut dinleyicileri temizle (Önemli: Çakışmaları önler)
+    await NfcManager.unregisterTagEvent().catch(() => {});
+    NfcManager.setEventListener(NfcEvents.DiscoverTag, null);
+
+    // 4. Yeni dinleyiciyi bağla
     NfcManager.setEventListener(NfcEvents.DiscoverTag, handleTagDiscovered);
+
+    // 5. Okumayı başlat
     await NfcManager.registerTagEvent();
+    console.log('📡 NFC Okuma moduna girildi.');
   } catch (error) {
     setIsReading(false);
-    console.error('NFC başlatma hatası:', error);
+    console.error('NFC Kayıt Hatası:', error);
+    // Kullanıcıya activity hatası hakkında bilgi verebilirsin
+    if (error.toString().includes('current activity')) {
+      console.warn(
+        'Uygulama henüz hazır değil, lütfen bir saniye sonra tekrar deneyin.',
+      );
+    }
   }
 }
-
 export async function stopNfcReading(setIsReading, isProcessingRef) {
   try {
     setIsReading(false);
     if (isProcessingRef) isProcessingRef.current = false;
+
+    // Event listener'ı kaldır
     NfcManager.setEventListener(NfcEvents.DiscoverTag, null);
-    await NfcManager.unregisterTagEvent().catch(() => {});
+
+    // Kaydı iptal et
+    await NfcManager.unregisterTagEvent();
+    console.log('🛑 NFC Durduruldu.');
   } catch (error) {
-    console.error('NFC durdurma hatası:', error);
+    // Genellikle zaten durmuşsa hata verir, sessizce geçebiliriz
   }
 }

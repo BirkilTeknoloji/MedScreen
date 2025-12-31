@@ -31,9 +31,6 @@ const SurgeryHistoryDetail = ({ visible, surgeryHistory, onClose }) => {
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>Ameliyat Geçmişi Detayı</Text>
-              <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>Tamamlandı</Text>
-              </View>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Icon name="close" size={24} color="#6B7280" />
@@ -54,14 +51,16 @@ const SurgeryHistoryDetail = ({ visible, surgeryHistory, onClose }) => {
                 style={{ width: '48%' }}
                 icon="medical-bag"
                 label="Ameliyat Adı"
-                value={surgeryHistory.procedure_name || 'Belirtilmemiş'}
+                value={
+                  surgeryHistory.tibbi_bilgi_alt_turu_kodu || 'Belirtilmemiş'
+                }
               />
 
               <InfoRow
                 style={{ width: '48%' }}
                 icon="calendar-blank-outline"
                 label="Ameliyat Tarihi"
-                value={formatDate(surgeryHistory.surgery_date)}
+                value={formatDate(surgeryHistory.kayit_zamani)}
               />
 
               {surgeryHistory.surgeon_name && (
@@ -108,13 +107,13 @@ const SurgeryHistoryDetail = ({ visible, surgeryHistory, onClose }) => {
                 <View
                   style={[
                     styles.notesContainer,
-                    { borderLeftColor: '#DC2626' },
+                    { borderLeftColor: '#2563EB' },
                   ]}
                 >
                   <Icon
                     name="alert-circle"
                     size={20}
-                    color="#DC2626"
+                    color="#2563EB"
                     style={styles.notesIcon}
                   />
                   <Text style={styles.notesText}>
@@ -124,21 +123,33 @@ const SurgeryHistoryDetail = ({ visible, surgeryHistory, onClose }) => {
               </View>
             )}
 
-            {surgeryHistory.notes && (
-              <View style={styles.notesSection}>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Notlar</Text>
-                <View style={styles.notesContainer}>
-                  <Icon
-                    name="note-text"
-                    size={20}
-                    color="#2563EB"
-                    style={styles.notesIcon}
-                  />
-                  <Text style={styles.notesText}>{surgeryHistory.notes}</Text>
-                </View>
+            <View style={[styles.notesSection, { width: '100%' }]}>
+              <View style={styles.divider} />
+              <Text style={[styles.sectionTitle, { color: '#2563EB' }]}>
+                Açıklama ve Reaksiyon
+              </Text>
+
+              <View
+                style={[
+                  styles.notesContainer,
+                  {
+                    borderLeftColor: '#2563EB',
+                    backgroundColor: '#e4ecffff',
+                    width: '100%',
+                  },
+                ]}
+              >
+                <Icon
+                  name="alert-circle-outline"
+                  size={20}
+                  color="#2563EB"
+                  style={styles.notesIcon}
+                />
+                <Text style={[styles.notesText, { color: '#2563EB' }]}>
+                  {surgeryHistory.aciklama || 'Belirtilmemiş'}
+                </Text>
               </View>
-            )}
+            </View>
 
             {surgeryHistory.added_by_doctor && (
               <View>

@@ -1,22 +1,22 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/DetailModalStyle';
 import UserCard from '../UserCard';
 import InfoRow from '../InfoRow';
+
 const DiagnosesDetail = ({ visible, diagnosis, onClose }) => {
   if (!visible || !diagnosis) return null;
 
   const formatDate = dateString => {
     if (!dateString) return 'Tarih belirtilmemiş';
-    return new Date(dateString).toLocaleDateString('tr-TR');
+    return new Date(dateString).toLocaleDateString('tr-TR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
@@ -31,9 +31,27 @@ const DiagnosesDetail = ({ visible, diagnosis, onClose }) => {
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>Tanı Detayı</Text>
-              <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>
-                  {diagnosis.status || 'Aktif'}
+              <View
+                style={[
+                  styles.statusBadge,
+                  {
+                    backgroundColor:
+                      diagnosis.birincil_tani === 1 ? '#EBF5FF' : '#F3F4F6',
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.statusText,
+                    {
+                      color:
+                        diagnosis.birincil_tani === 1 ? '#2563EB' : '#4B5563',
+                    },
+                  ]}
+                >
+                  {diagnosis.birincil_tani === 1
+                    ? 'Birincil Tanı'
+                    : 'Destekleyici Tanı'}
                 </Text>
               </View>
             </View>
@@ -43,7 +61,7 @@ const DiagnosesDetail = ({ visible, diagnosis, onClose }) => {
           </View>
 
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            <Text style={styles.sectionTitle}>Tanı Bilgileri</Text>
+            <Text style={styles.sectionTitle}>Tıbbi Bilgiler</Text>
 
             <View
               style={{
@@ -54,71 +72,46 @@ const DiagnosesDetail = ({ visible, diagnosis, onClose }) => {
             >
               <InfoRow
                 style={{ width: '48%' }}
-                icon="medical-bag"
-                label="Tanı Adı"
-                value={
-                  diagnosis.diagnosis_name || diagnosis.name || 'Belirtilmemiş'
-                }
+                icon="barcode"
+                label="Tanı Kodu"
+                value={diagnosis.tani_kodu || 'N/A'}
               />
 
               <InfoRow
                 style={{ width: '48%' }}
-                icon="calendar-blank-outline"
-                label="Tanı Tarihi"
-                value={formatDate(diagnosis.diagnosis_date || diagnosis.date)}
+                icon="tag-outline"
+                label="Tanı Türü"
+                value={
+                  diagnosis.tani_turu === 'ON_TANI' ? 'Ön Tanı' : 'Kesin Tanı'
+                }
               />
 
-              {diagnosis.icd_code && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="barcode"
-                  label="ICD Kodu"
-                  value={diagnosis.icd_code}
-                />
-              )}
+              <InfoRow
+                style={{ width: '100%' }}
+                icon="calendar-clock"
+                label="Tanı Konulma Zamanı"
+                value={formatDate(diagnosis.tani_zamani)}
+              />
 
-              {diagnosis.severity && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="alert-circle-outline"
-                  label="Şiddet"
-                  value={diagnosis.severity}
-                />
-              )}
-
-              {diagnosis.description && (
-                <InfoRow
-                  style={{ width: '100%' }}
-                  icon="text-subject"
-                  label="Açıklama"
-                  value={diagnosis.description}
-                />
-              )}
+              <InfoRow
+                style={{ width: '100%' }}
+                icon="file-document-outline"
+                label="Başvuru Protokol No"
+                value={
+                  diagnosis.hasta_basvuru?.basvuru_protokol_numarasi || 'N/A'
+                }
+              />
             </View>
 
-            {diagnosis.notes && (
-              <View style={styles.notesSection}>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Notlar</Text>
-                <View style={styles.notesContainer}>
-                  <Icon
-                    name="note-text"
-                    size={20}
-                    color="#2563EB"
-                    style={styles.notesIcon}
-                  />
-                  <Text style={styles.notesText}>{diagnosis.notes}</Text>
-                </View>
-              </View>
-            )}
-
-            {diagnosis.doctor && (
+            {/* Hekim Bilgisi */}
+            {diagnosis.hekim && (
               <View>
                 <View style={styles.divider} />
+                <Text style={styles.sectionTitle}>Tanıyı Koyan Hekim</Text>
                 <UserCard
                   icon="doctor"
-                  name={`Dr. ${diagnosis.doctor.first_name} ${diagnosis.doctor.last_name}`}
-                  role={diagnosis.doctor.specialization}
+                  name={`Dr. ${diagnosis.hekim.ad} ${diagnosis.hekim.soyadi}`}
+                  role={diagnosis.hekim.personel_gorev_kodu || 'Hekim'}
                 />
               </View>
             )}

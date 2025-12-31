@@ -16,12 +16,7 @@ const AppointmentsContainer = ({
 }) => {
   return (
     <View
-      style={{
-        flexDirection: 'row',
-        flex: 1,
-        paddingHorizontal: 10,
-        gap: 10,
-      }}
+      style={{ flexDirection: 'row', flex: 1, paddingHorizontal: 10, gap: 10 }}
     >
       <View style={styles.appointmentContainer}>
         <View
@@ -37,35 +32,28 @@ const AppointmentsContainer = ({
             Randevular & Tetkikler
           </Text>
         </View>
-        <View style={styles.line}></View>
+        <View style={styles.line} />
 
         <ScrollView
           style={{ flex: 1, marginTop: 10 }}
-          showsVerticalScrollIndicator={true}
-          nestedScrollEnabled={true}
+          showsVerticalScrollIndicator
+          nestedScrollEnabled
         >
           <CustomDropdown
             data={appointments}
-            title={'Randevular'}
-            icon={'calendar-clock'}
+            title="Randevular"
+            icon="calendar-clock"
           />
-          <CustomDropdown
-            data={diagnoses}
-            title={'Tanılar'}
-            icon={'stethoscope'}
-          />
-          <CustomDropdown
-            data={prescriptions}
-            title={'İlaçlar'}
-            icon={'pill'}
-          />
+          <CustomDropdown data={diagnoses} title="Tanılar" icon="stethoscope" />
+          <CustomDropdown data={prescriptions} title="Reçeteler" icon="pill" />
           <CustomDropdown
             data={medicalTests}
-            title={'Tetkikler'}
-            icon={'test-tube'}
+            title="Tetkikler"
+            icon="test-tube"
           />
         </ScrollView>
       </View>
+
       <View style={styles.appointmentContainer}>
         <View
           style={{
@@ -80,32 +68,27 @@ const AppointmentsContainer = ({
             Sağlık Geçmişi
           </Text>
         </View>
-        <View style={styles.line}></View>
+        <View style={styles.line} />
 
         <ScrollView
           style={{ flex: 1, marginTop: 10 }}
-          showsVerticalScrollIndicator={true}
-          nestedScrollEnabled={true}
+          showsVerticalScrollIndicator
+          nestedScrollEnabled
         >
           <CustomDropdown
             data={medicalHistory}
-            title={'Tıbbi Geçmiş'}
-            icon={'history'}
+            title="Tıbbi Geçmiş"
+            icon="history"
           />
           <CustomDropdown
             data={surgeryHistory}
-            title={'Ameliyat Geçmişi'}
-            icon={'hospital-box'}
+            title="Ameliyat Geçmişi"
+            icon="hospital-box"
           />
           <CustomDropdown
             data={allergies}
-            title={'Alerjiler'}
-            icon={'alert-circle-outline'}
-          />
-          <CustomDropdown
-            data={userData.Prescriptions}
-            title={'Reçeteler'}
-            icon={'prescription'}
+            title="Alerjiler"
+            icon="alert-circle-outline"
           />
         </ScrollView>
       </View>

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/DetailModalStyle';
 import UserCard from '../UserCard';
@@ -17,7 +10,13 @@ const PrescriptionsDetail = ({ visible, prescription, onClose }) => {
 
   const formatDate = dateString => {
     if (!dateString) return 'Tarih belirtilmemiş';
-    return new Date(dateString).toLocaleDateString('tr-TR');
+    return new Date(dateString).toLocaleDateString('tr-TR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
@@ -31,10 +30,10 @@ const PrescriptionsDetail = ({ visible, prescription, onClose }) => {
         <View style={styles.modalContainer}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>İlaç Detayı</Text>
+              <Text style={styles.title}>Reçete Detayı</Text>
               <View style={styles.statusBadge}>
                 <Text style={styles.statusText}>
-                  {prescription.status || 'Aktif'}
+                  {prescription.recete_turu_kodu || 'NORMAL'}
                 </Text>
               </View>
             </View>
@@ -44,8 +43,8 @@ const PrescriptionsDetail = ({ visible, prescription, onClose }) => {
           </View>
 
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            <Text style={styles.sectionTitle}>İlaç Bilgileri</Text>
-
+            {/* --- Reçete Genel Bilgileri --- */}
+            <Text style={styles.sectionTitle}>Genel Bilgiler</Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -55,84 +54,94 @@ const PrescriptionsDetail = ({ visible, prescription, onClose }) => {
             >
               <InfoRow
                 style={{ width: '48%' }}
-                icon="pill"
-                label="İlaç Adı"
-                value={
-                  prescription.medication_name ||
-                  prescription.name ||
-                  'Belirtilmemiş'
-                }
+                icon="barcode"
+                label="Reçete Kodu"
+                value={prescription.recete_kodu}
               />
-
               <InfoRow
                 style={{ width: '48%' }}
-                icon="calendar-blank-outline"
-                label="Reçete Tarihi"
-                value={formatDate(
-                  prescription.prescribed_date || prescription.date,
-                )}
+                icon="file-document-edit-outline"
+                label="E-Reçete No"
+                value={prescription.medula_e_recete_numarasi || 'N/A'}
               />
-
-              {prescription.dosage && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="medical-bag"
-                  label="Doz"
-                  value={prescription.dosage}
-                />
-              )}
-
-              {prescription.frequency && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="clock-time-four-outline"
-                  label="Kullanım Sıklığı"
-                  value={prescription.frequency}
-                />
-              )}
-
-              {prescription.duration && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="calendar-range"
-                  label="Kullanım Süresi"
-                  value={prescription.duration}
-                />
-              )}
-
-              {prescription.instructions && (
-                <InfoRow
-                  style={{ width: '100%' }}
-                  icon="text-subject"
-                  label="Kullanım Talimatları"
-                  value={prescription.instructions}
-                />
-              )}
+              <InfoRow
+                style={{ width: '100%' }}
+                icon="calendar-clock"
+                label="Reçete Zamanı"
+                value={formatDate(prescription.recete_zamani)}
+              />
             </View>
 
-            {prescription.notes && (
-              <View style={styles.notesSection}>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Notlar</Text>
-                <View style={styles.notesContainer}>
-                  <Icon
-                    name="note-text"
-                    size={20}
-                    color="#2563EB"
-                    style={styles.notesIcon}
-                  />
-                  <Text style={styles.notesText}>{prescription.notes}</Text>
-                </View>
-              </View>
-            )}
+            <View style={styles.divider} />
 
-            {prescription.doctor && (
+            {/* --- İlaç Listesi (Yeni Eklenen Kısım) --- */}
+            <Text style={styles.sectionTitle}>
+              İlaçlar ({prescription.ilaclar?.length || 0})
+            </Text>
+            {prescription.ilaclar &&
+              prescription.ilaclar.map((ilac, index) => (
+                <View
+                  key={index}
+                  style={{
+                    backgroundColor: '#F9FAFB',
+                    padding: 12,
+                    borderRadius: 8,
+                    marginBottom: 10,
+                    borderLeftWidth: 4,
+                    borderLeftColor: '#2563EB',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: 16,
+                      color: '#111827',
+                      marginBottom: 5,
+                    }}
+                  >
+                    {ilac.ilac_adi}
+                  </Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: '#4B5563',
+                        marginRight: 15,
+                      }}
+                    >
+                      💉 Doz: {ilac.ilac_kullanim_dozu} {ilac.doz_birim}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        color: '#4B5563',
+                        marginRight: 15,
+                      }}
+                    >
+                      🕒 Periyot: {ilac.ilac_kullanim_periyodu}{' '}
+                      {ilac.ilac_kullanim_periyodu_birimi}
+                    </Text>
+                    <Text style={{ fontSize: 13, color: '#4B5563' }}>
+                      📦 Adet: {ilac.kutu_adeti}
+                    </Text>
+                  </View>
+                  <Text
+                    style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}
+                  >
+                    📌 Şekil: {ilac.ilac_kullanim_sekli} | Barkod: {ilac.barkod}
+                  </Text>
+                </View>
+              ))}
+
+            {/* --- Hekim Bilgisi --- */}
+            {prescription.hekim && (
               <View>
                 <View style={styles.divider} />
+                <Text style={styles.sectionTitle}>Yazan Hekim</Text>
                 <UserCard
                   icon="doctor"
-                  name={`Dr. ${prescription.doctor.first_name} ${prescription.doctor.last_name}`}
-                  role={prescription.doctor.specialization}
+                  name={`Dr. ${prescription.hekim.ad} ${prescription.hekim.soyadi}`}
+                  role={prescription.hekim.personel_gorev_kodu || 'Hekim'}
                 />
               </View>
             )}

@@ -1,24 +1,68 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/DetailModalStyle';
-import UserCard from '../UserCard';
 import InfoRow from '../InfoRow';
 
 const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
   if (!visible || !medicalTest) return null;
 
   const formatDate = dateString => {
-    if (!dateString) return 'Tarih belirtilmemiş';
-    return new Date(dateString).toLocaleDateString('tr-TR');
+    if (!dateString) return 'Belirtilmemiş';
+    return new Date(dateString).toLocaleDateString('tr-TR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
+
+  // --- Değer Analizi Fonksiyonu ---
+  const analyzeResult = () => {
+    const valueStr = medicalTest.sonuc_degeri; // Örn: "102 mg/dL"
+    const rangeStr = medicalTest.kritik_deger_araligi; // Örn: "70-110 mg/dL"
+
+    if (!valueStr || !rangeStr)
+      return {
+        label: 'Analiz Edilemedi',
+        color: '#6B7280',
+        icon: 'help-circle',
+      };
+
+    // Sayısal değerleri ayıkla
+    const value = parseFloat(valueStr.replace(',', '.'));
+    const ranges = rangeStr
+      .split('-')
+      .map(r => parseFloat(r.replace(',', '.')));
+
+    if (isNaN(value) || ranges.length < 2)
+      return { label: 'Bilinmiyor', color: '#6B7280', icon: 'help-circle' };
+
+    const [min, max] = ranges;
+
+    if (value < min) {
+      return {
+        label: 'Değer Altında (Düşük)',
+        color: '#EF4444',
+        icon: 'arrow-down-bold',
+      };
+    } else if (value > max) {
+      return {
+        label: 'Değer Üstünde (Yüksek)',
+        color: '#EF4444',
+        icon: 'arrow-up-bold',
+      };
+    } else {
+      return {
+        label: 'Değer Aralığında (Normal)',
+        color: '#059669',
+        icon: 'check-circle',
+      };
+    }
+  };
+
+  const analysis = analyzeResult();
 
   return (
     <Modal
@@ -32,9 +76,14 @@ const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>Tetkik Detayı</Text>
-              <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>
-                  {medicalTest.status || 'Planlandı'}
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: analysis.color + '15' },
+                ]}
+              >
+                <Text style={[styles.statusText, { color: analysis.color }]}>
+                  {analysis.label}
                 </Text>
               </View>
             </View>
@@ -44,8 +93,52 @@ const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
           </View>
 
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            <Text style={styles.sectionTitle}>Tetkik Bilgileri</Text>
+            {/* --- Sonuç Paneli (Küçültülmüş ve Renklendirilmiş) --- */}
+            <View
+              style={{
+                backgroundColor: analysis.color + '10',
+                padding: 15,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: analysis.color + '30',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}
+            >
+              <Text
+                style={{ fontSize: 14, color: '#4B5563', fontWeight: '600' }}
+              >
+                {medicalTest.tetkik_adi}
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginVertical: 5,
+                }}
+              >
+                <Icon
+                  name={analysis.icon}
+                  size={20}
+                  color={analysis.color}
+                  style={{ marginRight: 8 }}
+                />
+                <Text
+                  style={{
+                    fontSize: 24,
+                    fontWeight: 'bold',
+                    color: analysis.color,
+                  }}
+                >
+                  {medicalTest.sonuc_degeri}
+                </Text>
+              </View>
+              <Text style={{ fontSize: 13, color: '#6B7280' }}>
+                Referans: {medicalTest.kritik_deger_araligi}
+              </Text>
+            </View>
 
+            <Text style={styles.sectionTitle}>Tetkik Detayları</Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -55,95 +148,49 @@ const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
             >
               <InfoRow
                 style={{ width: '48%' }}
-                icon="test-tube"
-                label="Tetkik Adı"
-                value={medicalTest.test_name || 'Belirtilmemiş'}
+                icon="barcode"
+                label="Kod"
+                value={medicalTest.tetkik_sonuc_kodu}
               />
-
               <InfoRow
                 style={{ width: '48%' }}
-                icon="medical-bag"
-                label="Tetkik Türü"
-                value={medicalTest.test_type || 'Belirtilmemiş'}
+                icon="clock-outline"
+                label="Onay"
+                value={formatDate(medicalTest.onay_zamani)}
               />
-
               <InfoRow
-                style={{ width: '48%' }}
-                icon="calendar-blank-outline"
-                label="İstenme Tarihi"
-                value={formatDate(medicalTest.ordered_date)}
+                style={{ width: '100%' }}
+                icon="file-document-outline"
+                label="Protokol No"
+                value={medicalTest.hasta_basvuru?.basvuru_protokol_numarasi}
               />
-
-              {medicalTest.scheduled_date && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="calendar-clock"
-                  label="Planlanan Tarih"
-                  value={formatDate(medicalTest.scheduled_date)}
-                />
-              )}
-
-              {medicalTest.completed_date && (
-                <InfoRow
-                  style={{ width: '48%' }}
-                  icon="calendar-check"
-                  label="Tamamlanma Tarihi"
-                  value={formatDate(medicalTest.completed_date)}
-                />
-              )}
-
-              {medicalTest.lab_name && (
-                <InfoRow
-                  style={{ width: '100%' }}
-                  icon="hospital-building"
-                  label="Laboratuvar"
-                  value={medicalTest.lab_name}
-                />
-              )}
             </View>
 
-            {medicalTest.results && (
-              <View style={styles.notesSection}>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Sonuçlar</Text>
-                <View style={styles.notesContainer}>
-                  <Icon
-                    name="clipboard-text"
-                    size={20}
-                    color="#059669"
-                    style={styles.notesIcon}
-                  />
-                  <Text style={styles.notesText}>{medicalTest.results}</Text>
-                </View>
-              </View>
-            )}
+            <View style={styles.divider} />
 
-            {medicalTest.notes && (
-              <View style={styles.notesSection}>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Notlar</Text>
-                <View style={styles.notesContainer}>
-                  <Icon
-                    name="note-text"
-                    size={20}
-                    color="#2563EB"
-                    style={styles.notesIcon}
-                  />
-                  <Text style={styles.notesText}>{medicalTest.notes}</Text>
-                </View>
-              </View>
-            )}
-
-            {medicalTest.ordered_by_doctor && (
-              <View>
-                <View style={styles.divider} />
-                <UserCard
-                  icon="doctor"
-                  name={`Dr. ${medicalTest.ordered_by_doctor.first_name} ${medicalTest.ordered_by_doctor.last_name}`}
-                  role={medicalTest.ordered_by_doctor.specialization}
-                />
-              </View>
-            )}
+            <Text style={styles.sectionTitle}>Başvuru Durumu</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+              <InfoRow
+                style={{ width: '100%' }}
+                icon="calendar-import"
+                label="Yatış Zamanı"
+                value={formatDate(
+                  medicalTest.hasta_basvuru?.hasta_kabul_zamani,
+                )}
+              />
+              <InfoRow
+                style={{ width: '48%' }}
+                icon="hospital-marker"
+                label="Birim"
+                value={medicalTest.hasta_basvuru?.basvuru_durumu}
+              />
+              <InfoRow
+                style={{ width: '48%' }}
+                icon="alert-decagram"
+                label="Hayati Tehlike"
+                value={medicalTest.hasta_basvuru?.hayati_tehlike_durumu}
+              />
+            </View>
           </ScrollView>
 
           <View style={styles.footer}>
@@ -156,4 +203,5 @@ const MedicalTestsDetail = ({ visible, medicalTest, onClose }) => {
     </Modal>
   );
 };
+
 export default MedicalTestsDetail;

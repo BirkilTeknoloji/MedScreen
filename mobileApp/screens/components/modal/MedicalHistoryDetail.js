@@ -30,12 +30,7 @@ const MedicalHistoryDetail = ({ visible, medicalHistory, onClose }) => {
         <View style={styles.modalContainer}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>Tıbbi Geçmiş Detayı</Text>
-              <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>
-                  {medicalHistory.status || 'Kayıt'}
-                </Text>
-              </View>
+              <Text style={styles.title}>Tıbbi Geçmişi Detayı</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Icon name="close" size={24} color="#6B7280" />
@@ -43,7 +38,7 @@ const MedicalHistoryDetail = ({ visible, medicalHistory, onClose }) => {
           </View>
 
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            <Text style={styles.sectionTitle}>Geçmiş Bilgileri</Text>
+            <Text style={styles.sectionTitle}>Tıbbi Geçmiş Bilgileri</Text>
 
             <View
               style={{
@@ -55,77 +50,106 @@ const MedicalHistoryDetail = ({ visible, medicalHistory, onClose }) => {
               <InfoRow
                 style={{ width: '48%' }}
                 icon="medical-bag"
-                label="Durum/Hastalık"
-                value={medicalHistory.condition_name || 'Belirtilmemiş'}
+                label="Tanı Adı"
+                value={
+                  medicalHistory.tibbi_bilgi_alt_turu_kodu || 'Belirtilmemiş'
+                }
               />
 
               <InfoRow
                 style={{ width: '48%' }}
                 icon="calendar-blank-outline"
                 label="Tanı Tarihi"
-                value={formatDate(medicalHistory.diagnosed_date)}
+                value={formatDate(medicalHistory.kayit_zamani)}
               />
 
-              {medicalHistory.treatment && (
+              {medicalHistory.surgeon_name && (
                 <InfoRow
                   style={{ width: '48%' }}
-                  icon="pill"
-                  label="Tedavi"
-                  value={medicalHistory.treatment}
+                  icon="account-tie"
+                  label="Cerrah"
+                  value={surgeryHistory.surgeon_name}
                 />
               )}
 
-              {medicalHistory.severity && (
+              {medicalHistory.hospital && (
                 <InfoRow
                   style={{ width: '48%' }}
-                  icon="alert-circle-outline"
-                  label="Şiddet"
-                  value={medicalHistory.severity}
+                  icon="hospital-building"
+                  label="Hastane"
+                  value={surgeryHistory.hospital}
                 />
               )}
 
-              {medicalHistory.outcome && (
+              {medicalHistory.duration && (
                 <InfoRow
-                  style={{ width: '100%' }}
-                  icon="check-circle-outline"
-                  label="Sonuç"
-                  value={medicalHistory.outcome}
+                  style={{ width: '48%' }}
+                  icon="clock-time-four-outline"
+                  label="Süre"
+                  value={`${surgeryHistory.duration} dakika`}
+                />
+              )}
+
+              {medicalHistory.anesthesia_type && (
+                <InfoRow
+                  style={{ width: '48%' }}
+                  icon="needle"
+                  label="Anestezi Türü"
+                  value={surgeryHistory.anesthesia_type}
                 />
               )}
             </View>
 
-            {medicalHistory.family_history && (
+            {medicalHistory.complications && (
               <View style={styles.notesSection}>
                 <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Aile Geçmişi</Text>
-                <View style={styles.notesContainer}>
+                <Text style={styles.sectionTitle}>Komplikasyonlar</Text>
+                <View
+                  style={[
+                    styles.notesContainer,
+                    { borderLeftColor: '#2563EB' },
+                  ]}
+                >
                   <Icon
-                    name="account-group"
-                    size={20}
-                    color="#7C3AED"
-                    style={styles.notesIcon}
-                  />
-                  <Text style={styles.notesText}>
-                    {medicalHistory.family_history}
-                  </Text>
-                </View>
-              </View>
-            )}
-            {medicalHistory.notes && (
-              <View style={styles.notesSection}>
-                <View style={styles.divider} />
-                <Text style={styles.sectionTitle}>Notlar</Text>
-                <View style={styles.notesContainer}>
-                  <Icon
-                    name="note-text"
+                    name="alert-circle"
                     size={20}
                     color="#2563EB"
                     style={styles.notesIcon}
                   />
-                  <Text style={styles.notesText}>{medicalHistory.notes}</Text>
+                  <Text style={styles.notesText}>
+                    {medicalHistory.complications}
+                  </Text>
                 </View>
               </View>
             )}
+
+            <View style={[styles.notesSection, { width: '100%' }]}>
+              <View style={styles.divider} />
+              <Text style={[styles.sectionTitle, { color: '#2563EB' }]}>
+                Açıklama ve Reaksiyon
+              </Text>
+
+              <View
+                style={[
+                  styles.notesContainer,
+                  {
+                    borderLeftColor: '#2563EB',
+                    backgroundColor: '#e4ecffff',
+                    width: '100%',
+                  },
+                ]}
+              >
+                <Icon
+                  name="alert-circle-outline"
+                  size={20}
+                  color="#2563EB"
+                  style={styles.notesIcon}
+                />
+                <Text style={[styles.notesText, { color: '#2563EB' }]}>
+                  {medicalHistory.aciklama || 'Belirtilmemiş'}
+                </Text>
+              </View>
+            </View>
 
             {medicalHistory.added_by_doctor && (
               <View>
@@ -133,7 +157,7 @@ const MedicalHistoryDetail = ({ visible, medicalHistory, onClose }) => {
                 <UserCard
                   icon="doctor"
                   name={`Dr. ${medicalHistory.added_by_doctor.first_name} ${medicalHistory.added_by_doctor.last_name}`}
-                  role={medicalHistory.added_by_doctor.specialization}
+                  role={surgeryHistory.added_by_doctor.specialization}
                 />
               </View>
             )}
