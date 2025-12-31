@@ -85,10 +85,10 @@ const CustomDropdown = ({ data, title, icon }) => {
       case 'Randevular':
         return {
           displayTitle: item.hekim
-            ? `Dr. ${item.hekim.ad} ${item.hekim.soyadi}`
+            ? item.randevu_turu || 'MUAYENE'
             : item.basvuru_protokol_numarasi || 'Başvuru',
-          displayDate: formatDateTime(item.hasta_kabul_zamani),
-          displayStatus: item.basvuru_durumu || 'Beklemede',
+          displayDate: formatDateTime(item.randevu_zamani),
+          displayStatus: item.randevu_kodu,
         };
 
       case 'Tanılar':

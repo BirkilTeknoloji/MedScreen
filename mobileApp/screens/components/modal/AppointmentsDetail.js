@@ -40,18 +40,12 @@ const AppointmentsDetail = ({ visible, appointment, onClose }) => {
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>Randevu Detayı</Text>
-              <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>
-                  {appointment.status || 'Planlandı'}
-                </Text>
-              </View>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Icon name="close" size={24} color="#6B7280" />
             </TouchableOpacity>
           </View>
-          // AppointmentsDetail.js içindeki InfoRow ve UserCard kısımlarını
-          güncelleyin:
+
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <Text style={styles.sectionTitle}>Başvuru Bilgileri</Text>
 
@@ -61,7 +55,7 @@ const AppointmentsDetail = ({ visible, appointment, onClose }) => {
                 icon="calendar-blank-outline"
                 label="Kabul Tarihi"
                 // API: hasta_kabul_zamani
-                value={formatDate(appointment.hasta_kabul_zamani)}
+                value={formatDate(appointment.randevu_zamani)}
               />
 
               <InfoRow
@@ -69,23 +63,7 @@ const AppointmentsDetail = ({ visible, appointment, onClose }) => {
                 icon="clock-time-four-outline"
                 label="Kabul Saati"
                 // API: hasta_kabul_zamani
-                value={formatTime(appointment.hasta_kabul_zamani)}
-              />
-
-              <InfoRow
-                style={{ width: '48%' }}
-                icon="identifier"
-                label="Protokol No"
-                // API: basvuru_protokol_numarasi
-                value={appointment.basvuru_protokol_numarasi}
-              />
-
-              <InfoRow
-                style={{ width: '48%' }}
-                icon="alert-circle-outline"
-                label="Hayati Tehlike"
-                // API: hayati_tehlike_durumu
-                value={appointment.hayati_tehlike_durumu}
+                value={formatTime(appointment.randevu_zamani)}
               />
             </View>
 

@@ -23,10 +23,12 @@ const handleResponse = res => res.data?.data ?? res.data;
 // ==================== HASTA ====================
 export const getPatientById = id =>
   apiClient.get(`/hasta/${id}`).then(handleResponse);
+export const getPatientInfoByPatientId = id =>
+  apiClient.get(`/hasta-basvuru/hasta/${id}`).then(handleResponse);
 
 // ==================== RANDEVU ====================
 export const getAppointmentsByPatientId = id =>
-  apiClient.get(`/hasta-basvuru/hasta/${id}`).then(handleResponse);
+  apiClient.get(`/randevu/hasta/${id}`).then(handleResponse);
 
 // ==================== TANILAR ====================
 export const getDiagnosesByPatientId = id =>
