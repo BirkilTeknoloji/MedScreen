@@ -8,3 +8,25 @@ services:
     envVars:
       - key: GO_VERSION
         value: 1.25.0
+      - key: DB_HOST
+        fromDatabase:
+          name: rest_db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: rest_db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: rest_db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: rest_db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: rest_db
+          property: database
+      - key: DB_SSLMODE
+        value: require
