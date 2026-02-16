@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: medscreen-backend
+    env: go
+    rootDir: backend
+    buildCommand: go build -o server ./cmd/server/main.go
+    startCommand: ./server
+    envVars:
+      - key: GO_VERSION
+        value: 1.25.0
