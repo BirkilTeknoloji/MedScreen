@@ -4,7 +4,7 @@ services:
     env: go
     rootDir: backend
     buildCommand: go build -o server ./cmd/server/main.go
-    startCommand: ./server
+    startCommand: SERVER_PORT=$PORT ./server
     envVars:
       - key: GO_VERSION
         value: 1.25.0
